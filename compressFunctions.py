@@ -12,23 +12,16 @@ from pyNAVIS import *
 def loadCompressedAedat(directory, filePath, settings, verbose=True):
     timeIni = time.time()
 
-    # Check the file
+    # --- Check the filePath ---
     if not os.path.exists(directory + filePath) and verbose:
         print("Unable to find the specified compressed aedat file")
 
-    # Get dataset folder and file name
+    # --- Get dataset folder and file name ---
     splitFilePath = filePath.split('/')
     dataset = splitFilePath[0]
     fileName = splitFilePath[1]
 
-    # Load data from compressed aedat file
-    # Pack and unpack help: https://docs.python.org/3/library/struct.html
-    '''unpack_param = ">B"
-    if addressSize == 2:
-        unpack_param = ">H"
-    elif addressSize > 2:
-        unpack_param = ">L"'''
-
+    # --- Load data from compressed aedat file ---
     file = open(directory + filePath, "rb")
 
     if verbose:
@@ -46,12 +39,6 @@ def loadCompressedAedat(directory, filePath, settings, verbose=True):
 
         addresses.append(int.from_bytes(address, "big"))
         timestamps.append(int.from_bytes(timestamp, "big"))
-
-        '''address = struct.unpack(unpack_param, address)[0]
-        timestamp = struct.unpack(">L", timestamp)[0]
-
-        addresses.append(address)
-        timestamps.append(timestamp)'''
 
         address = file.read(addressSize)
 
@@ -75,17 +62,17 @@ def loadCompressedAedat(directory, filePath, settings, verbose=True):
 def compressAedat(eventsDir, filePath, settings, ignoreOverwrite=True, verbose=True):
     timeIni = time.time()
 
-    # Bytes needed to address representation
+    # --- Get bytes needed to address representation ---
     addressSize = int(round(settings.num_channels * (settings.mono_stereo + 1) *
                             (settings.on_off_both + 1) / 256))
     orgAddressSize = settings.address_size
 
-    # Get dataset folder and file name
+    # --- Get dataset folder and file name ---
     splitFilePath = filePath.split('/')
     dataset = splitFilePath[0]
     fileName = splitFilePath[1]
 
-    # Check the file and destination folder
+    # --- Check the file and destination folder ---
     compressedEventsDir = eventsDir + "../compressedEvents/"
 
     if not ignoreOverwrite:
@@ -107,7 +94,7 @@ def compressAedat(eventsDir, filePath, settings, ignoreOverwrite=True, verbose=T
     if not os.path.exists(compressedEventsDir + dataset):
         os.mkdir(compressedEventsDir + dataset)
 
-    # Load data from original aedat file
+    # --- Load data from original aedat file ---
     if verbose:
         print("Loading " + fileName + " (original aedat file)")
     data = Loaders.loadAEDAT(eventsDir + filePath, settings)
@@ -118,14 +105,7 @@ def compressAedat(eventsDir, filePath, settings, ignoreOverwrite=True, verbose=T
         print("Compressing " + fileName + " with " + str(orgAddressSize) + "-byte addresses into an aedat file with "
               + str(addressSize) + "-byte addresses")
 
-    # Compress and save the data by discarding useless bytes
-    # Pack and unpack help: https://docs.python.org/3/library/struct.html
-    '''pack_param = ">B"
-    if addressSize == 2:
-        pack_param = ">H"
-    elif addressSize > 2:
-        pack_param = ">L"'''
-
+    # --- Compress and save the data by discarding useless bytes ---
     file = open(compressedEventsDir + filePath, "wb")
 
     # IMPORTANT: 1 byte of header
@@ -134,11 +114,6 @@ def compressAedat(eventsDir, filePath, settings, ignoreOverwrite=True, verbose=T
     for i in range(len(addresses) - 1):
         file.write(addresses[i].to_bytes(addressSize, "big"))
         file.write(timestamps[i].to_bytes(4, "big"))
-        '''address = struct.pack(pack_param, addresses[i])
-        timestamp = struct.pack('>L', timestamps[i])
-
-        file.write(address[:addressSize])
-        file.write(timestamp)'''
 
     file.close()
 
