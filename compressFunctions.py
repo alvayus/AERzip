@@ -1,12 +1,8 @@
 import copy
-import math
 import os
 import sys
 import time
-from bisect import bisect_left, bisect_right
 
-import numpy as np
-import matplotlib.pyplot as plt
 import lz4.frame
 import zstandard
 from pyNAVIS import *
