@@ -43,18 +43,19 @@ if __name__ == '__main__':
     print("Showing compressed file plots...")
     timeIni = time.time()
 
-    Plots.spikegram(compressedSpikes_File, newSettings)
+    # TODO: Optimize plots for compressed files
+    Plots.spikegram(compressedSpikes_File, newSettings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.sonogram(compressedSpikes_File, newSettings)
+    Plots.sonogram(compressedSpikes_File, newSettings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.histogram(compressedSpikes_File, newSettings)
+    Plots.histogram(compressedSpikes_File, newSettings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.average_activity(compressedSpikes_File, newSettings)
+    Plots.average_activity(compressedSpikes_File, newSettings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.difference_between_LR(compressedSpikes_File, newSettings)
+    Plots.difference_between_LR(compressedSpikes_File, newSettings, verbose=True)
 
     timeEnd = time.time()
-    print("The generation of the plots generation took " + '{0:.3f}'.format(timeEnd - timeIni) + " seconds")
+    print("Plots generation took " + '{0:.3f}'.format(timeEnd - timeIni) + " seconds")
 
     plt.show()
     gc.collect()  # Cleaning memory
@@ -75,17 +76,17 @@ if __name__ == '__main__':
     print("Showing original file plots...")
     timeIni = time.time()
 
-    Plots.spikegram(spikes_info, settings)
+    Plots.spikegram(spikes_info, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.sonogram(spikes_info, settings)
+    Plots.sonogram(spikes_info, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.histogram(spikes_info, settings)
+    Plots.histogram(spikes_info, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.average_activity(spikes_info, settings)
+    Plots.average_activity(spikes_info, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.difference_between_LR(spikes_info, settings)
+    Plots.difference_between_LR(spikes_info, settings, verbose=True)
 
     timeEnd = time.time()
-    print("The generation of the plots generation took " + '{0:.3f}'.format(timeEnd - timeIni) + " seconds")
+    print("Plots generation took " + '{0:.3f}'.format(timeEnd - timeIni) + " seconds")
 
     plt.show()
