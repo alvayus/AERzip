@@ -1,3 +1,4 @@
+import gc
 import time
 from tkinter.filedialog import askopenfilename
 
@@ -28,9 +29,11 @@ if __name__ == '__main__':
     # --- COMPRESSED DATA ---
     # Compress the original aedat file
     compressAedat(directory, filePath, settings, False)
+    gc.collect()  # Cleaning memory
 
     # Load the compressed aedat file
     [compressedSpikes_File, newSettings] = loadCompressedAedat(directory + "../compressedEvents/", filePath, settings)
+    gc.collect()  # Cleaning memory
 
     # Adapt the compressed aedat file
     Functions.check_SpikesFile(compressedSpikes_File, newSettings)
@@ -41,22 +44,28 @@ if __name__ == '__main__':
     timeIni = time.time()
 
     Plots.spikegram(compressedSpikes_File, newSettings)
+    gc.collect()  # Cleaning memory
     Plots.sonogram(compressedSpikes_File, newSettings)
+    gc.collect()  # Cleaning memory
     Plots.histogram(compressedSpikes_File, newSettings)
+    gc.collect()  # Cleaning memory
     Plots.average_activity(compressedSpikes_File, newSettings)
+    gc.collect()  # Cleaning memory
     Plots.difference_between_LR(compressedSpikes_File, newSettings)
 
     timeEnd = time.time()
     print("The generation of the plots generation took " + '{0:.3f}'.format(timeEnd - timeIni) + " seconds")
 
     plt.show()
+    gc.collect()  # Cleaning memory
 
     # --- ORIGINAL DATA ---
-    # Load the original aedat file
+    # Load the original aedat file. Prints added to show loading time
     timeIni = time.time()
     spikes_info = Loaders.loadAEDAT(directory + filePath, settings)
     timeEnd = time.time()
     print("Load original aedat file has took: " + str(timeEnd - timeIni))
+    gc.collect()  # Cleaning memory
 
     # Adapt the original aedat file
     Functions.check_SpikesFile(spikes_info, settings)
@@ -67,9 +76,13 @@ if __name__ == '__main__':
     timeIni = time.time()
 
     Plots.spikegram(spikes_info, settings)
+    gc.collect()  # Cleaning memory
     Plots.sonogram(spikes_info, settings)
+    gc.collect()  # Cleaning memory
     Plots.histogram(spikes_info, settings)
+    gc.collect()  # Cleaning memory
     Plots.average_activity(spikes_info, settings)
+    gc.collect()  # Cleaning memory
     Plots.difference_between_LR(spikes_info, settings)
 
     timeEnd = time.time()
