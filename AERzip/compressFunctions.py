@@ -7,6 +7,8 @@ import lz4.frame
 import zstandard
 from pyNAVIS import *
 
+# TODO: Fix variable names
+
 
 def loadCompressedAedat(directory, filePath, settings, verbose=True):
     # --- Check the filePath ---
@@ -80,7 +82,7 @@ def loadCompressedAedat(directory, filePath, settings, verbose=True):
     return [spikes_file, newSettings]
 
 
-def compressAedat(eventsDir, filePath, settings, ignoreOverwrite=True, verbose=True, compressor="ZSTD"):
+def compressAedat(eventsDir, filePath, settings, ignoreOverwrite=True, verbose=True, compressor="ZSTD", returnData=True):
     # --- Get bytes needed to address and timestamp representation ---
     addressSize = int(round(settings.num_channels * (settings.mono_stereo + 1) *
                             (settings.on_off_both + 1) / 256))
@@ -93,7 +95,7 @@ def compressAedat(eventsDir, filePath, settings, ignoreOverwrite=True, verbose=T
     dataset = splitFilePath[0]
     fileName = splitFilePath[1]
 
-    # --- Check the file and destination folder ---
+    # --- Check the file ---
     compressedEventsDir = eventsDir + "../compressedEvents/"
 
     if not ignoreOverwrite:
@@ -105,12 +107,6 @@ def compressAedat(eventsDir, filePath, settings, ignoreOverwrite=True, verbose=T
             if option == "N":
                 print("File compression has been cancelled")
                 return
-
-    if not os.path.exists(compressedEventsDir):
-        os.makedirs(compressedEventsDir)
-
-    if not os.path.exists(compressedEventsDir + dataset):
-        os.makedirs(compressedEventsDir + dataset)
 
     # --- Load data from original aedat file ---
     timeIni = time.time()
@@ -131,7 +127,7 @@ def compressAedat(eventsDir, filePath, settings, ignoreOverwrite=True, verbose=T
 
     # --- New data ---
     header = bytearray()
-    newData = bytearray()
+    rawData = bytearray()
 
     # Header definition
     if compressor == "ZSTD":
@@ -146,21 +142,33 @@ def compressAedat(eventsDir, filePath, settings, ignoreOverwrite=True, verbose=T
 
     # Reorder the data by discarding useless addresses bytes
     for i in range(len(addresses) - 1):
-        newData.extend(addresses[i].to_bytes(addressSize, "big"))
-        newData.extend(timestamps[i].to_bytes(4, "big"))
+        rawData.extend(addresses[i].to_bytes(addressSize, "big"))
+        rawData.extend(timestamps[i].to_bytes(4, "big"))
 
     # --- Compress and store the data ---
     if compressor == "ZSTD":
         cctx = zstandard.ZstdCompressor()
-        compressedData = cctx.compress(newData)
+        compressedData = cctx.compress(rawData)
     else:
-        compressedData = lz4.frame.compress(newData)
+        compressedData = lz4.frame.compress(rawData)
+
+    # Join header with compressed data
+    fileData = header.join(compressedData)
+
+    # Check the destination folder
+    if not os.path.exists(compressedEventsDir):
+        os.makedirs(compressedEventsDir)
+
+    if not os.path.exists(compressedEventsDir + dataset):
+        os.makedirs(compressedEventsDir + dataset)
 
     file = open(compressedEventsDir + filePath, "wb")
-    file.write(header)
-    file.write(compressedData)
+    file.write(fileData)
     file.close()
 
     timeEnd = time.time()
     if verbose:
         print("Compression achieved in " + '{0:.3f}'.format(timeEnd - timeIni) + " seconds")
+
+    if returnData:
+        return fileData
