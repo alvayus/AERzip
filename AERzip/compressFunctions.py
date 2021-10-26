@@ -1,6 +1,5 @@
 import copy
 import os
-import sys
 import time
 
 import lz4.frame
@@ -39,13 +38,13 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
             option = input()
 
             if option == "N":
-                print("File compression for the file " + file_name + " has been cancelled")
+                print("File compression for the file " + dataset_name + file_name + " has been cancelled")
                 return
 
     # --- Load data from original aedat file ---
     start_time = time.time()
     if verbose:
-        print("Loading " + file_name + " (original aedat file)")
+        print("Loading " + dataset_name + file_name + " (original aedat file)")
 
     # TODO: Optimize loadAEDAT
     spikes_file = Loaders.loadAEDAT(src_events_dir + dataset_name + file_name, settings)
@@ -53,8 +52,9 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     end_time = time.time()
     if verbose:
         print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-        print("Compressing " + file_name + " with " + str(org_address_size) + "-byte addresses into an aedat file with "
-              + str(address_size) + "-byte addresses through " + compressor + " compressor")
+        print("Compressing " + dataset_name + file_name + " with " + str(org_address_size) +
+              "-byte addresses into an aedat file with " + str(address_size) + "-byte addresses through " +
+              compressor + " compressor")
     start_time = time.time()
 
     # --- New data ---
@@ -136,13 +136,12 @@ def decompressData(compressed_data, compressor="ZSTD"):
 def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, settings, verbose=True):
     # --- Check the file path ---
     if not os.path.exists(src_compressed_events_dir + dataset_name + file_name) and verbose:
-        # TODO: Exceptions
-        raise FileNotFoundError("Unable to find the specified compressed aedat file")
+        raise FileNotFoundError("Unable to find the specified compressed aedat file: " + dataset_name + file_name)
 
     # --- Load data from compressed aedat file ---
     start_time = time.time()
     if verbose:
-        print("Loading " + file_name + " (compressed aedat file)")
+        print("Loading " + dataset_name + file_name + " (compressed aedat file)")
 
     header, compressed_data = loadCompressedFile(src_compressed_events_dir + dataset_name + file_name)
 
@@ -152,8 +151,8 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
 
     # --- Decompress data ---
     if verbose:
-        print("Decompressing " + file_name + " with " + str(header.address_size) + "-byte addresses through " +
-              header.compressor + " decompressor")
+        print("Decompressing " + dataset_name + file_name + " with " + str(header.address_size) +
+              "-byte addresses through " + header.compressor + " decompressor")
     start_time = time.time()
 
     decompressed_data = decompressData(compressed_data)
@@ -161,7 +160,8 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     bytes_per_spike = header.address_size + 4
     num_spikes = len(decompressed_data) / bytes_per_spike
     if not num_spikes.is_integer():
-        raise ValueError("Spikes are not a whole number. Something went wrong with the file " + file_name)
+        raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
+                         dataset_name + file_name)
     else:
         num_spikes = int(num_spikes)
 
