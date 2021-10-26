@@ -7,6 +7,8 @@ import lz4.frame
 import zstandard
 from pyNAVIS import *
 
+from AERzip.CompressedFileHeader import CompressedHeader
+
 
 def compressData(data, compressor="ZSTD"):
     if compressor == "ZSTD":
@@ -19,8 +21,7 @@ def compressData(data, compressor="ZSTD"):
 
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
-                         settings, ignore_overwriting=True, verbose=True, compressor="ZSTD",
-                         store=True):
+                         settings, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True):
     # --- Get bytes needed to address and timestamp representation ---
     address_size = int(round(settings.num_channels * (settings.mono_stereo + 1) *
                              (settings.on_off_both + 1) / 256))
@@ -55,7 +56,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     start_time = time.time()
 
     # --- New data ---
-    header = getCompressedFileHeader(compressor, address_size)
+    header = CompressedHeader(compressor, address_size).toBytes()
     raw_smallest_data = discardBytes(spikes_file, address_size, 4)  # Discard useless bytes
 
     # Compress the data
@@ -85,37 +86,40 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     return file_data
 
 
-def loadCompressedAedat(directory, file_path, settings, verbose=True):
-    # --- Check the filePath ---
-    if not os.path.exists(directory + file_path) and verbose:
-        print("Unable to find the specified compressed aedat file. Aborting...")
-        sys.exit(1)
+def loadCompressedFile(src_compressed_file_path):
+    # Read all the file
+    file = open(src_compressed_file_path, "rb")
+    file_data = file.read()
 
-    # --- Get dataset folder and file name ---
-    split_file_path = file_path.split('/')
-    dataset = split_file_path[0]
-    file_name = split_file_path[1]
+    # Header extraction from the file
+    header = CompressedHeader()
 
-    # --- Load data from compressed aedat file ---
-    start_time = time.time()
-    if verbose:
-        print("Loading " + file_name + " (compressed aedat file)")
+    start_index = 0
+    end_index = header.library_version_length
+    header.library_version = file_data[start_index:end_index].decode("utf-8").strip()
 
-    file = open(directory + file_path, "rb")
-    file_data = file.read()  # Read all the file
-    compressor = file_data[0:4].decode("utf-8").strip()
-    address_size = file_data[4] + 1
-    compressed_data = file_data[5:]
+    start_index = end_index
+    end_index = start_index + header.compressor_length
+    header.compressor = file_data[start_index:end_index].decode("utf-8").strip()
+
+    start_index = end_index
+    end_index = start_index + header.address_length
+    header.address_size = file_data[start_index:end_index] + 1
+
+    start_index = end_index
+    end_index = start_index + header.timestamp_length
+    header.timestamp_size = file_data[start_index:end_index] + 1
+
+    start_index = end_index
+    compressed_data = file_data[start_index:]
+
+    # Close the file
     file.close()
 
-    end_time = time.time()
-    if verbose:
-        print("Compressed file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-        print("Decompressing " + file_name + " with " + str(address_size) + "-byte addresses through " +
-              compressor + " decompressor")
-    start_time = time.time()
+    return header, compressed_data
 
-    # --- Decompress data ---
+
+def decompressData(compressed_data, compressor="ZSTD"):
     if compressor == "ZSTD":
         dctx = zstandard.ZstdDecompressor()
         decompressed_data = dctx.decompress(compressed_data)
@@ -125,52 +129,67 @@ def loadCompressedAedat(directory, file_path, settings, verbose=True):
         print("Unable to perform " + compressor + " decompression. Aborting...")
         sys.exit(1)
 
-    bytes_per_spike = address_size + 4
+    return decompressed_data
+
+
+def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, settings, verbose=True):
+    # --- Check the file path ---
+    if not os.path.exists(src_compressed_events_dir + dataset_name + file_name) and verbose:
+        # TODO: Exceptions
+        print("Unable to find the specified compressed aedat file. Aborting...")
+        sys.exit(1)
+
+    # --- Load data from compressed aedat file ---
+    start_time = time.time()
+    if verbose:
+        print("Loading " + file_name + " (compressed aedat file)")
+
+    header, compressed_data = loadCompressedFile(src_compressed_events_dir + dataset_name + file_name)
+
+    end_time = time.time()
+    if verbose:
+        print("Compressed file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
+    # --- Decompress data ---
+    if verbose:
+        print("Decompressing " + file_name + " with " + str(header.address_size) + "-byte addresses through " +
+              header.compressor + " decompressor")
+    start_time = time.time()
+
+    decompressed_data = decompressData(compressed_data)
+
+    bytes_per_spike = header.address_size + 4
     num_spikes = len(decompressed_data) / bytes_per_spike
     if not num_spikes.is_integer():
-        print("Spikes are not a whole number. Something went wrong. Aborting...")
-        sys.exit(1)
+        print("Spikes are not a whole number. Something went wrong with the file " + file_name)
     else:
         num_spikes = int(num_spikes)
 
+    # Convert addresses and timestamps from bytes to ints
     addresses = []
     timestamps = []
 
     for i in range(num_spikes):
         index = i * bytes_per_spike
-        addresses.append(decompressed_data[index:(index + address_size)])
-        timestamps.append(decompressed_data[(index + address_size):(index + bytes_per_spike)])
+        addresses.append(decompressed_data[index:(index + header.address_size)])
+        timestamps.append(decompressed_data[(index + header.address_size):(index + bytes_per_spike)])
+
+    addresses = [int.from_bytes(x, "big") for x in addresses]
+    timestamps = [int.from_bytes(x, "big") for x in timestamps]
 
     # Return the new spikes file
-    addresses = [int.from_bytes(x, "big") for x in addresses]  # Bytes to ints
-    timestamps = [int.from_bytes(x, "big") for x in timestamps]  # Bytes to ints
     spikes_file = SpikesFile(addresses, timestamps)
 
     # Return the modified settings
     new_settings = copy.deepcopy(settings)
-    new_settings.address_size = address_size
+    new_settings.address_size = header.address_size
+    # TODO: Modify settings to allow timestamp_size
 
     end_time = time.time()
     if verbose:
         print("Decompression achieved in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
-    return [spikes_file, new_settings]
-
-
-def getCompressedFileHeader(compressor="ZSTD", address_size=4):
-    header = bytearray()
-
-    if compressor == "ZSTD":
-        header.extend(bytes("ZSTD", "utf-8"))  # 4 bytes for the compressor
-    elif compressor == "LZ4":
-        header.extend(bytes("LZ4 ", "utf-8"))  # 4 bytes for the compressor
-    else:
-        print("Compressor not recognized. Aborting...")
-        sys.exit(1)
-
-    header.extend((address_size - 1).to_bytes(1, "big"))  # 1 byte for address size
-
-    return header
+    return spikes_file, new_settings
 
 
 def discardBytes(spikes_file, address_size, timestamp_size):
