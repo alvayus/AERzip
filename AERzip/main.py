@@ -24,8 +24,8 @@ if __name__ == '__main__':
 
     len_split_path = len(split_path)
     directory = "/".join(split_path[0:len_split_path - 2])
-    dataset = "/" + split_path[len_split_path - 2]
-    file = "/" + split_path[len_split_path - 1]
+    dataset = split_path[len_split_path - 2]
+    file = split_path[len_split_path - 1]
 
     # --- COMPRESSED DATA ---
     # Compress the original aedat file
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     # --- ORIGINAL DATA ---
     # Load the original aedat file. Prints added to show loading time
     start_time = time.time()
-    spikes_info = Loaders.loadAEDAT(directory + dataset + file, settings)
+    spikes_info = Loaders.loadAEDAT(directory + "/" + dataset + "/" + file, settings)
     end_time = time.time()
     print("Load original aedat file has took: " + '{0:.3f}'.format(end_time - start_time) + " seconds")
     gc.collect()  # Cleaning memory

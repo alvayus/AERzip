@@ -8,6 +8,7 @@ from pyNAVIS import *
 
 from AERzip.CompressedFileHeader import CompressedHeader
 
+
 # TODO: Documentation and history on v1.0.0
 
 # TODO: Add verbose to functions
@@ -24,34 +25,35 @@ def compressData(data, compressor="ZSTD"):
 
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
-                         settings, timestamp_size=4, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True):
+                         settings, timestamp_size=4, compressor="ZSTD", store=True, ignore_overwriting=True,
+                         verbose=True):
     # --- Get bytes needed to address and timestamp representation ---
     address_size = int(round(settings.num_channels * (settings.mono_stereo + 1) *
                              (settings.on_off_both + 1) / 256))
 
     # --- Check the file ---
     if store and not ignore_overwriting:
-        if os.path.exists(dst_compressed_events_dir + dataset_name + file_name):
+        if os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/" + file_name):
             print("The compressed aedat file associated with this aedat file already exists\n"
                   "Do you want to overwrite it? Y/N")
             option = input()
 
             if option == "N":
-                print("File compression for the file " + dataset_name + file_name + " has been cancelled")
+                print("File compression for the file " + "/" + dataset_name + "/" + file_name + " has been cancelled")
                 return
 
     # --- Load data from original aedat file ---
     start_time = time.time()
     if verbose:
-        print("Loading " + dataset_name + file_name + " (original aedat file)")
+        print("Loading " + "/" + dataset_name + "/" + file_name + " (original aedat file)")
 
     # TODO: Optimize loadAEDAT
-    spikes_file = Loaders.loadAEDAT(src_events_dir + dataset_name + file_name, settings)
+    spikes_file = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name, settings)
 
     end_time = time.time()
     if verbose:
         print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-        print("Compressing " + dataset_name + file_name + " with " + str(settings.address_size) +
+        print("Compressing " + "/" + dataset_name + "/" + file_name + " with " + str(settings.address_size) +
               "-byte addresses and " + str(settings.timestamp_size) + "-byte timestamps into an aedat file with " +
               str(address_size) + "-byte addresses and " + str(timestamp_size) + "-byte timestamps through " +
               compressor + " compressor")
@@ -80,16 +82,27 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     return file_data
 
 
-def storeCompressedFile(file_data, dst_compressed_events_dir, dataset_name, file_name):
+def storeCompressedFile(file_data, dst_compressed_events_dir, dataset_name, file_name, ignore_overwriting=True):
+    # Check the file
+    if not ignore_overwriting:
+        if os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/" + file_name):
+            print("The compressed aedat file associated with this aedat file already exists\n"
+                  "Do you want to overwrite it? Y/N")
+            option = input()
+
+            if option == "N":
+                print("File compression for the file " + "/" + dataset_name + "/" + file_name + " has been cancelled")
+                return
+
     # Check the destination folder
     if not os.path.exists(dst_compressed_events_dir):
         os.makedirs(dst_compressed_events_dir)
 
-    if not os.path.exists(dst_compressed_events_dir + dataset_name):
-        os.makedirs(dst_compressed_events_dir + dataset_name)
+    if not os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/"):
+        os.makedirs(dst_compressed_events_dir + "/" + dataset_name + "/")
 
     # Write the file
-    file = open(dst_compressed_events_dir + dataset_name + file_name, "wb")
+    file = open(dst_compressed_events_dir + "/" + dataset_name + "/" + file_name, "wb")
     file.write(file_data)
     file.close()
 
@@ -141,15 +154,15 @@ def decompressData(compressed_data, compressor="ZSTD"):
 
 def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, settings, verbose=True):
     # --- Check the file path ---
-    if not os.path.exists(src_compressed_events_dir + dataset_name + file_name) and verbose:
-        raise FileNotFoundError("Unable to find the specified compressed aedat file: " + dataset_name + file_name)
+    if not os.path.exists(src_compressed_events_dir + "/" + dataset_name + "/" + file_name) and verbose:
+        raise FileNotFoundError("Unable to find the specified compressed aedat file: " + "/" + dataset_name + "/" + file_name)
 
     # --- Load data from compressed aedat file ---
     start_time = time.time()
     if verbose:
-        print("Loading " + dataset_name + file_name + " (compressed aedat file)")
+        print("Loading " + "/" + dataset_name + "/" + file_name + " (compressed aedat file)")
 
-    header, compressed_data = loadCompressedFile(src_compressed_events_dir + dataset_name + file_name)
+    header, compressed_data = loadCompressedFile(src_compressed_events_dir + "/" + dataset_name + "/" + file_name)
 
     end_time = time.time()
     if verbose:
@@ -157,7 +170,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
 
     # --- Decompress data ---
     if verbose:
-        print("Decompressing " + dataset_name + file_name + " with " + str(header.address_size) +
+        print("Decompressing " + "/" + dataset_name + "/" + file_name + " with " + str(header.address_size) +
               "-byte addresses and " + str(header.timestamp_size) + "-byte timestamps through " +
               header.compressor + " decompressor")
     start_time = time.time()
@@ -168,7 +181,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     num_spikes = len(decompressed_data) / bytes_per_spike
     if not num_spikes.is_integer():
         raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
-                         dataset_name + file_name)
+                         "/" + dataset_name + "/" + file_name)
     else:
         num_spikes = int(num_spikes)
 

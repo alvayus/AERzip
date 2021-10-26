@@ -1,6 +1,6 @@
 class CompressedHeader:
     def __init__(self, compressor="ZSTD", address_size=4, timestamp_size=4):
-        self.library_version = "AERzip v0.2.0"
+        self.library_version = "AERzip v0.4.0"
         self.library_version_length = 13
 
         self.compressor = compressor
