@@ -6,7 +6,7 @@ from pyNAVIS import *
 import matplotlib.pyplot as plt
 from tkinter import Tk
 
-from compressFunctions import compressAedat, loadCompressedAedat
+from compressFunctions import compressDataFromFile, decompressDataFromFile
 
 if __name__ == '__main__':
     # Define source settings
@@ -23,16 +23,19 @@ if __name__ == '__main__':
     split_path = askopenfilename().split("/")
 
     len_split_path = len(split_path)
-    directory = "/".join(split_path[0:len_split_path - 2]) + "/"
-    file_path = "/".join(split_path[len_split_path - 2:len_split_path])
+    directory = "/".join(split_path[0:len_split_path - 2])
+    dataset = "/" + split_path[len_split_path - 2]
+    file = "/" + split_path[len_split_path - 1]
 
     # --- COMPRESSED DATA ---
     # Compress the original aedat file
-    compressAedat(directory, file_path, settings, False)
+    compressDataFromFile(directory, directory + "/../compressedEvents", dataset, file, settings,
+                         ignore_overwriting=False)
     gc.collect()  # Cleaning memory
 
-    # Load the compressed aedat file
-    [compressed_spikes_file, new_settings] = loadCompressedAedat(directory + "../compressedEvents/", file_path, settings)
+    # Decompress the compressed aedat file
+    compressed_spikes_file, new_settings = decompressDataFromFile(directory + "/../compressedEvents",
+                                                                  dataset, file, settings)
     gc.collect()  # Cleaning memory
 
     # Adapt the compressed aedat file
@@ -62,9 +65,9 @@ if __name__ == '__main__':
     # --- ORIGINAL DATA ---
     # Load the original aedat file. Prints added to show loading time
     start_time = time.time()
-    spikes_info = Loaders.loadAEDAT(directory + file_path, settings)
+    spikes_info = Loaders.loadAEDAT(directory + dataset + file, settings)
     end_time = time.time()
-    print("Load original aedat file has took: " + str(end_time - start_time))
+    print("Load original aedat file has took: " + '{0:.3f}'.format(end_time - start_time) + " seconds")
     gc.collect()  # Cleaning memory
 
     # Adapt the original aedat file
