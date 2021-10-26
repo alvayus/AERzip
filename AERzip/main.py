@@ -1,12 +1,12 @@
 import gc
 import time
+from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-from pyNAVIS import *
 import matplotlib.pyplot as plt
-from tkinter import Tk
+from pyNAVIS import *
 
-from compressFunctions import compressDataFromFile, decompressDataFromFile
+from compressFunctions import decompressDataFromFile
 
 if __name__ == '__main__':
     # Define source settings
@@ -28,11 +28,6 @@ if __name__ == '__main__':
     file = split_path[len_split_path - 1]
 
     # --- COMPRESSED DATA ---
-    # Compress the original aedat file
-    compressDataFromFile(directory, directory + "/../compressedEvents", dataset, file, settings,
-                         ignore_overwriting=False)
-    gc.collect()  # Cleaning memory
-
     # Decompress the compressed aedat file
     compressed_spikes_file, new_settings = decompressDataFromFile(directory + "/../compressedEvents",
                                                                   dataset, file, settings)
