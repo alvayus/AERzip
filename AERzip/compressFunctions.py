@@ -10,7 +10,7 @@ from AERzip.CompressedFileHeader import CompressedHeader
 
 # TODO: Documentation and history on v1.0.0
 
-
+# TODO: Add verbose to functions
 def compressData(data, compressor="ZSTD"):
     if compressor == "ZSTD":
         cctx = zstandard.ZstdCompressor()
@@ -71,23 +71,27 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
 
     # --- Store the data ---
     if store:
-        # Check the destination folder
-        if not os.path.exists(dst_compressed_events_dir):
-            os.makedirs(dst_compressed_events_dir)
-
-        if not os.path.exists(dst_compressed_events_dir + dataset_name):
-            os.makedirs(dst_compressed_events_dir + dataset_name)
-
-        # Write the file
-        file = open(dst_compressed_events_dir + dataset_name + file_name, "wb")
-        file.write(file_data)
-        file.close()
+        storeCompressedFile(file_data, dst_compressed_events_dir, dataset_name, file_name)
 
     end_time = time.time()
     if verbose:
         print("Compression achieved in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return file_data
+
+
+def storeCompressedFile(file_data, dst_compressed_events_dir, dataset_name, file_name):
+    # Check the destination folder
+    if not os.path.exists(dst_compressed_events_dir):
+        os.makedirs(dst_compressed_events_dir)
+
+    if not os.path.exists(dst_compressed_events_dir + dataset_name):
+        os.makedirs(dst_compressed_events_dir + dataset_name)
+
+    # Write the file
+    file = open(dst_compressed_events_dir + dataset_name + file_name, "wb")
+    file.write(file_data)
+    file.close()
 
 
 def loadCompressedFile(src_compressed_file_path):
