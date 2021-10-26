@@ -39,7 +39,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
             option = input()
 
             if option == "N":
-                print("File compression has been cancelled")
+                print("File compression for the file " + file_name + " has been cancelled")
                 return
 
     # --- Load data from original aedat file ---
@@ -137,8 +137,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     # --- Check the file path ---
     if not os.path.exists(src_compressed_events_dir + dataset_name + file_name) and verbose:
         # TODO: Exceptions
-        print("Unable to find the specified compressed aedat file. Aborting...")
-        sys.exit(1)
+        raise FileNotFoundError("Unable to find the specified compressed aedat file")
 
     # --- Load data from compressed aedat file ---
     start_time = time.time()
@@ -162,7 +161,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     bytes_per_spike = header.address_size + 4
     num_spikes = len(decompressed_data) / bytes_per_spike
     if not num_spikes.is_integer():
-        print("Spikes are not a whole number. Something went wrong with the file " + file_name)
+        raise ValueError("Spikes are not a whole number. Something went wrong with the file " + file_name)
     else:
         num_spikes = int(num_spikes)
 
