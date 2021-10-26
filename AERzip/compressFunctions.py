@@ -14,8 +14,10 @@ def compressData(data, compressor="ZSTD"):
     if compressor == "ZSTD":
         cctx = zstandard.ZstdCompressor()
         compressed_data = cctx.compress(data)
-    else:
+    elif compressor == "LZ4":
         compressed_data = lz4.frame.compress(data)
+    else:
+        raise ValueError("Compressor not recognized")
 
     return compressed_data
 
@@ -126,8 +128,7 @@ def decompressData(compressed_data, compressor="ZSTD"):
     elif compressor == "LZ4":
         decompressed_data = lz4.frame.decompress(compressed_data)
     else:
-        print("Unable to perform " + compressor + " decompression. Aborting...")
-        sys.exit(1)
+        raise ValueError("Compressor not recognized")
 
     return decompressed_data
 

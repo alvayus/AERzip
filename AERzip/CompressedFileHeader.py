@@ -24,7 +24,7 @@ class CompressedHeader:
         elif self.compressor == "LZ4":
             header.extend(bytes("LZ4".ljust(self.compressor_length), "utf-8"))
         else:
-            raise ValueError("Compressor not recognized. Aborting...")
+            raise ValueError("Compressor not recognized")
 
         header.extend((self.address_size - 1).to_bytes(self.address_length, "big"))
         header.extend((self.timestamp_size - 1).to_bytes(self.compressor_length, "big"))
