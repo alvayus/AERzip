@@ -17,7 +17,7 @@ class CompressedHeader:
     def toBytes(self):
         header = bytearray()
 
-        header.extend(self.library_version.ljust(self.library_version_length))
+        header.extend(bytes(self.library_version.ljust(self.library_version_length), "utf-8"))
 
         if self.compressor == "ZSTD":
             header.extend(bytes("ZSTD".ljust(self.compressor_length), "utf-8"))
@@ -27,6 +27,6 @@ class CompressedHeader:
             raise ValueError("Compressor not recognized")
 
         header.extend((self.address_size - 1).to_bytes(self.address_length, "big"))
-        header.extend((self.timestamp_size - 1).to_bytes(self.compressor_length, "big"))
+        header.extend((self.timestamp_size - 1).to_bytes(self.timestamp_length, "big"))
 
         return header

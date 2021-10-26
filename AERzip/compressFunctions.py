@@ -58,14 +58,16 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     start_time = time.time()
 
     # --- New data ---
-    header = CompressedHeader(compressor, address_size).toBytes()
+    header = CompressedHeader(compressor, address_size, timestamp_size).toBytes()
     raw_smallest_data = discardBytes(spikes_file, address_size, timestamp_size)  # Discard useless bytes
 
     # Compress the data
     compressed_data = compressData(raw_smallest_data, compressor)
 
     # Join header with compressed data
-    file_data = header.join(compressed_data)
+    file_data = bytearray()
+    file_data.extend(header)
+    file_data.extend(compressed_data)
 
     # --- Store the data ---
     if store:
@@ -106,11 +108,11 @@ def loadCompressedFile(src_compressed_file_path):
 
     start_index = end_index
     end_index = start_index + header.address_length
-    header.address_size = file_data[start_index:end_index] + 1
+    header.address_size = int.from_bytes(file_data[start_index:end_index], "big") + 1
 
     start_index = end_index
     end_index = start_index + header.timestamp_length
-    header.timestamp_size = file_data[start_index:end_index] + 1
+    header.timestamp_size = int.from_bytes(file_data[start_index:end_index], "big") + 1
 
     start_index = end_index
     compressed_data = file_data[start_index:]
