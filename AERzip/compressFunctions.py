@@ -8,6 +8,8 @@ from pyNAVIS import *
 
 from AERzip.CompressedFileHeader import CompressedHeader
 
+# TODO: Documentation and history on v1.0.0
+
 
 def compressData(data, compressor="ZSTD"):
     if compressor == "ZSTD":
@@ -22,13 +24,10 @@ def compressData(data, compressor="ZSTD"):
 
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
-                         settings, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True):
+                         settings, timestamp_size=4, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True):
     # --- Get bytes needed to address and timestamp representation ---
     address_size = int(round(settings.num_channels * (settings.mono_stereo + 1) *
                              (settings.on_off_both + 1) / 256))
-    org_address_size = settings.address_size
-    # TODO: Timestamp size = 2
-    # orgTimestampSize = settings.
 
     # --- Check the file ---
     if store and not ignore_overwriting:
@@ -52,14 +51,15 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     end_time = time.time()
     if verbose:
         print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-        print("Compressing " + dataset_name + file_name + " with " + str(org_address_size) +
-              "-byte addresses into an aedat file with " + str(address_size) + "-byte addresses through " +
+        print("Compressing " + dataset_name + file_name + " with " + str(settings.address_size) +
+              "-byte addresses and " + str(settings.timestamp_size) + "-byte timestamps into an aedat file with " +
+              str(address_size) + "-byte addresses and " + str(timestamp_size) + "-byte timestamps through " +
               compressor + " compressor")
     start_time = time.time()
 
     # --- New data ---
     header = CompressedHeader(compressor, address_size).toBytes()
-    raw_smallest_data = discardBytes(spikes_file, address_size, 4)  # Discard useless bytes
+    raw_smallest_data = discardBytes(spikes_file, address_size, timestamp_size)  # Discard useless bytes
 
     # Compress the data
     compressed_data = compressData(raw_smallest_data, compressor)
@@ -152,12 +152,13 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     # --- Decompress data ---
     if verbose:
         print("Decompressing " + dataset_name + file_name + " with " + str(header.address_size) +
-              "-byte addresses through " + header.compressor + " decompressor")
+              "-byte addresses and " + str(header.timestamp_size) + "-byte timestamps through " +
+              header.compressor + " decompressor")
     start_time = time.time()
 
     decompressed_data = decompressData(compressed_data)
 
-    bytes_per_spike = header.address_size + 4
+    bytes_per_spike = header.address_size + header.timestamp_size
     num_spikes = len(decompressed_data) / bytes_per_spike
     if not num_spikes.is_integer():
         raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
@@ -183,7 +184,6 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     # Return the modified settings
     new_settings = copy.deepcopy(settings)
     new_settings.address_size = header.address_size
-    # TODO: Modify settings to allow timestamp_size
 
     end_time = time.time()
     if verbose:
