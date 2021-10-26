@@ -20,51 +20,51 @@ if __name__ == '__main__':
     # Find the original aedat file
     print("Select a file in events folder")
     Tk().withdraw()  # we don't want a full GUI, so keep the root window from appearing
-    splitPath = askopenfilename().split("/")
+    split_path = askopenfilename().split("/")
 
-    lenSplitPath = len(splitPath)
-    directory = "/".join(splitPath[0:lenSplitPath-2]) + "/"
-    filePath = "/".join(splitPath[lenSplitPath-2:lenSplitPath])
+    len_split_path = len(split_path)
+    directory = "/".join(split_path[0:len_split_path - 2]) + "/"
+    file_path = "/".join(split_path[len_split_path - 2:len_split_path])
 
     # --- COMPRESSED DATA ---
     # Compress the original aedat file
-    compressAedat(directory, filePath, settings, False)
+    compressAedat(directory, file_path, settings, False)
     gc.collect()  # Cleaning memory
 
     # Load the compressed aedat file
-    [compressedSpikes_File, newSettings] = loadCompressedAedat(directory + "../compressedEvents/", filePath, settings)
+    [compressed_spikes_file, new_settings] = loadCompressedAedat(directory + "../compressedEvents/", file_path, settings)
     gc.collect()  # Cleaning memory
 
     # Adapt the compressed aedat file
-    Functions.check_SpikesFile(compressedSpikes_File, newSettings)
-    compressedSpikes_File.timestamps = Functions.adapt_timestamps(compressedSpikes_File.timestamps, newSettings)
+    Functions.check_SpikesFile(compressed_spikes_file, new_settings)
+    compressed_spikes_file.timestamps = Functions.adapt_timestamps(compressed_spikes_file.timestamps, new_settings)
 
     # Plots
     print("Showing compressed file plots...")
-    timeIni = time.time()
+    start_time = time.time()
 
-    Plots.spikegram(compressedSpikes_File, newSettings, verbose=True)
+    Plots.spikegram(compressed_spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.sonogram(compressedSpikes_File, newSettings, verbose=True)
+    Plots.sonogram(compressed_spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.histogram(compressedSpikes_File, newSettings, verbose=True)
+    Plots.histogram(compressed_spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.average_activity(compressedSpikes_File, newSettings, verbose=True)
+    Plots.average_activity(compressed_spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.difference_between_LR(compressedSpikes_File, newSettings, verbose=True)
+    Plots.difference_between_LR(compressed_spikes_file, new_settings, verbose=True)
 
-    timeEnd = time.time()
-    print("Plots generation took " + '{0:.3f}'.format(timeEnd - timeIni) + " seconds")
+    end_time = time.time()
+    print("Plots generation took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     plt.show()
     gc.collect()  # Cleaning memory
 
     # --- ORIGINAL DATA ---
     # Load the original aedat file. Prints added to show loading time
-    timeIni = time.time()
-    spikes_info = Loaders.loadAEDAT(directory + filePath, settings)
-    timeEnd = time.time()
-    print("Load original aedat file has took: " + str(timeEnd - timeIni))
+    start_time = time.time()
+    spikes_info = Loaders.loadAEDAT(directory + file_path, settings)
+    end_time = time.time()
+    print("Load original aedat file has took: " + str(end_time - start_time))
     gc.collect()  # Cleaning memory
 
     # Adapt the original aedat file
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     # Plots
     print("Showing original file plots...")
-    timeIni = time.time()
+    start_time = time.time()
 
     Plots.spikegram(spikes_info, settings, verbose=True)
     gc.collect()  # Cleaning memory
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     gc.collect()  # Cleaning memory
     Plots.difference_between_LR(spikes_info, settings, verbose=True)
 
-    timeEnd = time.time()
-    print("Plots generation took " + '{0:.3f}'.format(timeEnd - timeIni) + " seconds")
+    end_time = time.time()
+    print("Plots generation took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     plt.show()
