@@ -74,9 +74,8 @@ def getBytesToDiscard(settings):
 
 
 def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
-    start_time = time.time()
     if verbose:
-        print("Converting the raw data into a spikes compressed file")
+        print("rawFileToCompressedFile: Converting the raw data into a spikes compressed file...")
     # Discard useless bytes
     raw_smallest_data = discardBytes(raw_data, address_size, timestamp_size)
 
@@ -85,10 +84,6 @@ def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compress
 
     # Join header with compressed data
     file_data = getCompressedFile(compressed_data, address_size, timestamp_size, compressor)
-
-    end_time = time.time()
-    if verbose:
-        print("Raw data convertion has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return file_data
 
@@ -106,7 +101,7 @@ def discardBytes(raw_data, address_size, timestamp_size, verbose=True):
 
     end_time = time.time()
     if verbose:
-        print("Discarded bytes in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+        print("-> Discarded bytes in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return raw_smallest_data
 
@@ -124,12 +119,12 @@ def compressData(data, compressor="ZSTD", verbose=True):
 
     end_time = time.time()
     if verbose:
-        print("Compressed data in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+        print("-> Compressed data in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return compressed_data
 
 
-def getCompressedFile(compressed_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
+def getCompressedFile(compressed_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=False):
     start_time = time.time()
 
     # Create file with header
@@ -140,7 +135,7 @@ def getCompressedFile(compressed_data, address_size=4, timestamp_size=4, compres
 
     end_time = time.time()
     if verbose:
-        print("Compressed data attached to the header in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+        print("-> Compressed data attached to the header in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return file_data
 
@@ -257,7 +252,7 @@ def decompressData(compressed_data, compressor="ZSTD"):
 def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True):
     start_time = time.time()
     if verbose:
-        print("\nExtracting raw data from bytes")
+        print("bytesToSpikesFile: Extracting raw data from bytes")
 
     # Check if the data is correct
     bytes_per_spike = header.address_size + header.timestamp_size
@@ -285,7 +280,7 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True)
 
     end_time = time.time()
     if verbose:
-        print("Raw data extraction has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+        print("bytesToSpikesFile: Raw data extraction has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return raw_data
 
