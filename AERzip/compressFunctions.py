@@ -229,10 +229,10 @@ def decompressData(compressed_data, compressor="ZSTD"):
     return decompressed_data
 
 
-def bytesToSpikesFile(decompressed_data, dataset_name, file_name, header):
+def bytesToSpikesFile(bytes_data, dataset_name, file_name, header):
     # Check if the data is correct
     bytes_per_spike = header.address_size + header.timestamp_size
-    num_spikes = len(decompressed_data) / bytes_per_spike
+    num_spikes = len(bytes_data) / bytes_per_spike
     if not num_spikes.is_integer():
         raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
                          "/" + dataset_name + "/" + file_name)
@@ -245,8 +245,8 @@ def bytesToSpikesFile(decompressed_data, dataset_name, file_name, header):
 
     for i in range(num_spikes):
         index = i * bytes_per_spike
-        addresses.append(decompressed_data[index:(index + header.address_size)])
-        timestamps.append(decompressed_data[(index + header.address_size):(index + bytes_per_spike)])
+        addresses.append(bytes_data[index:(index + header.address_size)])
+        timestamps.append(bytes_data[(index + header.address_size):(index + bytes_per_spike)])
 
     addresses = [int.from_bytes(x, "big") for x in addresses]
     timestamps = [int.from_bytes(x, "big") for x in timestamps]
