@@ -260,17 +260,11 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True)
     if not num_spikes.is_integer():
         raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
                          "/" + dataset_name + "/" + file_name)
-    else:
-        num_spikes = int(num_spikes)
 
     # Separate addresses and timestamps
-    addresses = []
-    timestamps = []
-
-    for i in range(num_spikes):
-        index = i * bytes_per_spike
-        addresses.append(bytes_data[index:(index + header.address_size)])
-        timestamps.append(bytes_data[(index + header.address_size):(index + bytes_per_spike)])
+    addresses = [bytes_data[i:i+header.address_size] for i in range(0, len(bytes_data), bytes_per_spike)]
+    timestamps = [bytes_data[i:i+header.timestamp_size] for i in range(header.address_size,
+                                                                       len(bytes_data), bytes_per_spike)]
 
     addresses = [int.from_bytes(x, "big") for x in addresses]
     timestamps = [int.from_bytes(x, "big") for x in timestamps]
