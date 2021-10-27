@@ -266,8 +266,8 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True)
         num_spikes = int(num_spikes)
 
     # Separate addresses and timestamps
-    address_param = "u" + str(header.address_size)
-    timestamp_param = "u" + str(header.timestamp_size)
+    address_param = ">u" + str(header.address_size)
+    timestamp_param = ">u" + str(header.timestamp_size)
     bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
     spikes = np.frombuffer(bytes_data, bytes_struct)

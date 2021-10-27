@@ -32,6 +32,7 @@ if __name__ == '__main__':
                          compressor="ZSTD", ignore_overwriting=False)
 
     # --- COMPRESSED DATA ---
+    start_time = time.time()
     # Decompress the compressed aedat file
     compressed_spikes_file, new_settings = decompressDataFromFile(directory + "/../compressedEvents",
                                                                   dataset, file, settings)
@@ -40,6 +41,9 @@ if __name__ == '__main__':
     # Adapt the compressed aedat file
     Functions.check_SpikesFile(compressed_spikes_file, new_settings)
     compressed_spikes_file.timestamps = Functions.adapt_timestamps(compressed_spikes_file.timestamps, new_settings)
+
+    end_time = time.time()
+    print(end_time - start_time)
 
     # Plots
     print("Showing compressed file plots...")
