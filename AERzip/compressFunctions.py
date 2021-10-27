@@ -6,31 +6,15 @@ import lz4.frame
 import zstandard
 from pyNAVIS import *
 
-from AERzip.CompressedFileHeader import CompressedHeader
+from AERzip.CompressedFileHeader import CompressedFileHeader
 
 
 # TODO: Documentation and history on v1.0.0
 
 # TODO: Add verbose to functions
-def compressData(data, compressor="ZSTD"):
-    if compressor == "ZSTD":
-        cctx = zstandard.ZstdCompressor()
-        compressed_data = cctx.compress(data)
-    elif compressor == "LZ4":
-        compressed_data = lz4.frame.compress(data)
-    else:
-        raise ValueError("Compressor not recognized")
-
-    return compressed_data
-
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
-                         settings, timestamp_size=4, compressor="ZSTD", store=True, ignore_overwriting=True,
-                         verbose=True):
-    # --- Get bytes needed to address and timestamp representation ---
-    address_size = int(round(settings.num_channels * (settings.mono_stereo + 1) *
-                             (settings.on_off_both + 1) / 256))
-
+                         settings, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True):
     # --- Check the file ---
     if store and not ignore_overwriting:
         if os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/" + file_name):
@@ -48,11 +32,16 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
         print("Loading " + "/" + dataset_name + "/" + file_name + " (original aedat file)")
 
     # TODO: Optimize loadAEDAT
-    spikes_file = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name, settings)
+    raw_data = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name, settings)
 
     end_time = time.time()
     if verbose:
         print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
+    # Get the bytes to be discarded
+    address_size, timestamp_size = getBytesToDiscard(settings)
+
+    if verbose:
         print("Compressing " + "/" + dataset_name + "/" + file_name + " with " + str(settings.address_size) +
               "-byte addresses and " + str(settings.timestamp_size) + "-byte timestamps into an aedat file with " +
               str(address_size) + "-byte addresses and " + str(timestamp_size) + "-byte timestamps through " +
@@ -60,24 +49,73 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     start_time = time.time()
 
     # --- New data ---
-    header = CompressedHeader(compressor, address_size, timestamp_size).toBytes()
-    raw_smallest_data = discardBytes(spikes_file, address_size, timestamp_size)  # Discard useless bytes
+    file_data = rawFileToCompressedFile(raw_data, address_size, timestamp_size, compressor)
+
+    # --- Store the data ---
+    if store:
+        storeCompressedFile(file_data, dst_compressed_events_dir, dataset_name, file_name)
+        # Ignores overwriting because the file was checked at the beginning
+
+    end_time = time.time()
+    if verbose:
+        print("Compression achieved in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
+    return file_data
+
+
+def getBytesToDiscard(settings):
+    # --- Get bytes needed to address and timestamp representation ---
+    address_size = int(round(settings.num_channels * (settings.mono_stereo + 1) *
+                             (settings.on_off_both + 1) / 256))
+    # TODO: Timestamps
+    timestamp_size = 4
+
+    return address_size, timestamp_size
+
+
+def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compressor="ZSTD"):
+    # Discard useless bytes
+    raw_smallest_data = discardBytes(raw_data, address_size, timestamp_size)
 
     # Compress the data
     compressed_data = compressData(raw_smallest_data, compressor)
 
     # Join header with compressed data
-    file_data = bytearray()
-    file_data.extend(header)
+    file_data = getCompressedFile(compressed_data, address_size, timestamp_size, compressor)
+
+    return file_data
+
+
+def discardBytes(raw_data, address_size, timestamp_size):
+    raw_smallest_data = bytearray()
+    addresses = raw_data.addresses
+    timestamps = raw_data.timestamps
+
+    for i in range(len(addresses) - 1):
+        raw_smallest_data.extend(addresses[i].to_bytes(address_size, "big"))
+        raw_smallest_data.extend(timestamps[i].to_bytes(timestamp_size, "big"))
+
+    return raw_smallest_data
+
+
+def compressData(data, compressor="ZSTD"):
+    if compressor == "ZSTD":
+        cctx = zstandard.ZstdCompressor()
+        compressed_data = cctx.compress(data)
+    elif compressor == "LZ4":
+        compressed_data = lz4.frame.compress(data)
+    else:
+        raise ValueError("Compressor not recognized")
+
+    return compressed_data
+
+
+def getCompressedFile(compressed_data, address_size=4, timestamp_size=4, compressor="ZSTD"):
+    # Create file with header
+    file_data = CompressedFileHeader(compressor, address_size, timestamp_size).toBytes()
+
+    # Extend file with data
     file_data.extend(compressed_data)
-
-    # --- Store the data ---
-    if store:
-        storeCompressedFile(file_data, dst_compressed_events_dir, dataset_name, file_name)
-
-    end_time = time.time()
-    if verbose:
-        print("Compression achieved in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return file_data
 
@@ -107,13 +145,52 @@ def storeCompressedFile(file_data, dst_compressed_events_dir, dataset_name, file
     file.close()
 
 
+def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, settings, verbose=True):
+    # --- Check the file path ---
+    if not os.path.exists(src_compressed_events_dir + "/" + dataset_name + "/" + file_name) and verbose:
+        raise FileNotFoundError("Unable to find the specified compressed aedat file: " + "/" + dataset_name + "/" + file_name)
+
+    # --- Load data from compressed aedat file ---
+    start_time = time.time()
+    if verbose:
+        print("Loading " + "/" + dataset_name + "/" + file_name + " (compressed aedat file)")
+
+    header, compressed_data = loadCompressedFile(src_compressed_events_dir + "/" + dataset_name + "/" + file_name)
+
+    end_time = time.time()
+    if verbose:
+        print("Compressed file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
+    # --- Decompress data ---
+    if verbose:
+        print("Decompressing " + "/" + dataset_name + "/" + file_name + " with " + str(header.address_size) +
+              "-byte addresses and " + str(header.timestamp_size) + "-byte timestamps through " +
+              header.compressor + " decompressor")
+    start_time = time.time()
+
+    decompressed_data = decompressData(compressed_data)
+
+    # Convert addresses and timestamps from bytes to ints
+    raw_data = bytesToSpikesFile(decompressed_data, dataset_name, file_name, header)
+
+    # Return the modified settings
+    new_settings = copy.deepcopy(settings)
+    new_settings.address_size = header.address_size
+
+    end_time = time.time()
+    if verbose:
+        print("Decompression achieved in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
+    return raw_data, new_settings
+
+
 def loadCompressedFile(src_compressed_file_path):
     # Read all the file
     file = open(src_compressed_file_path, "rb")
     file_data = file.read()
 
     # Header extraction from the file
-    header = CompressedHeader()
+    header = CompressedFileHeader()
 
     start_index = 0
     end_index = header.library_version_length
@@ -152,31 +229,8 @@ def decompressData(compressed_data, compressor="ZSTD"):
     return decompressed_data
 
 
-def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, settings, verbose=True):
-    # --- Check the file path ---
-    if not os.path.exists(src_compressed_events_dir + "/" + dataset_name + "/" + file_name) and verbose:
-        raise FileNotFoundError("Unable to find the specified compressed aedat file: " + "/" + dataset_name + "/" + file_name)
-
-    # --- Load data from compressed aedat file ---
-    start_time = time.time()
-    if verbose:
-        print("Loading " + "/" + dataset_name + "/" + file_name + " (compressed aedat file)")
-
-    header, compressed_data = loadCompressedFile(src_compressed_events_dir + "/" + dataset_name + "/" + file_name)
-
-    end_time = time.time()
-    if verbose:
-        print("Compressed file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-
-    # --- Decompress data ---
-    if verbose:
-        print("Decompressing " + "/" + dataset_name + "/" + file_name + " with " + str(header.address_size) +
-              "-byte addresses and " + str(header.timestamp_size) + "-byte timestamps through " +
-              header.compressor + " decompressor")
-    start_time = time.time()
-
-    decompressed_data = decompressData(compressed_data)
-
+def bytesToSpikesFile(decompressed_data, dataset_name, file_name, header):
+    # Check if the data is correct
     bytes_per_spike = header.address_size + header.timestamp_size
     num_spikes = len(decompressed_data) / bytes_per_spike
     if not num_spikes.is_integer():
@@ -185,7 +239,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     else:
         num_spikes = int(num_spikes)
 
-    # Convert addresses and timestamps from bytes to ints
+    # Separate addresses and timestamps
     addresses = []
     timestamps = []
 
@@ -198,26 +252,9 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     timestamps = [int.from_bytes(x, "big") for x in timestamps]
 
     # Return the new spikes file
-    spikes_file = SpikesFile(addresses, timestamps)
+    raw_data = SpikesFile(addresses, timestamps)
 
-    # Return the modified settings
-    new_settings = copy.deepcopy(settings)
-    new_settings.address_size = header.address_size
-
-    end_time = time.time()
-    if verbose:
-        print("Decompression achieved in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-
-    return spikes_file, new_settings
+    return raw_data
 
 
-def discardBytes(spikes_file, address_size, timestamp_size):
-    raw_smallest_data = bytearray()
-    addresses = spikes_file.addresses
-    timestamps = spikes_file.timestamps
 
-    for i in range(len(addresses) - 1):
-        raw_smallest_data.extend(addresses[i].to_bytes(address_size, "big"))
-        raw_smallest_data.extend(timestamps[i].to_bytes(timestamp_size, "big"))
-
-    return raw_smallest_data
