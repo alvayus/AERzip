@@ -1,8 +1,10 @@
 import copy
 import os
+import struct
 import time
 
 import lz4.frame
+import numpy as np
 import zstandard
 from pyNAVIS import *
 
@@ -256,17 +258,21 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True)
 
     # Check if the data is correct
     bytes_per_spike = header.address_size + header.timestamp_size
-    bytes_data_length = len(bytes_data)
-    num_spikes = bytes_data_length / bytes_per_spike
+    num_spikes = len(bytes_data) / bytes_per_spike
     if not num_spikes.is_integer():
         raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
                          "/" + dataset_name + "/" + file_name)
+    else:
+        num_spikes = int(num_spikes)
 
     # Separate addresses and timestamps
-    addresses = [int.from_bytes(bytes_data[i:i+header.address_size], "big")
-                 for i in range(0, bytes_data_length, bytes_per_spike)]
-    timestamps = [int.from_bytes(bytes_data[i:i+header.timestamp_size], "big")
-                  for i in range(header.address_size, bytes_data_length, bytes_per_spike)]
+    address_param = "u" + str(header.address_size)
+    timestamp_param = "u" + str(header.timestamp_size)
+    bytes_struct = np.dtype(address_param + ", " + timestamp_param)
+
+    spikes = np.frombuffer(bytes_data, bytes_struct)
+    addresses = spikes['f0']
+    timestamps = spikes['f1']
 
     # Return the new spikes file
     raw_data = SpikesFile(addresses, timestamps)
