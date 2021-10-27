@@ -6,7 +6,7 @@ from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
 from pyNAVIS import *
 
-from compressFunctions import decompressDataFromFile
+from compressFunctions import decompressDataFromFile, compressDataFromFile
 
 if __name__ == '__main__':
     # Define source settings
@@ -26,6 +26,10 @@ if __name__ == '__main__':
     directory = "/".join(split_path[0:len_split_path - 2])
     dataset = split_path[len_split_path - 2]
     file = split_path[len_split_path - 1]
+
+    # Compress data
+    compressDataFromFile(directory, directory + "/../compressedEvents", dataset, file, settings,
+                         compressor="ZSTD", ignore_overwriting=False)
 
     # --- COMPRESSED DATA ---
     # Decompress the compressed aedat file
