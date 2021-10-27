@@ -258,7 +258,8 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True)
 
     # Check if the data is correct
     bytes_per_spike = header.address_size + header.timestamp_size
-    num_spikes = len(bytes_data) / bytes_per_spike
+    bytes_data_length = len(bytes_data)
+    num_spikes = bytes_data_length / bytes_per_spike
     if not num_spikes.is_integer():
         raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
                          "/" + dataset_name + "/" + file_name)
@@ -271,8 +272,8 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True)
     bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
-    addresses = spikes['f0']
-    timestamps = spikes['f1']
+    addresses = spikes['f0'].tolist()
+    timestamps = spikes['f1'].tolist()
 
     # Return the new spikes file
     raw_data = SpikesFile(addresses, timestamps)
