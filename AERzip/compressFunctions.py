@@ -10,7 +10,7 @@ from AERzip.CompressedFileHeader import CompressedFileHeader
 
 
 # TODO: Documentation and history on v1.0.0
-
+# TODO: Test files
 # TODO: Add verbose to functions
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
@@ -73,7 +73,10 @@ def getBytesToDiscard(settings):
     return address_size, timestamp_size
 
 
-def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compressor="ZSTD"):
+def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
+    start_time = time.time()
+    if verbose:
+        print("Converting the raw data into a spikes compressed file")
     # Discard useless bytes
     raw_smallest_data = discardBytes(raw_data, address_size, timestamp_size)
 
@@ -83,10 +86,16 @@ def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compress
     # Join header with compressed data
     file_data = getCompressedFile(compressed_data, address_size, timestamp_size, compressor)
 
+    end_time = time.time()
+    if verbose:
+        print("Raw data convertion has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
     return file_data
 
 
-def discardBytes(raw_data, address_size, timestamp_size):
+def discardBytes(raw_data, address_size, timestamp_size, verbose=True):
+    start_time = time.time()
+
     raw_smallest_data = bytearray()
     addresses = raw_data.addresses
     timestamps = raw_data.timestamps
@@ -95,10 +104,16 @@ def discardBytes(raw_data, address_size, timestamp_size):
         raw_smallest_data.extend(addresses[i].to_bytes(address_size, "big"))
         raw_smallest_data.extend(timestamps[i].to_bytes(timestamp_size, "big"))
 
+    end_time = time.time()
+    if verbose:
+        print("Discarded bytes in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
     return raw_smallest_data
 
 
-def compressData(data, compressor="ZSTD"):
+def compressData(data, compressor="ZSTD", verbose=True):
+    start_time = time.time()
+
     if compressor == "ZSTD":
         cctx = zstandard.ZstdCompressor()
         compressed_data = cctx.compress(data)
@@ -107,15 +122,25 @@ def compressData(data, compressor="ZSTD"):
     else:
         raise ValueError("Compressor not recognized")
 
+    end_time = time.time()
+    if verbose:
+        print("Compressed data in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
     return compressed_data
 
 
-def getCompressedFile(compressed_data, address_size=4, timestamp_size=4, compressor="ZSTD"):
+def getCompressedFile(compressed_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
+    start_time = time.time()
+
     # Create file with header
     file_data = CompressedFileHeader(compressor, address_size, timestamp_size).toBytes()
 
     # Extend file with data
     file_data.extend(compressed_data)
+
+    end_time = time.time()
+    if verbose:
+        print("Compressed data attached to the header in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return file_data
 
@@ -229,7 +254,11 @@ def decompressData(compressed_data, compressor="ZSTD"):
     return decompressed_data
 
 
-def bytesToSpikesFile(bytes_data, dataset_name, file_name, header):
+def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True):
+    start_time = time.time()
+    if verbose:
+        print("\nExtracting raw data from bytes")
+
     # Check if the data is correct
     bytes_per_spike = header.address_size + header.timestamp_size
     num_spikes = len(bytes_data) / bytes_per_spike
@@ -253,6 +282,10 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header):
 
     # Return the new spikes file
     raw_data = SpikesFile(addresses, timestamps)
+
+    end_time = time.time()
+    if verbose:
+        print("Raw data extraction has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return raw_data
 
