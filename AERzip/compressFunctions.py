@@ -172,7 +172,9 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     decompressed_data = decompressData(compressed_data)
 
     # Convert addresses and timestamps from bytes to ints
-    raw_data = bytesToSpikesFile(decompressed_data, dataset_name, file_name, header)
+    # TODO: Fix parameters
+    raw_data = bytesToSpikesFile(decompressed_data, dataset_name, file_name,
+                                 header.address_size, header.timestamp_size, discard=False)
 
     # Return the modified settings
     new_settings = copy.deepcopy(settings)
@@ -231,7 +233,7 @@ def decompressData(compressed_data, compressor="ZSTD"):
 
 
 def bytesToSpikesFile(bytes_data, dataset_name, file_name, old_address_size, old_timestamp_size,
-                      new_address_size, new_timestamp_size, verbose=True):
+                      new_address_size, new_timestamp_size, verbose=True, discard=True):
     start_time = time.time()
     if verbose:
         print("bytesToSpikesFile: Extracting raw data from bytes")
@@ -253,9 +255,10 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, old_address_size, old
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
 
-    new_address_param = ">u" + str(new_address_size)
-    new_timestamp_param = ">u" + str(new_timestamp_size)
-    spikes = spikes.astype(dtype=np.dtype(new_address_param + ", " + new_timestamp_param), copy=False)
+    if discard:
+        new_address_param = ">u" + str(new_address_size)
+        new_timestamp_param = ">u" + str(new_timestamp_size)
+        spikes = spikes.astype(dtype=np.dtype(new_address_param + ", " + new_timestamp_param), copy=False)
 
     addresses = spikes['f0']
     timestamps = spikes['f1']
@@ -271,7 +274,7 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, old_address_size, old
 
 
 def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, old_address_size, old_timestamp_size,
-                           new_address_size, new_timestamp_size, verbose=True):
+                           new_address_size, new_timestamp_size, verbose=True, discard=True):
     start_time = time.time()
     if verbose:
         print("bytesToSpikesBytearray: Extracting raw data from bytes")
@@ -293,9 +296,10 @@ def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, old_address_size
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
 
-    new_address_param = ">u" + str(new_address_size)
-    new_timestamp_param = ">u" + str(new_timestamp_size)
-    spikes = spikes.astype(dtype=np.dtype(new_address_param + ", " + new_timestamp_param), copy=False)
+    if discard:
+        new_address_param = ">u" + str(new_address_size)
+        new_timestamp_param = ">u" + str(new_timestamp_size)
+        spikes = spikes.astype(dtype=np.dtype(new_address_param + ", " + new_timestamp_param), copy=False)
 
     # Return the new spikes bytearray
     raw_data = spikes.tobytes()
