@@ -12,7 +12,6 @@ from AERzip.CompressedFileHeader import CompressedFileHeader
 
 # TODO: Documentation and history on v1.0.0
 # TODO: Test files
-# TODO: Add verbose to functions
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
                          settings, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True):
@@ -233,7 +232,7 @@ def decompressData(compressed_data, compressor="ZSTD"):
 
 
 def bytesToSpikesFile(bytes_data, dataset_name, file_name, old_address_size, old_timestamp_size,
-                      new_address_size, new_timestamp_size, verbose=True, discard=True):
+                      new_address_size=4, new_timestamp_size=4, verbose=True, discard=True):
     start_time = time.time()
     if verbose:
         print("bytesToSpikesFile: Extracting raw data from bytes")
@@ -274,7 +273,7 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, old_address_size, old
 
 
 def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, old_address_size, old_timestamp_size,
-                           new_address_size, new_timestamp_size, verbose=True, discard=True):
+                           new_address_size=4, new_timestamp_size=4, verbose=True, discard=True):
     start_time = time.time()
     if verbose:
         print("bytesToSpikesBytearray: Extracting raw data from bytes")
