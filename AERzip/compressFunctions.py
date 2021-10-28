@@ -32,7 +32,8 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
         print("Loading " + "/" + dataset_name + "/" + file_name + " (original aedat file)")
 
     # TODO: Optimize loadAEDAT
-    raw_data = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name, settings)
+    raw_data = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name,
+                                 settings.address_size, settings.timestamp_size)
 
     end_time = time.time()
     if verbose:

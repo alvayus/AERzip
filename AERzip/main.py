@@ -4,6 +4,7 @@ from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
 import matplotlib.pyplot as plt
+import numpy as np
 from pyNAVIS import *
 
 from compressFunctions import decompressDataFromFile, compressDataFromFile
@@ -31,17 +32,16 @@ if __name__ == '__main__':
     compressDataFromFile(directory, directory + "/../compressedEvents", dataset, file, settings,
                          compressor="ZSTD", ignore_overwriting=False)
 
-    # --- COMPRESSED DATA ---
+    '''# --- COMPRESSED DATA ---
     start_time = time.time()
     # Decompress the compressed aedat file
     compressed_spikes_file, new_settings = decompressDataFromFile(directory + "/../compressedEvents",
                                                                   dataset, file, settings)
     gc.collect()  # Cleaning memory
 
-    # Adapt the compressed aedat file
-    Functions.check_SpikesFile(compressed_spikes_file, new_settings)
-    compressed_spikes_file.timestamps = Functions.adapt_timestamps(compressed_spikes_file.timestamps, new_settings)
-
+    # Check the compressed aedat file
+    spikes_file_is_ok = Functions.check_SpikesFile(compressed_spikes_file, new_settings)
+    
     end_time = time.time()
     print(end_time - start_time)
 
@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     Plots.spikegram(compressed_spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.sonogram(compressed_spikes_file, new_settings, verbose=True)
+    Plots.sonogram(compressed_spikes_file, new_settings, ordered=spikes_file_is_ok, verbose=True)
     gc.collect()  # Cleaning memory
     Plots.histogram(compressed_spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
@@ -63,19 +63,21 @@ if __name__ == '__main__':
     print("Plots generation took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     plt.show()
-    gc.collect()  # Cleaning memory
+    gc.collect()  # Cleaning memory'''
 
     # --- ORIGINAL DATA ---
     # Load the original aedat file. Prints added to show loading time
     start_time = time.time()
-    spikes_info = Loaders.loadAEDAT(directory + "/" + dataset + "/" + file, settings)
+    spikes_info = Loaders.loadAEDAT(directory + "/" + dataset + "/" + file,
+                                    settings.address_size, settings.timestamp_size)
     end_time = time.time()
     print("Load original aedat file has took: " + '{0:.3f}'.format(end_time - start_time) + " seconds")
     gc.collect()  # Cleaning memory
 
-    # Adapt the original aedat file
-    Functions.check_SpikesFile(spikes_info, settings)
-    spikes_info.timestamps = Functions.adapt_timestamps(spikes_info.timestamps, settings)
+    # Check the original aedat file
+    order_is_ok = Functions.check_SpikesFile(spikes_info, settings)
+    if not order_is_ok:
+        Functions.order_SpikesFile(spikes_info)
 
     # Plots
     print("Showing original file plots...")
@@ -94,4 +96,7 @@ if __name__ == '__main__':
     end_time = time.time()
     print("Plots generation took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
+    start_time = time.time()
     plt.show()
+    end_time = time.time()
+    print("It took " + '{0:.3f}'.format(end_time - start_time) + " seconds to display the plots.")
