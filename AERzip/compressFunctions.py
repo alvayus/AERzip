@@ -74,7 +74,7 @@ def getBytesToDiscard(settings):
     return address_size, timestamp_size
 
 
-def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True, discard=True):
+def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
     if verbose:
         print("rawFileToCompressedFile: Converting the raw data into a spikes compressed file...")
 
