@@ -15,7 +15,8 @@ from AERzip.CompressedFileHeader import CompressedFileHeader
 # TODO: Add verbose to functions
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
-                         settings, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True):
+                         settings, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True,
+                         discard=True):
     # --- Check the file ---
     if store and not ignore_overwriting:
         if os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/" + file_name):
@@ -50,7 +51,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     start_time = time.time()
 
     # --- New data ---
-    file_data = rawFileToCompressedFile(raw_data, address_size, timestamp_size, compressor)
+    file_data = rawFileToCompressedFile(raw_data, address_size, timestamp_size, compressor, discard)
 
     # --- Store the data ---
     if store:
@@ -293,7 +294,7 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True)
 def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, header, verbose=True):
     start_time = time.time()
     if verbose:
-        print("bytesToSpikesFile: Extracting raw data from bytes")
+        print("bytesToSpikesBytearray: Extracting raw data from bytes")
 
     # Check if the data is correct
     bytes_per_spike = header.address_size + header.timestamp_size
@@ -311,13 +312,15 @@ def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, header, verbose=
     bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
+    addresses = spikes['f0']
+    timestamps = spikes['f1']
 
     # Return the new spikes file
     raw_data = spikes.tobytes()
 
     end_time = time.time()
     if verbose:
-        print("bytesToSpikesFile: Raw data extraction has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+        print("bytesToSpikesBytearray: Raw data extraction has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return raw_data
 
