@@ -1,6 +1,5 @@
 import copy
 import os
-import struct
 import time
 
 import lz4.frame
@@ -75,14 +74,18 @@ def getBytesToDiscard(settings):
     return address_size, timestamp_size
 
 
-def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
+def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True, discard=True):
     if verbose:
         print("rawFileToCompressedFile: Converting the raw data into a spikes compressed file...")
+
     # Discard useless bytes
-    raw_smallest_data = discardBytes(raw_data, address_size, timestamp_size)
+    if discard:
+        compress_data = discardBytes(raw_data, address_size, timestamp_size)
+    else:
+        compress_data = raw_data
 
     # Compress the data
-    compressed_data = compressData(raw_smallest_data, compressor)
+    compressed_data = compressData(compress_data, compressor)
 
     # Join header with compressed data
     file_data = getCompressedFile(compressed_data, address_size, timestamp_size, compressor)
@@ -97,6 +100,7 @@ def discardBytes(raw_data, address_size, timestamp_size, verbose=True):
     addresses = raw_data.addresses
     timestamps = raw_data.timestamps
 
+    # TODO: Optimize this
     for i in range(len(addresses) - 1):
         raw_smallest_data.extend(addresses[i].to_bytes(address_size, "big"))
         raw_smallest_data.extend(timestamps[i].to_bytes(timestamp_size, "big"))
@@ -272,11 +276,44 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True)
     bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
+    # TODO: Why pyNAVIS is faster with lists?
     addresses = spikes['f0'].tolist()
     timestamps = spikes['f1'].tolist()
 
     # Return the new spikes file
     raw_data = SpikesFile(addresses, timestamps)
+
+    end_time = time.time()
+    if verbose:
+        print("bytesToSpikesFile: Raw data extraction has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
+    return raw_data
+
+
+def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, header, verbose=True):
+    start_time = time.time()
+    if verbose:
+        print("bytesToSpikesFile: Extracting raw data from bytes")
+
+    # Check if the data is correct
+    bytes_per_spike = header.address_size + header.timestamp_size
+    bytes_data_length = len(bytes_data)
+    num_spikes = bytes_data_length / bytes_per_spike
+    if not num_spikes.is_integer():
+        raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
+                         "/" + dataset_name + "/" + file_name)
+    else:
+        num_spikes = int(num_spikes)
+
+    # Separate addresses and timestamps
+    address_param = ">u" + str(header.address_size)
+    timestamp_param = ">u" + str(header.timestamp_size)
+    bytes_struct = np.dtype(address_param + ", " + timestamp_param)
+
+    spikes = np.frombuffer(bytes_data, bytes_struct)
+
+    # Return the new spikes file
+    raw_data = spikes.tobytes()
 
     end_time = time.time()
     if verbose:
