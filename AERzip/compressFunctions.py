@@ -15,8 +15,7 @@ from AERzip.CompressedFileHeader import CompressedFileHeader
 # TODO: Add verbose to functions
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
-                         settings, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True,
-                         discard=True):
+                         settings, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True):
     # --- Check the file ---
     if store and not ignore_overwriting:
         if os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/" + file_name):
@@ -51,7 +50,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     start_time = time.time()
 
     # --- New data ---
-    file_data = rawFileToCompressedFile(raw_data, address_size, timestamp_size, compressor, discard)
+    file_data = rawFileToCompressedFile(raw_data, address_size, timestamp_size, compressor)
 
     # --- Store the data ---
     if store:
@@ -79,38 +78,13 @@ def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compress
     if verbose:
         print("rawFileToCompressedFile: Converting the raw data into a spikes compressed file...")
 
-    # Discard useless bytes
-    if discard:
-        compress_data = discardBytes(raw_data, address_size, timestamp_size)
-    else:
-        compress_data = raw_data
-
     # Compress the data
-    compressed_data = compressData(compress_data, compressor)
+    compressed_data = compressData(raw_data, compressor)
 
     # Join header with compressed data
     file_data = getCompressedFile(compressed_data, address_size, timestamp_size, compressor)
 
     return file_data
-
-
-def discardBytes(raw_data, address_size, timestamp_size, verbose=True):
-    start_time = time.time()
-
-    raw_smallest_data = bytearray()
-    addresses = raw_data.addresses
-    timestamps = raw_data.timestamps
-
-    # TODO: Optimize this
-    for i in range(len(addresses) - 1):
-        raw_smallest_data.extend(addresses[i].to_bytes(address_size, "big"))
-        raw_smallest_data.extend(timestamps[i].to_bytes(timestamp_size, "big"))
-
-    end_time = time.time()
-    if verbose:
-        print("-> Discarded bytes in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-
-    return raw_smallest_data
 
 
 def compressData(data, compressor="ZSTD", verbose=True):
@@ -256,13 +230,14 @@ def decompressData(compressed_data, compressor="ZSTD"):
     return decompressed_data
 
 
-def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True):
+def bytesToSpikesFile(bytes_data, dataset_name, file_name, old_address_size, old_timestamp_size,
+                      new_address_size, new_timestamp_size, verbose=True):
     start_time = time.time()
     if verbose:
         print("bytesToSpikesFile: Extracting raw data from bytes")
 
     # Check if the data is correct
-    bytes_per_spike = header.address_size + header.timestamp_size
+    bytes_per_spike = old_address_size + old_timestamp_size
     bytes_data_length = len(bytes_data)
     num_spikes = bytes_data_length / bytes_per_spike
     if not num_spikes.is_integer():
@@ -272,14 +247,18 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True)
         num_spikes = int(num_spikes)
 
     # Separate addresses and timestamps
-    address_param = ">u" + str(header.address_size)
-    timestamp_param = ">u" + str(header.timestamp_size)
+    address_param = ">u" + str(old_address_size)
+    timestamp_param = ">u" + str(old_timestamp_size)
     bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
-    # TODO: Why pyNAVIS is faster with lists?
-    addresses = spikes['f0'].tolist()
-    timestamps = spikes['f1'].tolist()
+
+    new_address_param = ">u" + str(new_address_size)
+    new_timestamp_param = ">u" + str(new_timestamp_size)
+    spikes = spikes.astype(dtype=np.dtype(new_address_param + ", " + new_timestamp_param), copy=False)
+
+    addresses = spikes['f0']
+    timestamps = spikes['f1']
 
     # Return the new spikes file
     raw_data = SpikesFile(addresses, timestamps)
@@ -291,13 +270,14 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, header, verbose=True)
     return raw_data
 
 
-def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, header, verbose=True):
+def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, old_address_size, old_timestamp_size,
+                           new_address_size, new_timestamp_size, verbose=True):
     start_time = time.time()
     if verbose:
         print("bytesToSpikesBytearray: Extracting raw data from bytes")
 
     # Check if the data is correct
-    bytes_per_spike = header.address_size + header.timestamp_size
+    bytes_per_spike = old_address_size + old_timestamp_size
     bytes_data_length = len(bytes_data)
     num_spikes = bytes_data_length / bytes_per_spike
     if not num_spikes.is_integer():
@@ -307,21 +287,18 @@ def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, header, verbose=
         num_spikes = int(num_spikes)
 
     # Separate addresses and timestamps
-    address_param = ">u" + str(header.address_size)
-    timestamp_param = ">u" + str(header.timestamp_size)
+    address_param = ">u" + str(old_address_size)
+    timestamp_param = ">u" + str(old_timestamp_size)
     bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
 
+    new_address_param = ">u" + str(new_address_size)
+    new_timestamp_param = ">u" + str(new_timestamp_size)
+    spikes = spikes.astype(dtype=np.dtype(new_address_param + ", " + new_timestamp_param), copy=False)
+
     # Return the new spikes bytearray
-    raw_data = bytearray()
-
-    addresses = spikes['f0']
-    timestamps = spikes['f1']
-
-    for i in range(num_spikes):
-        raw_data.extend(addresses[i])
-        raw_data.extend(timestamps[i])
+    raw_data = spikes.tobytes()
 
     end_time = time.time()
     if verbose:
