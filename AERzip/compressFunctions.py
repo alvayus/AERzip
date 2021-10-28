@@ -32,7 +32,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
         print("Loading " + "/" + dataset_name + "/" + file_name + " (original aedat file)")
 
     # TODO: Optimize loadAEDAT
-    raw_data = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name,
+    raw_file = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name,
                                  settings.address_size, settings.timestamp_size)
 
     end_time = time.time()
@@ -50,7 +50,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     start_time = time.time()
 
     # --- New data ---
-    file_data = rawFileToCompressedFile(raw_data, address_size, timestamp_size, compressor)
+    file_data = rawFileToCompressedFile(raw_file, address_size, timestamp_size, compressor)
 
     # --- Store the data ---
     if store:
@@ -74,9 +74,25 @@ def getBytesToDiscard(settings):
     return address_size, timestamp_size
 
 
-def rawFileToCompressedFile(raw_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
+def rawSpikesToCompressedFile(raw_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
     if verbose:
         print("rawFileToCompressedFile: Converting the raw data into a spikes compressed file...")
+
+    # Compress the data
+    compressed_data = compressData(raw_data, compressor)
+
+    # Join header with compressed data
+    file_data = getCompressedFile(compressed_data, address_size, timestamp_size, compressor)
+
+    return file_data
+
+
+def rawFileToCompressedFile(raw_file, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
+    if verbose:
+        print("rawFileToCompressedFile: Converting the raw data into a spikes compressed file...")
+
+    # Convert to bytearray
+    raw_data = rawFileToSpikesBytearray(raw_file, address_size, timestamp_size)
 
     # Compress the data
     compressed_data = compressData(raw_data, compressor)
@@ -149,7 +165,8 @@ def storeCompressedFile(file_data, dst_compressed_events_dir, dataset_name, file
 def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, settings, verbose=True):
     # --- Check the file path ---
     if not os.path.exists(src_compressed_events_dir + "/" + dataset_name + "/" + file_name) and verbose:
-        raise FileNotFoundError("Unable to find the specified compressed aedat file: " + "/" + dataset_name + "/" + file_name)
+        raise FileNotFoundError(
+            "Unable to find the specified compressed aedat file: " + "/" + dataset_name + "/" + file_name)
 
     # --- Load data from compressed aedat file ---
     start_time = time.time()
@@ -264,11 +281,36 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, old_address_size, old
     timestamps = spikes['f1']
 
     # Return the new spikes file
-    raw_data = SpikesFile(addresses, timestamps)
+    raw_file = SpikesFile(addresses, timestamps)
 
     end_time = time.time()
     if verbose:
         print("bytesToSpikesFile: Raw data extraction has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
+    return raw_file
+
+
+def rawFileToSpikesBytearray(raw_file, address_size=4, timestamp_size=4,
+                             verbose=True, discard=True):
+    start_time = time.time()
+    if verbose:
+        print("bytesToSpikesBytearray: Extracting raw data from bytes")
+
+    # Discard bytes before compression (if current sizes are not original sizes)
+    new_address_param = ">u" + str(address_size)
+    new_timestamp_param = ">u" + str(timestamp_size)
+
+    raw_data = np.zeros(len(raw_file.addresses), dtype=np.dtype(new_address_param + ", " + new_timestamp_param))
+    raw_data['f0'] = raw_file.addresses.astype(dtype=np.dtype(new_address_param), copy=False)
+    raw_data['f1'] = raw_file.timestamps.astype(dtype=np.dtype(new_timestamp_param), copy=False)
+
+    # Return the new spikes bytearray
+    raw_data = raw_data.tobytes()
+
+    end_time = time.time()
+    if verbose:
+        print("rawFileToSpikesBytearray: Raw data extraction has took " + '{0:.3f}'.format(
+            end_time - start_time) + " seconds")
 
     return raw_data
 
@@ -306,9 +348,7 @@ def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, old_address_size
 
     end_time = time.time()
     if verbose:
-        print("bytesToSpikesBytearray: Raw data extraction has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+        print("bytesToSpikesBytearray: Raw data extraction has took " + '{0:.3f}'.format(
+            end_time - start_time) + " seconds")
 
     return raw_data
-
-
-
