@@ -312,11 +312,16 @@ def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, header, verbose=
     bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
+
+    # Return the new spikes bytearray
+    raw_data = bytearray()
+
     addresses = spikes['f0']
     timestamps = spikes['f1']
 
-    # Return the new spikes file
-    raw_data = spikes.tobytes()
+    for i in range(num_spikes):
+        raw_data.extend(addresses[i])
+        raw_data.extend(timestamps[i])
 
     end_time = time.time()
     if verbose:
