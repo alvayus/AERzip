@@ -63,7 +63,7 @@ def discardBytesToSpikesBytearray(bytes_data, settings, new_address_size,
 
 
 def discardBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp_size, verbose=True):
-
+    # Call to discardBytesToSpikesBytearray function
     smallest_bytes_data = discardBytesToSpikesBytearray(bytes_data, settings,
                                                         new_address_size, new_timestamp_size)
 
