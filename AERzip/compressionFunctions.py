@@ -113,7 +113,9 @@ def compressData(spikes_bytes, compressor="ZSTD", verbose=True):
     return compressed_data
 
 
-def decompressData(compressed_data, compressor="ZSTD"):
+def decompressData(compressed_data, compressor="ZSTD", verbose=True):
+    start_time = time.time()
+    
     if compressor == "ZSTD":
         dctx = zstandard.ZstdDecompressor()
         decompressed_data = dctx.decompress(compressed_data)
@@ -121,6 +123,10 @@ def decompressData(compressed_data, compressor="ZSTD"):
         decompressed_data = lz4.frame.decompress(compressed_data)
     else:
         raise ValueError("Compressor not recognized")
+
+    end_time = time.time()
+    if verbose:
+        print("-> Decompressed data in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return decompressed_data
 
