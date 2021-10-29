@@ -34,13 +34,6 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
 
     raw_file = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name, settings)
 
-    # Check and order if necessary
-    _, order_is_ok, all_in_range = Functions.check_SpikesFile(raw_file, settings)
-    if not all_in_range:
-        raise ValueError("Addresses are not in range. Could be due to bad decoding")
-    if not order_is_ok:
-        Functions.order_SpikesFile(raw_file, settings)
-
     end_time = time.time()
     if verbose:
         print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
@@ -255,14 +248,14 @@ def decompressData(compressed_data, compressor="ZSTD"):
     return decompressed_data
 
 
-def bytesToSpikesFile(bytes_data, dataset_name, file_name, old_address_size, old_timestamp_size,
-                      new_address_size=4, new_timestamp_size=4, verbose=True, discard=True):
+def bytesToSpikesFile(bytes_data, dataset_name, file_name, settings, new_address_size=4,
+                      new_timestamp_size=4, verbose=True, discard=True):
     start_time = time.time()
     if verbose:
         print("bytesToSpikesFile: Extracting raw data from bytes")
 
     # Check if the data is correct
-    bytes_per_spike = old_address_size + old_timestamp_size
+    bytes_per_spike = settings.address_size + settings.timestamp_size
     bytes_data_length = len(bytes_data)
     num_spikes = bytes_data_length / bytes_per_spike
     if not num_spikes.is_integer():
@@ -272,8 +265,8 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, old_address_size, old
         num_spikes = int(num_spikes)
 
     # Separate addresses and timestamps
-    address_param = ">u" + str(old_address_size)
-    timestamp_param = ">u" + str(old_timestamp_size)
+    address_param = ">u" + str(settings.address_size)
+    timestamp_param = ">u" + str(settings.timestamp_size)
     bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
@@ -296,8 +289,7 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, old_address_size, old
     return raw_file
 
 
-def rawFileToSpikesBytearray(raw_file, address_size=4, timestamp_size=4,
-                             verbose=True, discard=True):
+def rawFileToSpikesBytearray(raw_file, address_size=4, timestamp_size=4, verbose=True):
     start_time = time.time()
     if verbose:
         print("bytesToSpikesBytearray: Extracting raw data from bytes")
@@ -321,14 +313,14 @@ def rawFileToSpikesBytearray(raw_file, address_size=4, timestamp_size=4,
     return raw_data
 
 
-def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, old_address_size, old_timestamp_size,
-                           new_address_size=4, new_timestamp_size=4, verbose=True, discard=True):
+def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, settings, new_address_size=4,
+                           new_timestamp_size=4, verbose=True, discard=True):
     start_time = time.time()
     if verbose:
         print("bytesToSpikesBytearray: Extracting raw data from bytes")
 
     # Check if the data is correct
-    bytes_per_spike = old_address_size + old_timestamp_size
+    bytes_per_spike = settings.address_size + settings.timestamp_size
     bytes_data_length = len(bytes_data)
     num_spikes = bytes_data_length / bytes_per_spike
     if not num_spikes.is_integer():
@@ -338,8 +330,8 @@ def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, old_address_size
         num_spikes = int(num_spikes)
 
     # Separate addresses and timestamps
-    address_param = ">u" + str(old_address_size)
-    timestamp_param = ">u" + str(old_timestamp_size)
+    address_param = ">u" + str(settings.address_size)
+    timestamp_param = ">u" + str(settings.timestamp_size)
     bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
