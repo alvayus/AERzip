@@ -22,14 +22,17 @@ if __name__ == '__main__':
     else:
         raise ValueError("Not file selected. Select a new file")
 
-    if split_path[len_split_path-2] != "events":
+    if split_path[len_split_path-3] != "events":
         raise ValueError("Wrong folder. You must select a original aedat file in events folder")
 
     directory = "/".join(split_path[0:len_split_path - 2])
     dataset = split_path[len_split_path - 2]
     file = split_path[len_split_path - 1]
 
-    if file.split(".")[1] != "aedat":
+    split_file = file.split(".")
+    len_split_file = len(split_file)
+
+    if file.split(".")[len_split_file-1] != "aedat":
         raise ValueError("This file is not an aedat file")
 
     # Define source settings
