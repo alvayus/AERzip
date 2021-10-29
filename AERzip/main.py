@@ -14,13 +14,22 @@ if __name__ == '__main__':
                                  bin_size=10000)
     MatLab_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=2, ts_tick=0.2,
                                    bin_size=10000)
+    MatLab_settings_mono = MainSettings(num_channels=64, mono_stereo=0, on_off_both=1, address_size=2, ts_tick=0.2,
+                                        bin_size=10000)
+    MatLab_settings_32ch_mono = MainSettings(num_channels=32, mono_stereo=0, on_off_both=1, address_size=2, ts_tick=0.2,
+                                        bin_size=10000)
 
     settings = jAER_settings
 
     # Find the original aedat file
     print("Select a file in events folder")
     Tk().withdraw()  # we don't want a full GUI, so keep the root window from appearing
-    split_path = askopenfilename().split("/")
+    path = askopenfilename()
+
+    if path:
+        split_path = path.split("/")
+    else:
+        raise ValueError("Not file selected. Select a new file")
 
     len_split_path = len(split_path)
     directory = "/".join(split_path[0:len_split_path - 2])
@@ -39,7 +48,9 @@ if __name__ == '__main__':
     gc.collect()  # Cleaning memory
 
     # Check increasing timestamp order in the original aedat file
-    order_is_ok = Functions.check_SpikesFile(raw_data, settings)[1]
+    _, order_is_ok, all_in_range = Functions.check_SpikesFile(raw_data, settings)
+    if not all_in_range:
+        raise ValueError("Addresses are not in range. Could be due to bad decoding")
     if not order_is_ok:
         Functions.order_SpikesFile(raw_data, settings)
 
@@ -61,7 +72,7 @@ if __name__ == '__main__':
     gc.collect()  # Cleaning memory
     Plots.average_activity(raw_data, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.difference_between_LR(raw_data, new_settings, verbose=True)
+    # Plots.difference_between_LR(raw_data, new_settings, verbose=True)
 
     end_time = time.time()
     print("Plots generation took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
@@ -78,7 +89,9 @@ if __name__ == '__main__':
     gc.collect()  # Cleaning memory
 
     # Check increasing timestamp order in the original aedat file
-    order_is_ok = Functions.check_SpikesFile(spikes_info, settings)[1]
+    _, order_is_ok, all_in_range = Functions.check_SpikesFile(raw_data, settings)
+    if not all_in_range:
+        raise ValueError("Addresses are not in range. Could be due to bad decoding")
     if not order_is_ok:
         Functions.order_SpikesFile(spikes_info, settings)
 

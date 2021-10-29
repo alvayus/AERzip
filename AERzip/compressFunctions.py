@@ -35,7 +35,9 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     raw_file = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name, settings)
 
     # Check and order if necessary
-    order_is_ok = Functions.check_SpikesFile(raw_file, settings)[1]
+    _, order_is_ok, all_in_range = Functions.check_SpikesFile(raw_file, settings)
+    if not all_in_range:
+        raise ValueError("Addresses are not in range. Could be due to bad decoding")
     if not order_is_ok:
         Functions.order_SpikesFile(raw_file, settings)
 
@@ -193,7 +195,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     decompressed_data = decompressData(compressed_data)
 
     # Convert addresses and timestamps from bytes to ints
-    # TODO: Fix parameters
+    # TODO: Fix parameters (of all functions, passing settings)
     raw_data = bytesToSpikesFile(decompressed_data, dataset_name, file_name,
                                  header.address_size, header.timestamp_size, discard=False)
 
@@ -232,7 +234,7 @@ def loadCompressedFile(src_compressed_file_path):
     end_index = start_index + header.timestamp_length
     header.timestamp_size = int.from_bytes(file_data[start_index:end_index], "big") + 1
 
-    start_index = end_index
+    start_index = end_index + header.end_header_length
     compressed_data = file_data[start_index:]
 
     # Close the file
