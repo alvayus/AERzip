@@ -13,6 +13,8 @@ from AERzip.CompressedFileHeader import CompressedFileHeader
 
 # TODO: Documentation and history on v1.0.0
 # TODO: Test files
+# TODO: Fix returned value names
+# TODO: Extract new functions
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
                          settings, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True):
@@ -248,29 +250,18 @@ def decompressData(compressed_data, compressor="ZSTD"):
     return decompressed_data
 
 
-def bytesToSpikesFile(bytes_data, dataset_name, file_name, address_size=4,
-                      timestamp_size=4, verbose=True):
+def bytesToSpikesFile(bytes_data, address_size=4, timestamp_size=4, verbose=True):
     start_time = time.time()
     if verbose:
         print("bytesToSpikesFile: Converting bytes to SpikesFile")
 
     # Check if the data is correct
-    bytes_per_spike = address_size + timestamp_size
-    bytes_data_length = len(bytes_data)
-    num_spikes = bytes_data_length / bytes_per_spike
-    if not num_spikes.is_integer():
-        raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
-                         "/" + dataset_name + "/" + file_name)
-    else:
-        num_spikes = int(num_spikes)
+    checkBytes(bytes_data, address_size, timestamp_size)
 
     # Separate addresses and timestamps
-    address_param = ">u" + str(address_size)
-    timestamp_param = ">u" + str(timestamp_size)
-    bytes_struct = np.dtype(address_param + ", " + timestamp_param)
+    struct = constructStruct(address_size, timestamp_size)
 
-    spikes = np.frombuffer(bytes_data, bytes_struct)
-
+    spikes = np.frombuffer(bytes_data, struct)
     addresses = spikes['f0']
     timestamps = spikes['f1']
 
@@ -285,46 +276,50 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, address_size=4,
     return raw_file
 
 
-def discardBytesToSpikesFile(bytes_data, dataset_name, file_name, settings, new_address_size,
-                             new_timestamp_size, verbose=True):
+def discardBytesToSpikesBytearray(bytes_data, settings, new_address_size,
+                                  new_timestamp_size, verbose=True):
     start_time = time.time()
     if verbose:
-        print("discardBytesToSpikesFile: Converting bytes to SpikesFile with byte discarding"
-              "(from " + str(settings.timestamp_size) + "-bytes addresses and " +
+        print("discardBytesToSpikesBytearray: Converting bytearray of spikes"
+              "from " + str(settings.timestamp_size) + "-bytes addresses and " +
               str(settings.timestamp_size) + "-bytes timestamps to " + new_address_size +
-              "-bytes addresses and " + new_timestamp_size + "-bytes timestamps)")
+              "-bytes addresses and " + new_timestamp_size + "-bytes timestamps")
 
     # Check if the data is correct (with original aedat file sizes)
-    bytes_per_spike = settings.address_size + settings.timestamp_size
-    bytes_data_length = len(bytes_data)
-    num_spikes = bytes_data_length / bytes_per_spike
-    if not num_spikes.is_integer():
-        raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
-                         "/" + dataset_name + "/" + file_name)
-    else:
-        num_spikes = int(num_spikes)
+    checkBytes(bytes_data, settings.address_size, settings.timestamp_size)
 
     # Read addresses and timestamps (with original aedat file sizes)
-    address_param = ">u" + str(settings.address_size)
-    timestamp_param = ">u" + str(settings.timestamp_size)
-    bytes_struct = np.dtype(address_param + ", " + timestamp_param)
+    struct = constructStruct(settings.address_size, settings.timestamp_size)
 
-    spikes = np.frombuffer(bytes_data, bytes_struct)
+    spikes = np.frombuffer(bytes_data, struct)
 
     # Convert address and timestamp sizes (with desired sizes)
-    new_address_param = ">u" + str(new_address_size)
-    new_timestamp_param = ">u" + str(new_timestamp_size)
-    spikes = spikes.astype(dtype=np.dtype(new_address_param + ", " + new_timestamp_param), copy=False)
+    struct = constructStruct(new_address_size, new_timestamp_size)
 
-    addresses = spikes['f0']
-    timestamps = spikes['f1']
-
-    # Return the new spikes file
-    raw_file = SpikesFile(addresses, timestamps)
+    small_bytes = spikes.astype(dtype=struct, copy=False)
 
     end_time = time.time()
     if verbose:
-        print("discardBytesToSpikesFile: Data conversion has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+        print("discardBytesToSpikesBytearray: Data conversion has took " + '{0:.3f}'.format(
+            end_time - start_time) + " seconds")
+
+    return small_bytes
+
+
+def discardBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp_size, verbose=True):
+
+    smallest_bytes_data = discardBytesToSpikesBytearray(bytes_data, settings,
+                                                        new_address_size, new_timestamp_size)
+
+    # Extracting addresses and timestamps from bytearray
+    addresses = smallest_bytes_data['f0']
+    timestamps = smallest_bytes_data['f1']
+
+    # Return the spikes file
+    raw_file = SpikesFile(addresses, timestamps)
+
+    if verbose:
+        print("discardBytesToSpikesFile: Spikes bytearray converted into a SpikesFile")
 
     return raw_file
 
@@ -353,40 +348,19 @@ def rawFileToSpikesBytearray(raw_file, address_size=4, timestamp_size=4, verbose
     return raw_data
 
 
-def bytesToSpikesBytearray(bytes_data, dataset_name, file_name, settings, new_address_size=4,
-                           new_timestamp_size=4, verbose=True, discard=True):
-    start_time = time.time()
-    if verbose:
-        print("bytesToSpikesBytearray: Extracting raw data from bytes")
-
-    # Check if the data is correct
-    bytes_per_spike = settings.address_size + settings.timestamp_size
+def checkBytes(bytes_data, address_size, timestamp_size):
+    bytes_per_spike = address_size + timestamp_size
     bytes_data_length = len(bytes_data)
     num_spikes = bytes_data_length / bytes_per_spike
     if not num_spikes.is_integer():
-        raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
-                         "/" + dataset_name + "/" + file_name)
+        raise ValueError("Spikes are not a whole number. Something went wrong with the file")
     else:
-        num_spikes = int(num_spikes)
+        return True
 
-    # Separate addresses and timestamps
-    address_param = ">u" + str(settings.address_size)
-    timestamp_param = ">u" + str(settings.timestamp_size)
-    bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
-    spikes = np.frombuffer(bytes_data, bytes_struct)
+def constructStruct(address_size, timestamp_size):
+    address_param = ">u" + str(address_size)
+    timestamp_param = ">u" + str(timestamp_size)
+    struct = np.dtype(address_param + ", " + timestamp_param)
 
-    if discard:
-        new_address_param = ">u" + str(new_address_size)
-        new_timestamp_param = ">u" + str(new_timestamp_size)
-        spikes = spikes.astype(dtype=np.dtype(new_address_param + ", " + new_timestamp_param), copy=False)
-
-    # Return the new spikes bytearray
-    raw_data = spikes.tobytes()
-
-    end_time = time.time()
-    if verbose:
-        print("bytesToSpikesBytearray: Raw data extraction has took " + '{0:.3f}'.format(
-            end_time - start_time) + " seconds")
-
-    return raw_data
+    return struct
