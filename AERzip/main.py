@@ -22,6 +22,10 @@ if __name__ == '__main__':
         raise ValueError("Not file selected. Select a new file")
 
     len_split_path = len(split_path)
+
+    if split_path[len_split_path-1] != "events":
+        raise ValueError("Wrong folder. You must select a original aedat file in events folder")
+
     directory = "/".join(split_path[0:len_split_path - 2])
     dataset = split_path[len_split_path - 2]
     file = split_path[len_split_path - 1]

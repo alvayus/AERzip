@@ -115,7 +115,7 @@ def compressData(spikes_bytes, compressor="ZSTD", verbose=True):
 
 def decompressData(compressed_data, compressor="ZSTD", verbose=True):
     start_time = time.time()
-    
+
     if compressor == "ZSTD":
         dctx = zstandard.ZstdDecompressor()
         decompressed_data = dctx.decompress(compressed_data)
