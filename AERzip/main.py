@@ -9,22 +9,12 @@ from pyNAVIS import *
 from compressFunctions import decompressDataFromFile, compressDataFromFile
 
 if __name__ == '__main__':
-    # Define source settings
-    jAER_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=4, ts_tick=1,
-                                 bin_size=10000)
-    MatLab_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=2, ts_tick=0.2,
-                                   bin_size=10000)
-    MatLab_settings_mono = MainSettings(num_channels=64, mono_stereo=0, on_off_both=1, address_size=2, ts_tick=0.2,
-                                        bin_size=10000)
-    MatLab_settings_32ch_mono = MainSettings(num_channels=32, mono_stereo=0, on_off_both=1, address_size=2, ts_tick=0.2,
-                                        bin_size=10000)
-
-    settings = jAER_settings
+    root = Tk()
+    root.withdraw()  # we don't want a full GUI, so keep the root window from appearing
 
     # Find the original aedat file
-    print("Select a file in events folder")
-    Tk().withdraw()  # we don't want a full GUI, so keep the root window from appearing
-    path = askopenfilename()
+    print("\nSelect a file in events folder")
+    path = askopenfilename(parent=root)
 
     if path:
         split_path = path.split("/")
@@ -35,6 +25,35 @@ if __name__ == '__main__':
     directory = "/".join(split_path[0:len_split_path - 2])
     dataset = split_path[len_split_path - 2]
     file = split_path[len_split_path - 1]
+
+    # Define source settings
+    jAER_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=4, ts_tick=1,
+                                 bin_size=10000)
+    MatLab_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=2, ts_tick=0.2,
+                                   bin_size=10000)
+    MatLab_settings_mono = MainSettings(num_channels=64, mono_stereo=0, on_off_both=1, address_size=2, ts_tick=0.2,
+                                        bin_size=10000)
+    MatLab_settings_32ch_mono = MainSettings(num_channels=32, mono_stereo=0, on_off_both=1, address_size=2, ts_tick=0.2,
+                                        bin_size=10000)
+
+    print("Currently these are the predefined settings:\n\n"
+          "1) jAER_settings (num_channels=64, mono_stereo=1, address_size=4)\n"
+          "2) MatLab_settings (num_channels=64, mono_stereo=1, address_size=2)\n"
+          "3) MatLab_settings_mono (num_channels=64, mono_stereo=0, address_size=2)\n"
+          "4) MatLab_settings_32ch_mono (num_channels=64, mono_stereo=0, address_size=2)\n")
+
+    number = int(input("Enter your option: "))
+
+    if number == 1:
+        settings = jAER_settings
+    elif number == 2:
+        settings = MatLab_settings
+    elif number == 3:
+        settings = MatLab_settings_mono
+    elif number == 4:
+        settings = MatLab_settings_32ch_mono
+    else:
+        settings = None
 
     # Compress data
     compressDataFromFile(directory, directory + "/../compressedEvents", dataset, file, settings,
