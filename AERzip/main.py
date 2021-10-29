@@ -1,4 +1,5 @@
 import gc
+import os
 import time
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
@@ -7,6 +8,8 @@ import matplotlib.pyplot as plt
 from pyNAVIS import *
 
 from compressionFunctions import decompressDataFromFile, compressDataFromFile
+
+# TODO: Fix variable names
 
 if __name__ == '__main__':
     root = Tk()
@@ -22,7 +25,7 @@ if __name__ == '__main__':
     else:
         raise ValueError("Not file selected. Select a new file")
 
-    if split_path[len_split_path-3] != "events":
+    if split_path[len_split_path - 3] != "events":
         raise ValueError("Wrong folder. You must select a original aedat file in events folder")
 
     directory = "/".join(split_path[0:len_split_path - 2])
@@ -32,7 +35,7 @@ if __name__ == '__main__':
     split_file = file.split(".")
     len_split_file = len(split_file)
 
-    if file.split(".")[len_split_file-1] != "aedat":
+    if file.split(".")[len_split_file - 1] != "aedat":
         raise ValueError("This file is not an aedat file")
 
     # Define source settings
@@ -65,8 +68,8 @@ if __name__ == '__main__':
         settings = None
 
     # Compress data
-    compressDataFromFile(directory, directory + "/../compressedEvents", dataset, file, settings,
-                         compressor="ZSTD", ignore_overwriting=False)
+    # compressDataFromFile(directory, directory + "/../compressedEvents", dataset, file, settings,
+                         #compressor="ZSTD", ignore_overwriting=False)
 
     # --- COMPRESSED DATA ---
     start_time = time.time()
@@ -104,27 +107,37 @@ if __name__ == '__main__':
     # --- ORIGINAL DATA ---
     # Load the original aedat file. Prints added to show loading time
     start_time = time.time()
-    spikes_info = Loaders.loadAEDAT(directory + "/" + dataset + "/" + file, settings)
+    spikes_file = Loaders.loadAEDAT(directory + "/" + dataset + "/" + file, settings)
     end_time = time.time()
     print("Load original aedat file has took: " + '{0:.3f}'.format(end_time - start_time) + " seconds")
     gc.collect()  # Cleaning memory
 
     # Adapting timestamps
-    spikes_info.timestamps = Functions.adapt_timestamps(spikes_info.timestamps, settings)
+    spikes_file.timestamps = Functions.adapt_timestamps(spikes_file.timestamps, settings)
 
     # Plots
     print("Showing original file plots...")
     start_time = time.time()
 
-    Plots.spikegram(spikes_info, settings, verbose=True)
+    Plots.spikegram(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.sonogram(spikes_info, settings, verbose=True)
+    Plots.sonogram(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.histogram(spikes_info, settings, verbose=True)
+    Plots.histogram(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.average_activity(spikes_info, settings, verbose=True)
+    Plots.average_activity(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
     # Plots.difference_between_LR(spikes_info, settings, verbose=True)
+
+    report_directory = directory + "/../reports/"
+
+    if not os.path.exists(report_directory + dataset + "/"):
+        os.makedirs(report_directory + dataset + "/")
+
+    # TODO: Not PDF, just PNG
+    '''Functions.PDF_report(spikes_file, settings, report_directory + dataset +
+                         "/" + file + ".pdf", plots=["Spikegram", "Sonogram",
+                                                     "Histogram", "Average activity"])'''
 
     end_time = time.time()
     print("Plots generation took " + '{0:.3f}'.format(end_time - start_time) + " seconds")

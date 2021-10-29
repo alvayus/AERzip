@@ -138,9 +138,6 @@ def storeCompressedFile(compressed_file, dst_compressed_events_dir, dataset_name
         checkCompressedFileExists(dst_compressed_events_dir, dataset_name, file_name)
 
     # Check the destination folder
-    if not os.path.exists(dst_compressed_events_dir):
-        os.makedirs(dst_compressed_events_dir)
-
     if not os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/"):
         os.makedirs(dst_compressed_events_dir + "/" + dataset_name + "/")
 
