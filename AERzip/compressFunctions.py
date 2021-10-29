@@ -188,13 +188,13 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     decompressed_data = decompressData(compressed_data)
 
     # Convert addresses and timestamps from bytes to ints
-    # TODO: Fix parameters (of all functions, passing settings)
     raw_data = bytesToSpikesFile(decompressed_data, dataset_name, file_name,
                                  header.address_size, header.timestamp_size, discard=False)
 
     # Return the modified settings
     new_settings = copy.deepcopy(settings)
     new_settings.address_size = header.address_size
+    new_settings.timestamp_size = header.timestamp_size
 
     end_time = time.time()
     if verbose:
