@@ -189,7 +189,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
 
     # Convert addresses and timestamps from bytes to ints
     raw_data = bytesToSpikesFile(decompressed_data, dataset_name, file_name,
-                                 header.address_size, header.timestamp_size, discard=False)
+                                 header.address_size, header.timestamp_size)
 
     # Return the modified settings
     new_settings = copy.deepcopy(settings)
@@ -248,14 +248,14 @@ def decompressData(compressed_data, compressor="ZSTD"):
     return decompressed_data
 
 
-def bytesToSpikesFile(bytes_data, dataset_name, file_name, settings, new_address_size=4,
-                      new_timestamp_size=4, verbose=True, discard=True):
+def bytesToSpikesFile(bytes_data, dataset_name, file_name, address_size=4,
+                      timestamp_size=4, verbose=True):
     start_time = time.time()
     if verbose:
-        print("bytesToSpikesFile: Extracting raw data from bytes")
+        print("bytesToSpikesFile: Converting bytes to SpikesFile")
 
     # Check if the data is correct
-    bytes_per_spike = settings.address_size + settings.timestamp_size
+    bytes_per_spike = address_size + timestamp_size
     bytes_data_length = len(bytes_data)
     num_spikes = bytes_data_length / bytes_per_spike
     if not num_spikes.is_integer():
@@ -265,16 +265,11 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, settings, new_address
         num_spikes = int(num_spikes)
 
     # Separate addresses and timestamps
-    address_param = ">u" + str(settings.address_size)
-    timestamp_param = ">u" + str(settings.timestamp_size)
+    address_param = ">u" + str(address_size)
+    timestamp_param = ">u" + str(timestamp_size)
     bytes_struct = np.dtype(address_param + ", " + timestamp_param)
 
     spikes = np.frombuffer(bytes_data, bytes_struct)
-
-    if discard:
-        new_address_param = ">u" + str(new_address_size)
-        new_timestamp_param = ">u" + str(new_timestamp_size)
-        spikes = spikes.astype(dtype=np.dtype(new_address_param + ", " + new_timestamp_param), copy=False)
 
     addresses = spikes['f0']
     timestamps = spikes['f1']
@@ -284,7 +279,52 @@ def bytesToSpikesFile(bytes_data, dataset_name, file_name, settings, new_address
 
     end_time = time.time()
     if verbose:
-        print("bytesToSpikesFile: Raw data extraction has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+        print("bytesToSpikesFile: Data conversion has took " + '{0:.3f}'.format(
+            end_time - start_time) + " seconds")
+
+    return raw_file
+
+
+def discardBytesToSpikesFile(bytes_data, dataset_name, file_name, settings, new_address_size,
+                             new_timestamp_size, verbose=True):
+    start_time = time.time()
+    if verbose:
+        print("discardBytesToSpikesFile: Converting bytes to SpikesFile with byte discarding"
+              "(from " + str(settings.timestamp_size) + "-bytes addresses and " +
+              str(settings.timestamp_size) + "-bytes timestamps to " + new_address_size +
+              "-bytes addresses and " + new_timestamp_size + "-bytes timestamps)")
+
+    # Check if the data is correct (with original aedat file sizes)
+    bytes_per_spike = settings.address_size + settings.timestamp_size
+    bytes_data_length = len(bytes_data)
+    num_spikes = bytes_data_length / bytes_per_spike
+    if not num_spikes.is_integer():
+        raise ValueError("Spikes are not a whole number. Something went wrong with the file " +
+                         "/" + dataset_name + "/" + file_name)
+    else:
+        num_spikes = int(num_spikes)
+
+    # Read addresses and timestamps (with original aedat file sizes)
+    address_param = ">u" + str(settings.address_size)
+    timestamp_param = ">u" + str(settings.timestamp_size)
+    bytes_struct = np.dtype(address_param + ", " + timestamp_param)
+
+    spikes = np.frombuffer(bytes_data, bytes_struct)
+
+    # Convert address and timestamp sizes (with desired sizes)
+    new_address_param = ">u" + str(new_address_size)
+    new_timestamp_param = ">u" + str(new_timestamp_size)
+    spikes = spikes.astype(dtype=np.dtype(new_address_param + ", " + new_timestamp_param), copy=False)
+
+    addresses = spikes['f0']
+    timestamps = spikes['f1']
+
+    # Return the new spikes file
+    raw_file = SpikesFile(addresses, timestamps)
+
+    end_time = time.time()
+    if verbose:
+        print("discardBytesToSpikesFile: Data conversion has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return raw_file
 
