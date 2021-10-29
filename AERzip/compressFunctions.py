@@ -31,9 +31,12 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     if verbose:
         print("Loading " + "/" + dataset_name + "/" + file_name + " (original aedat file)")
 
-    # TODO: Optimize loadAEDAT
-    raw_file = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name,
-                                 settings.address_size, settings.timestamp_size)
+    raw_file = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name, settings)
+
+    # Check and order if necessary
+    order_is_ok = Functions.check_SpikesFile(raw_file, settings)[1]
+    if not order_is_ok:
+        Functions.order_SpikesFile(raw_file, settings)
 
     end_time = time.time()
     if verbose:
