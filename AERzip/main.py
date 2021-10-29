@@ -18,10 +18,9 @@ if __name__ == '__main__':
 
     if path:
         split_path = path.split("/")
+        len_split_path = len(split_path)
     else:
         raise ValueError("Not file selected. Select a new file")
-
-    len_split_path = len(split_path)
 
     if split_path[len_split_path-1] != "events":
         raise ValueError("Wrong folder. You must select a original aedat file in events folder")
@@ -29,6 +28,9 @@ if __name__ == '__main__':
     directory = "/".join(split_path[0:len_split_path - 2])
     dataset = split_path[len_split_path - 2]
     file = split_path[len_split_path - 1]
+
+    if file.split(".")[1] != "aedat":
+        raise ValueError("This file is not an aedat file")
 
     # Define source settings
     jAER_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=4, ts_tick=1,
