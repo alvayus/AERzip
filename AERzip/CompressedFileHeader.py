@@ -12,9 +12,11 @@ class CompressedFileHeader:
         self.timestamp_size = timestamp_size
         self.timestamp_length = 1
 
-        self.header_size = self.library_version_length + self.compressor_length + self.address_length + self.timestamp_length
         self.end_header = "#End Of ASCII Header\r\n"
         self.end_header_length = 22
+
+        self.header_size = self.library_version_length + self.compressor_length + \
+                           self.address_length + self.timestamp_length + self.end_header_length
 
     def toBytes(self):
         header = bytearray()
