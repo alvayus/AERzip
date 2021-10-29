@@ -72,8 +72,7 @@ if __name__ == '__main__':
     # --- ORIGINAL DATA ---
     # Load the original aedat file. Prints added to show loading time
     start_time = time.time()
-    spikes_info = Loaders.loadAEDAT(directory + "/" + dataset + "/" + file,
-                                    settings.address_size, settings.timestamp_size)
+    spikes_info = Loaders.loadAEDAT(directory + "/" + dataset + "/" + file, settings)
     end_time = time.time()
     print("Load original aedat file has took: " + '{0:.3f}'.format(end_time - start_time) + " seconds")
     gc.collect()  # Cleaning memory
