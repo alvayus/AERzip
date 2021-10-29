@@ -1,4 +1,5 @@
 import copy
+import math
 import os
 import time
 
@@ -69,8 +70,8 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
 
 def getBytesToDiscard(settings):
     # --- Get bytes needed to address and timestamp representation ---
-    address_size = int(round(settings.num_channels * (settings.mono_stereo + 1) *
-                             (settings.on_off_both + 1) / 256))
+    address_size = int(math.ceil(settings.num_channels * (settings.mono_stereo + 1) *
+                                 (settings.on_off_both + 1) / 256))
     # TODO: Timestamps
     timestamp_size = 4
 
