@@ -29,4 +29,7 @@ class CompressedFileHeader:
         header.extend((self.address_size - 1).to_bytes(self.address_length, "big"))
         header.extend((self.timestamp_size - 1).to_bytes(self.timestamp_length, "big"))
 
+        # End of header
+        header.extend(bytes("#End Of ASCII Header\r\n", "utf-8"))
+
         return header
