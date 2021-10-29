@@ -1,16 +1,12 @@
 import copy
-import math
 import os
 import time
 
 import lz4.frame
-import numpy as np
 import zstandard
 from pyNAVIS import *
 
 from AERzip.CompressedFileHeader import CompressedFileHeader
-
-
 # TODO: Documentation and history on v1.0.0
 # TODO: Test files
 # TODO: Fix returned value names
@@ -181,8 +177,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     decompressed_data = decompressData(compressed_data)
 
     # Convert addresses and timestamps from bytes to ints
-    raw_data = bytesToSpikesFile(decompressed_data, dataset_name, file_name,
-                                 header.address_size, header.timestamp_size)
+    raw_data = bytesToSpikesFile(decompressed_data, header.address_size, header.timestamp_size)
 
     # Return the modified settings
     new_settings = copy.deepcopy(settings)
