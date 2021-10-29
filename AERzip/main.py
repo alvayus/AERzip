@@ -22,7 +22,7 @@ if __name__ == '__main__':
     else:
         raise ValueError("Not file selected. Select a new file")
 
-    if split_path[len_split_path-1] != "events":
+    if split_path[len_split_path-2] != "events":
         raise ValueError("Wrong folder. You must select a original aedat file in events folder")
 
     directory = "/".join(split_path[0:len_split_path - 2])
