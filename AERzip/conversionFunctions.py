@@ -5,7 +5,7 @@ import numpy as np
 from pyNAVIS import SpikesFile
 
 
-def discardBytesToSpikesBytearray(bytes_data, settings, new_address_size,
+def prunedBytesToSpikesBytearray(bytes_data, settings, new_address_size,
                                   new_timestamp_size, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
@@ -28,7 +28,7 @@ def discardBytesToSpikesBytearray(bytes_data, settings, new_address_size,
     """
     start_time = time.time()
     if verbose:
-        print("discardBytesToSpikesBytearray: Converting bytes of spikes"
+        print("prunedBytesToSpikesBytearray: Converting bytes of spikes"
               "with " + str(settings.timestamp_size) + "-bytes addresses and " +
               str(settings.timestamp_size) + "-bytes timestamps to bytes of spikes with " +
               str(new_address_size) + "-bytes addresses and " + str(new_timestamp_size) +
@@ -50,13 +50,13 @@ def discardBytesToSpikesBytearray(bytes_data, settings, new_address_size,
 
     end_time = time.time()
     if verbose:
-        print("discardBytesToSpikesBytearray: Data conversion has took " + '{0:.3f}'.format(
+        print("prunedBytesToSpikesBytearray: Data conversion has took " + '{0:.3f}'.format(
             end_time - start_time) + " seconds")
 
     return smallest_bytes
 
 
-def discardBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp_size, verbose=True):
+def prunedBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp_size, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
     to a SpikesFile of raw spikes of c-bytes addresses and d-bytes timestamps, where
@@ -78,8 +78,8 @@ def discardBytesToSpikesFile(bytes_data, settings, new_address_size, new_timesta
         If a and b are equal to c and d respectively, output SpikesFile spikes will be of the same shape that
         input bytearray spikes.
     """
-    # Call to discardBytesToSpikesBytearray function
-    smallest_bytes = discardBytesToSpikesBytearray(bytes_data, settings,
+    # Call to prunedBytesToSpikesBytearray function
+    smallest_bytes = prunedBytesToSpikesBytearray(bytes_data, settings,
                                                    new_address_size, new_timestamp_size)
 
     # Extracting addresses and timestamps from bytearray
@@ -90,7 +90,7 @@ def discardBytesToSpikesFile(bytes_data, settings, new_address_size, new_timesta
     spikes_file = SpikesFile(addresses, timestamps)
 
     if verbose:
-        print("discardBytesToSpikesFile: Spikes bytes converted into a SpikesFile")
+        print("prunedBytesToSpikesFile: Spikes bytes converted into a SpikesFile")
 
     return spikes_file
 
@@ -160,7 +160,7 @@ def spikesFileToBytes(spikes_file, address_size=4, timestamp_size=4, verbose=Tru
     if verbose:
         print("spikesFileToBytes: Converting SpikesFile to spikes bytes")
 
-    # Discard bytes before compression (if parameter sizes are not original sizes)
+    # Prune bytes before compression (if parameter sizes are not original sizes)
     address_param = ">u" + str(address_size)
     timestamp_param = ">u" + str(timestamp_size)
     struct = np.dtype(address_param + ", " + timestamp_param)
@@ -201,7 +201,7 @@ def checkBytes(bytes_data, address_size, timestamp_size):
         return True
 
 
-def getBytesToDiscard(settings):
+def getBytesToPrune(settings):
     """
     Gets the minimum number of bytes needed for spikes addresses and timestamps representation based on the input settings.
 
@@ -213,7 +213,6 @@ def getBytesToDiscard(settings):
         address_size (int): An int indicating the minimum number of bytes to represent the addresses.
         timestamp_size (int): An int indicating the minimum number of bytes to represent the timestamps.
     """
-    # --- Get bytes needed to address and timestamp representation ---
     address_size = int(math.ceil(settings.num_channels * (settings.mono_stereo + 1) *
                                  (settings.on_off_both + 1) / 256))
     # TODO: Timestamps
