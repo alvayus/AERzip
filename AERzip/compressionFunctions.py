@@ -10,7 +10,7 @@ from pyNAVIS import *
 from AERzip.CompressedFileHeader import CompressedFileHeader
 # TODO: Documentation and history on v1.0.0
 # TODO: Test files
-from AERzip.conversionFunctions import bytesToSpikesFile, rawFileToSpikesBytearray, getBytesToDiscard
+from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, getBytesToDiscard
 
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
@@ -201,7 +201,7 @@ def bytesToCompressedFile(spikes_bytes, address_size=4, timestamp_size=4, compre
 
 def spikesFileToCompressedFile(spikes_file, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
     # Convert to bytearray (needed to compress)
-    spikes_bytes = rawFileToSpikesBytearray(spikes_file, address_size, timestamp_size)
+    spikes_bytes = spikesFileToBytes(spikes_file, address_size, timestamp_size)
 
     # Call to bytesToCompressedFile function
     compressed_file = bytesToCompressedFile(spikes_bytes, address_size, timestamp_size, compressor)
