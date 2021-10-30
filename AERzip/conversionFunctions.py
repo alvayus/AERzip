@@ -5,7 +5,7 @@ import numpy as np
 from pyNAVIS import SpikesFile
 
 
-def prunedBytesToSpikesBytearray(bytes_data, settings, new_address_size,
+def pruneBytesToSpikesBytearray(bytes_data, settings, new_address_size,
                                   new_timestamp_size, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
@@ -28,7 +28,7 @@ def prunedBytesToSpikesBytearray(bytes_data, settings, new_address_size,
     """
     start_time = time.time()
     if verbose:
-        print("prunedBytesToSpikesBytearray: Converting bytes of spikes"
+        print("pruneBytesToSpikesBytearray: Converting bytes of spikes"
               "with " + str(settings.timestamp_size) + "-bytes addresses and " +
               str(settings.timestamp_size) + "-bytes timestamps to bytes of spikes with " +
               str(new_address_size) + "-bytes addresses and " + str(new_timestamp_size) +
@@ -50,13 +50,13 @@ def prunedBytesToSpikesBytearray(bytes_data, settings, new_address_size,
 
     end_time = time.time()
     if verbose:
-        print("prunedBytesToSpikesBytearray: Data conversion has took " + '{0:.3f}'.format(
+        print("pruneBytesToSpikesBytearray: Data conversion has took " + '{0:.3f}'.format(
             end_time - start_time) + " seconds")
 
     return smallest_bytes
 
 
-def prunedBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp_size, verbose=True):
+def pruneBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp_size, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
     to a SpikesFile of raw spikes of c-bytes addresses and d-bytes timestamps, where
@@ -78,8 +78,8 @@ def prunedBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestam
         If a and b are equal to c and d respectively, output SpikesFile spikes will be of the same shape that
         input bytearray spikes.
     """
-    # Call to prunedBytesToSpikesBytearray function
-    smallest_bytes = prunedBytesToSpikesBytearray(bytes_data, settings,
+    # Call to pruneBytesToSpikesBytearray function
+    smallest_bytes = pruneBytesToSpikesBytearray(bytes_data, settings,
                                                    new_address_size, new_timestamp_size)
 
     # Extracting addresses and timestamps from bytearray
@@ -90,7 +90,7 @@ def prunedBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestam
     spikes_file = SpikesFile(addresses, timestamps)
 
     if verbose:
-        print("prunedBytesToSpikesFile: Spikes bytes converted into a SpikesFile")
+        print("pruneBytesToSpikesFile: Spikes bytes converted into a SpikesFile")
 
     return spikes_file
 
