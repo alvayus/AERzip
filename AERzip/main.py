@@ -9,8 +9,6 @@ from pyNAVIS import *
 
 from compressionFunctions import decompressDataFromFile, compressDataFromFile
 
-# TODO: Fix variable names
-
 if __name__ == '__main__':
     root = Tk()
     root.withdraw()  # we don't want a full GUI, so keep the root window from appearing
@@ -74,12 +72,12 @@ if __name__ == '__main__':
     # --- COMPRESSED DATA ---
     start_time = time.time()
     # Decompress the compressed aedat file
-    raw_data, new_settings = decompressDataFromFile(directory + "/../compressedEvents",
-                                                    dataset, file, settings)
+    spikes_file, new_settings = decompressDataFromFile(directory + "/../compressedEvents",
+                                                       dataset, file, settings)
     gc.collect()  # Cleaning memory
 
     # Adapting timestamps
-    raw_data.timestamps = Functions.adapt_timestamps(raw_data.timestamps, settings)
+    spikes_file.timestamps = Functions.adapt_timestamps(spikes_file.timestamps, settings)
 
     end_time = time.time()
     print(end_time - start_time)
@@ -88,13 +86,13 @@ if __name__ == '__main__':
     print("\nShowing compressed file plots...")
     start_time = time.time()
 
-    Plots.spikegram(raw_data, new_settings, verbose=True)
+    Plots.spikegram(spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.sonogram(raw_data, new_settings, verbose=True)
+    Plots.sonogram(spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.histogram(raw_data, new_settings, verbose=True)
+    Plots.histogram(spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.average_activity(raw_data, new_settings, verbose=True)
+    Plots.average_activity(spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
     # Plots.difference_between_LR(raw_data, new_settings, verbose=True)
 
