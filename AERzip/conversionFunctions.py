@@ -21,7 +21,7 @@ def pruneBytesToSpikesBytearray(bytes_data, settings, new_address_size,
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
     Returns:
-        smallest_bytes (bytearray): The output bytearray. It contains raw spikes shaped as desired.
+        pruned_bytes (bytearray): The output bytearray. It contains raw spikes shaped as desired.
 
     Notes:
         If a and b are equal to c and d respectively, output bytearray spikes will be of the same shape that input bytearray spikes.
@@ -45,15 +45,15 @@ def pruneBytesToSpikesBytearray(bytes_data, settings, new_address_size,
     # Convert address and timestamp sizes (with desired sizes)
     struct = constructStruct(new_address_size, new_timestamp_size)
 
-    # Return the smallest bytearray
-    smallest_bytes = spikes.astype(dtype=struct, copy=False)
+    # Return the pruned bytearray
+    pruned_bytes = spikes.astype(dtype=struct, copy=False)
 
     end_time = time.time()
     if verbose:
         print("pruneBytesToSpikesBytearray: Data conversion has took " + '{0:.3f}'.format(
             end_time - start_time) + " seconds")
 
-    return smallest_bytes
+    return pruned_bytes
 
 
 def pruneBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp_size, verbose=True):
@@ -79,12 +79,12 @@ def pruneBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp
         input bytearray spikes.
     """
     # Call to pruneBytesToSpikesBytearray function
-    smallest_bytes = pruneBytesToSpikesBytearray(bytes_data, settings,
+    pruned_bytes = pruneBytesToSpikesBytearray(bytes_data, settings,
                                                    new_address_size, new_timestamp_size)
 
     # Extracting addresses and timestamps from bytearray
-    addresses = smallest_bytes['f0']
-    timestamps = smallest_bytes['f1']
+    addresses = pruned_bytes['f0']
+    timestamps = pruned_bytes['f1']
 
     # Return the SpikesFile
     spikes_file = SpikesFile(addresses, timestamps)
@@ -169,7 +169,7 @@ def spikesFileToBytes(spikes_file, address_size=4, timestamp_size=4, verbose=Tru
     bytes_data['f0'] = spikes_file.addresses.astype(dtype=np.dtype(address_param), copy=False)
     bytes_data['f1'] = spikes_file.timestamps.astype(dtype=np.dtype(timestamp_param), copy=False)
 
-    # Return the spikes bytearray (smallest or not)
+    # Return the spikes bytearray (pruned or not)
     bytes_data = bytes_data.tobytes()
 
     end_time = time.time()
