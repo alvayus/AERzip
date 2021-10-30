@@ -22,7 +22,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     # --- Load data from original aedat file ---
     start_time = time.time()
     if verbose:
-        print("Loading " + "/" + dataset_name + "/" + file_name + " (original aedat file)")
+        print("\nLoading " + "/" + dataset_name + "/" + file_name + " (original aedat file)")
 
     spikes_file = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name, settings)
 
@@ -34,7 +34,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     address_size, timestamp_size = getBytesToDiscard(settings)
 
     if verbose:
-        print("Compressing " + "/" + dataset_name + "/" + file_name + " with " + str(settings.address_size) +
+        print("\nCompressing " + "/" + dataset_name + "/" + file_name + " with " + str(settings.address_size) +
               "-byte addresses and " + str(settings.timestamp_size) + "-byte timestamps into an aedat file with " +
               str(address_size) + "-byte addresses and " + str(timestamp_size) + "-byte timestamps through " +
               compressor + " compressor")
@@ -63,7 +63,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     # --- Load data from compressed aedat file ---
     start_time = time.time()
     if verbose:
-        print("Loading " + "/" + dataset_name + "/" + file_name + " (compressed aedat file)")
+        print("\nLoading " + "/" + dataset_name + "/" + file_name + " (compressed aedat file)")
 
     header, compressed_data = loadCompressedFile(src_compressed_events_dir + "/" + dataset_name + "/" + file_name)
 
@@ -73,12 +73,12 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
 
     # --- Decompress the data ---
     if verbose:
-        print("Decompressing " + "/" + dataset_name + "/" + file_name + " with " + str(header.address_size) +
+        print("\nDecompressing " + "/" + dataset_name + "/" + file_name + " with " + str(header.address_size) +
               "-byte addresses and " + str(header.timestamp_size) + "-byte timestamps through " +
               header.compressor + " decompressor")
     start_time = time.time()
 
-    decompressed_data = decompressData(compressed_data)
+    decompressed_data = decompressData(compressed_data, verbose=False)
 
     # Convert addresses and timestamps from bytes to ints
     spikes_file = bytesToSpikesFile(decompressed_data, header.address_size, header.timestamp_size)
@@ -183,10 +183,10 @@ def loadCompressedFile(src_compressed_file_path):
 def bytesToCompressedFile(spikes_bytes, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=True):
     start_time = time.time()
     if verbose:
-        print("bytesToCompressedFile: Converting the raw data into a spikes compressed file...")
+        print("bytesToCompressedFile: Converting spikes bytes into a spikes compressed file...")
 
     # Compress the data
-    compressed_data = compressData(spikes_bytes, compressor)
+    compressed_data = compressData(spikes_bytes, compressor, verbose=False)
 
     # Join header with compressed data
     compressed_file = getCompressedFile(compressed_data, address_size, timestamp_size, compressor)
@@ -230,7 +230,7 @@ def getCompressedFile(compressed_data, address_size=4, timestamp_size=4, compres
 
 def checkCompressedFileExists(dst_compressed_events_dir, dataset_name, file_name):
     if os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/" + file_name):
-        print("The compressed aedat file associated with this aedat file already exists\n"
+        print("\nThe compressed aedat file associated with this aedat file already exists\n"
               "Do you want to overwrite it? Y/N")
         option = input()
 

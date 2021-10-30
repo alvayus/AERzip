@@ -28,10 +28,11 @@ def discardBytesToSpikesBytearray(bytes_data, settings, new_address_size,
     """
     start_time = time.time()
     if verbose:
-        print("discardBytesToSpikesBytearray: Converting bytearray of spikes"
-              "from " + str(settings.timestamp_size) + "-bytes addresses and " +
-              str(settings.timestamp_size) + "-bytes timestamps to " + str(new_address_size) +
-              "-bytes addresses and " + str(new_timestamp_size) + "-bytes timestamps")
+        print("discardBytesToSpikesBytearray: Converting bytes of spikes"
+              "with " + str(settings.timestamp_size) + "-bytes addresses and " +
+              str(settings.timestamp_size) + "-bytes timestamps to bytes of spikes with " +
+              str(new_address_size) + "-bytes addresses and " + str(new_timestamp_size) +
+              "-bytes timestamps")
 
     # Check if the data is correct (with original aedat file sizes)
     checkBytes(bytes_data, settings.address_size, settings.timestamp_size)
@@ -89,7 +90,7 @@ def discardBytesToSpikesFile(bytes_data, settings, new_address_size, new_timesta
     spikes_file = SpikesFile(addresses, timestamps)
 
     if verbose:
-        print("discardBytesToSpikesFile: Spikes bytearray converted into a SpikesFile")
+        print("discardBytesToSpikesFile: Spikes bytes converted into a SpikesFile")
 
     return spikes_file
 
@@ -114,7 +115,7 @@ def bytesToSpikesFile(bytes_data, address_size=4, timestamp_size=4, verbose=True
     """
     start_time = time.time()
     if verbose:
-        print("bytesToSpikesFile: Converting bytes to SpikesFile")
+        print("bytesToSpikesFile: Converting spikes bytes to SpikesFile")
 
     # Check if the data is correct
     checkBytes(bytes_data, address_size, timestamp_size)
@@ -157,7 +158,7 @@ def spikesFileToBytes(spikes_file, address_size=4, timestamp_size=4, verbose=Tru
     """
     start_time = time.time()
     if verbose:
-        print("spikesFileToBytes: Converting SpikesFile to bytes")
+        print("spikesFileToBytes: Converting SpikesFile to spikes bytes")
 
     # Discard bytes before compression (if parameter sizes are not original sizes)
     address_param = ">u" + str(address_size)

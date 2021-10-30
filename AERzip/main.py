@@ -68,8 +68,8 @@ if __name__ == '__main__':
         settings = None
 
     # Compress data
-    # compressDataFromFile(directory, directory + "/../compressedEvents", dataset, file, settings,
-                         #compressor="ZSTD", ignore_overwriting=False)
+    compressDataFromFile(directory, directory + "/../compressedEvents", dataset, file, settings,
+                         compressor="ZSTD", ignore_overwriting=False)
 
     # --- COMPRESSED DATA ---
     start_time = time.time()
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     print(end_time - start_time)
 
     # Plots
-    print("Showing compressed file plots...")
+    print("\nShowing compressed file plots...")
     start_time = time.time()
 
     Plots.spikegram(raw_data, new_settings, verbose=True)
@@ -107,16 +107,17 @@ if __name__ == '__main__':
     # --- ORIGINAL DATA ---
     # Load the original aedat file. Prints added to show loading time
     start_time = time.time()
+    print("\nLoading " + "/" + dataset + "/" + file + " (original aedat file)")
     spikes_file = Loaders.loadAEDAT(directory + "/" + dataset + "/" + file, settings)
     end_time = time.time()
-    print("Load original aedat file has took: " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+    print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
     gc.collect()  # Cleaning memory
 
     # Adapting timestamps
     spikes_file.timestamps = Functions.adapt_timestamps(spikes_file.timestamps, settings)
 
     # Plots
-    print("Showing original file plots...")
+    print("\nShowing original file plots...")
     start_time = time.time()
 
     Plots.spikegram(spikes_file, settings, verbose=True)
