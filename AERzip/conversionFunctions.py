@@ -5,32 +5,6 @@ import numpy as np
 from pyNAVIS import SpikesFile
 
 
-def bytesToSpikesFile(bytes_data, address_size=4, timestamp_size=4, verbose=True):
-    start_time = time.time()
-    if verbose:
-        print("bytesToSpikesFile: Converting bytes to SpikesFile")
-
-    # Check if the data is correct
-    checkBytes(bytes_data, address_size, timestamp_size)
-
-    # Separate addresses and timestamps
-    struct = constructStruct(address_size, timestamp_size)
-
-    spikes = np.frombuffer(bytes_data, struct)
-    addresses = spikes['f0']
-    timestamps = spikes['f1']
-
-    # Return the SpikesFile
-    raw_file = SpikesFile(addresses, timestamps)
-
-    end_time = time.time()
-    if verbose:
-        print("bytesToSpikesFile: Data conversion has took " + '{0:.3f}'.format(
-            end_time - start_time) + " seconds")
-
-    return raw_file
-
-
 def discardBytesToSpikesBytearray(bytes_data, settings, new_address_size,
                                   new_timestamp_size, verbose=True):
     start_time = time.time()
@@ -76,6 +50,32 @@ def discardBytesToSpikesFile(bytes_data, settings, new_address_size, new_timesta
 
     if verbose:
         print("discardBytesToSpikesFile: Spikes bytearray converted into a SpikesFile")
+
+    return raw_file
+
+
+def bytesToSpikesFile(bytes_data, address_size=4, timestamp_size=4, verbose=True):
+    start_time = time.time()
+    if verbose:
+        print("bytesToSpikesFile: Converting bytes to SpikesFile")
+
+    # Check if the data is correct
+    checkBytes(bytes_data, address_size, timestamp_size)
+
+    # Separate addresses and timestamps
+    struct = constructStruct(address_size, timestamp_size)
+
+    spikes = np.frombuffer(bytes_data, struct)
+    addresses = spikes['f0']
+    timestamps = spikes['f1']
+
+    # Return the SpikesFile
+    raw_file = SpikesFile(addresses, timestamps)
+
+    end_time = time.time()
+    if verbose:
+        print("bytesToSpikesFile: Data conversion has took " + '{0:.3f}'.format(
+            end_time - start_time) + " seconds")
 
     return raw_file
 
