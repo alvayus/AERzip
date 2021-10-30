@@ -10,7 +10,7 @@ from pyNAVIS import *
 from AERzip.CompressedFileHeader import CompressedFileHeader
 # TODO: Documentation and history on v1.0.0
 # TODO: Test files
-from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, getBytesToDiscard
+from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, getBytesToPrune
 
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
@@ -31,7 +31,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
         print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     # Get the bytes to be discarded
-    address_size, timestamp_size = getBytesToDiscard(settings)
+    address_size, timestamp_size = getBytesToPrune(settings)
 
     if verbose:
         print("\nCompressing " + "/" + dataset_name + "/" + file_name + " with " + str(settings.address_size) +
@@ -213,6 +213,21 @@ def spikesFileToCompressedFile(spikes_file, address_size=4, timestamp_size=4, co
 
 
 def getCompressedFile(compressed_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=False):
+    """
+    Assembles the full compressed aedat file by joining the CompressedFileHeader object
+    to the compressed spikes raw data.
+
+    Parameters:
+        compressed_data (bytearray): The input bytearray that contains the compressed spikes raw data.
+        address_size (int): An int indicating the size of the addresses.
+        timestamp_size (int): An int indicating the size of the timestamps.
+        compressor (string): A string indicating the compressor to be used.
+        verbose (boolean): A boolean indicating whether or not debug comments are printed.
+
+    Returns:
+        compressed_file (bytearray): The output bytearray. It contains the compressed file header joined to the
+        compressed spikes raw data.
+    """
     start_time = time.time()
 
     # Create file with header
@@ -229,11 +244,33 @@ def getCompressedFile(compressed_data, address_size=4, timestamp_size=4, compres
 
 
 def checkCompressedFileExists(dst_compressed_events_dir, dataset_name, file_name):
-    if os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/" + file_name):
-        print("\nThe compressed aedat file associated with this aedat file already exists\n"
+    """
+    Checks if the specified compressed file exists. If it does, this function allows the user to
+    decide whether to overwrite it or not. If the user decides not to overwrite the file, a new file path
+    is generated to write the file to.
+
+    Parameters:
+        dst_compressed_events_dir (string): A string indicating the compressed files folder.
+        dataset_name (string): A string indicating the dataset name. It must exists inside the compressed files folder.
+        file_name (string): A string indicating the file name. It must exists inside the dataset folder.
+
+    Returns:
+        file_path (string): The output string that indicates where to write the file
+    """
+    file_path = dst_compressed_events_dir + "/" + dataset_name + "/" + file_name
+
+    if os.path.exists(file_path):
+        print("\nThe compressed aedat file already exists\n"
               "Do you want to overwrite it? Y/N")
         option = input()
 
         if option == "N":
-            print("File compression for the file " + "/" + dataset_name + "/" + file_name + " has been cancelled")
-            sys.exit(1)
+            cut_file_name = file_name.replace(".aedat", "")
+
+            i = 1
+            while os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/" + cut_file_name + " (" + str(i) + ").aedat"):
+                i += 1
+
+            file_path = dst_compressed_events_dir + "/" + dataset_name + "/" + cut_file_name + " (" + str(i) + ").aedat "
+
+    return file_path
