@@ -73,7 +73,7 @@ if __name__ == '__main__':
     start_time = time.time()
     # Decompress the compressed aedat file
     spikes_file, new_settings = decompressDataFromFile(directory + "/../compressedEvents",
-                                                       dataset, file, settings)
+                                                       dataset, file, settings, compressor="ZSTD")
     gc.collect()  # Cleaning memory
 
     # Adapting timestamps

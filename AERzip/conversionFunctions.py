@@ -6,12 +6,12 @@ from pyNAVIS import SpikesFile
 
 
 def pruneBytesToSpikesBytearray(bytes_data, settings, new_address_size,
-                                  new_timestamp_size, verbose=True):
+                                new_timestamp_size, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
     to a bytearray of raw spikes of c-bytes addresses and d-bytes timestamps, where
     a is settings.address_size field, b is settings.timestamp_size field and
-    c and d are new input parameters (the desired sizes).
+    c and d are the new sizes input parameters (the desired sizes).
 
     Parameters:
         bytes_data (bytearray): The input bytearray. It must contain raw spikes data (without headers).
@@ -61,7 +61,7 @@ def pruneBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
     to a SpikesFile of raw spikes of c-bytes addresses and d-bytes timestamps, where
     a is settings.address_size field, b is settings.timestamp_size field and
-    c and d are new input parameters (the desired sizes).
+    c and d are the new sizes input parameters (the desired sizes).
 
     Parameters:
         bytes_data (bytearray): The input bytearray. It must contain raw spikes data (without headers).
@@ -80,7 +80,7 @@ def pruneBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp
     """
     # Call to pruneBytesToSpikesBytearray function
     pruned_bytes = pruneBytesToSpikesBytearray(bytes_data, settings,
-                                                   new_address_size, new_timestamp_size)
+                                               new_address_size, new_timestamp_size)
 
     # Extracting addresses and timestamps from bytearray
     addresses = pruned_bytes['f0']
@@ -95,10 +95,10 @@ def pruneBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp
     return spikes_file
 
 
-def bytesToSpikesFile(bytes_data, address_size=4, timestamp_size=4, verbose=True):
+def bytesToSpikesFile(bytes_data, address_size, timestamp_size, verbose=True):
     """
-    Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
-    to a SpikesFile of raw spikes of the same shape.
+    Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
+    and timestamp_size parameters respectively, to a SpikesFile of raw spikes of the same shape.
 
     Parameters:
         bytes_data (bytearray): The input bytearray. It must contain raw spikes data (without headers).
@@ -138,10 +138,10 @@ def bytesToSpikesFile(bytes_data, address_size=4, timestamp_size=4, verbose=True
     return spikes_file
 
 
-def spikesFileToBytes(spikes_file, address_size=4, timestamp_size=4, verbose=True):
+def spikesFileToBytes(spikes_file, address_size, timestamp_size, verbose=True):
     """
-    Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps to a bytearray of raw spikes of
-    the same shape.
+    Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
+    and timestamp_size parameters respectively, to a bytearray of raw spikes of the same shape.
 
     Parameters:
         spikes_file (SpikesFile): The input SpikesFile object from pyNAVIS. It must contain raw spikes data (without headers).
