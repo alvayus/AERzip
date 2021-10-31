@@ -14,7 +14,7 @@ from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, get
 
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
-                         settings, compressor="ZSTD", store=True, ignore_overwriting=True, verbose=True):
+                         settings, compressor, store=True, ignore_overwriting=True, verbose=True):
     # --- Check the file ---
     if store and not ignore_overwriting:
         checkCompressedFileExists(dst_compressed_events_dir, dataset_name, file_name)
@@ -161,7 +161,7 @@ def loadCompressedFile(src_compressed_file_path):
     return header, compressed_data
 
 
-def bytesToCompressedFile(spikes_bytes, address_size, timestamp_size, compressor="ZSTD", verbose=True):
+def bytesToCompressedFile(spikes_bytes, address_size, timestamp_size, compressor, verbose=True):
     start_time = time.time()
     if verbose:
         print("bytesToCompressedFile: Converting spikes bytes into a spikes compressed file...")
@@ -180,7 +180,36 @@ def bytesToCompressedFile(spikes_bytes, address_size, timestamp_size, compressor
     return compressed_file
 
 
-def spikesFileToCompressedFile(spikes_file, address_size, timestamp_size, compressor="ZSTD", verbose=True):
+def compressedFileToBytes(compressed_file, verbose=True):
+    """
+    Converts a bytearray of CompressedFileHeader and compressed spikes of a-bytes addresses and b-bytes timestamps,
+    where a and b are address_size and timestamp_size ints which are inside the bytearray, to a bytearray of raw spikes
+    of the same shape.
+
+    Parameters:
+        compressed_file (bytearray): The input bytearray that contains the CompressedFileHeader and the compressed spikes data.
+        verbose (boolean): A boolean indicating whether or not debug comments are printed.
+
+    Returns:
+        bytes_data (bytearray): The output bytearray. It contains raw spikes shaped as the compressed spikes of the
+        compressed file.
+
+    Notes:
+        This function is the inverse of the bytesToCompressedFile function.
+    """
+    # Call to compressedFileToSpikesFile function
+    header, spikes_file = compressedFileToSpikesFile(compressed_file)
+
+    # Call to spikesFileToBytes function
+    bytes_data = spikesFileToBytes(spikes_file, header.address_size, header.timestamp_size)
+
+    if verbose:
+        print("compressedFileToBytes: Compressed file bytearray decompressed into a raw spikes bytearray")
+
+    return bytes_data
+
+
+def spikesFileToCompressedFile(spikes_file, address_size, timestamp_size, compressor, verbose=True):
     """
     Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps to a bytearray of CompressedFileHeader
     and compressed spikes (compressed via the specified compressor) of the same shape.
@@ -199,7 +228,7 @@ def spikesFileToCompressedFile(spikes_file, address_size, timestamp_size, compre
     Notes:
         This function is the inverse of the compressedFileToSpikesFile function.
     """
-    # Convert to bytearray (needed to compress)
+    # Call to spikesFileToBytes function
     spikes_bytes = spikesFileToBytes(spikes_file, address_size, timestamp_size)
 
     # Call to bytesToCompressedFile function
@@ -234,13 +263,13 @@ def compressedFileToSpikesFile(compressed_file, verbose=False):
     # Decompress the data
     decompressed_data = decompressData(compressed_data, header.compressor)
 
-    # Return the SpikesFile
+    # Call to bytesToSpikesFile function
     spikes_file = bytesToSpikesFile(decompressed_data, header.address_size, header.timestamp_size)
 
     if verbose:
         print("compressedFileToSpikesFile: Compressed file bytearray decompressed into a SpikesFile")
 
-    return spikes_file
+    return header, spikes_file
 
 
 def extractCompressedData(compressed_file, verbose=False):
@@ -287,7 +316,7 @@ def extractCompressedData(compressed_file, verbose=False):
     return header, compressed_data
 
 
-def getCompressedFile(compressed_data, address_size=4, timestamp_size=4, compressor="ZSTD", verbose=False):
+def getCompressedFile(compressed_data, address_size, timestamp_size, compressor, verbose=False):
     """
     Assembles the full compressed aedat file by joining the CompressedFileHeader object
     to the compressed spikes raw data.
