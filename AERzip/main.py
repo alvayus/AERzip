@@ -80,7 +80,7 @@ if __name__ == '__main__':
     spikes_file.timestamps = Functions.adapt_timestamps(spikes_file.timestamps, settings)
 
     end_time = time.time()
-    print(end_time - start_time)
+    print("Total time: " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     # Plots
     print("\nShowing compressed file plots...")

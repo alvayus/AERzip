@@ -1,5 +1,5 @@
 class CompressedFileHeader:
-    def __init__(self, compressor="ZSTD", address_size=4, timestamp_size=4):
+    def __init__(self, compressor, address_size, timestamp_size):
         self.library_version = "AERzip v0.5.8"
         self.library_version_length = 13
 
@@ -19,6 +19,9 @@ class CompressedFileHeader:
                            self.address_length + self.timestamp_length + self.end_header_length
 
     def toBytes(self):
+        """
+        Returns the CompressedFileHeader object as a bytearray.
+        """
         header = bytearray()
 
         header.extend(bytes(self.library_version.ljust(self.library_version_length), "utf-8"))

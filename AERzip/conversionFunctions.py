@@ -185,7 +185,7 @@ def checkBytes(bytes_data, address_size, timestamp_size):
     Checks if the bytes_data input bytearray contains a whole number of spikes.
 
     Parameters:
-        bytes_data (bytearray): The input bytearray. It must contain raw spikes data (without headers)
+        bytes_data (bytearray): The input bytearray. It must contain raw spikes data (without headers).
         address_size (int): An int indicating the size of the addresses.
         timestamp_size (int): An int indicating the size of the timestamps.
 
@@ -206,8 +206,7 @@ def getBytesToPrune(settings):
     Gets the minimum number of bytes needed for spikes addresses and timestamps representation based on the input settings.
 
     Parameters:
-        settings (MainSettings): A MainSettings object from pyNAVIS. It must contain the num_channels, mono_stereo and
-        on_off_both fields.
+        settings (MainSettings): A MainSettings object from pyNAVIS.
 
     Returns:
         address_size (int): An int indicating the minimum number of bytes to represent the addresses.
