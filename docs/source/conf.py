@@ -31,12 +31,8 @@ release = 'v0.6.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinxcontrib.napoleon',
-    'm2r2'
+    'sphinx.ext.autodoc'
 ]
-
-source_suffix = ['.rst', '.md']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
