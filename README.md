@@ -1,5 +1,6 @@
-![GitHub](https://img.shields.io/github/license/alvaroy96/AERzip?color=yellow&label=License&logo=License&logoColor=black&style=plastic)
-![PyPI](https://img.shields.io/pypi/v/AERzip?color=yellow&label=AERzip&logo=AERzip&logoColor=black&style=plastic)
+![GitHub](https://img.shields.io/github/license/alvaroy96/AERzip?label=License&style=plastic)
+![PyPI](https://img.shields.io/pypi/v/AERzip?label=AERzip&style=plastic)
+![Read the Docs](https://img.shields.io/readthedocs/aerzip?label=Documentation&style=plastic)
 
 <p align="center">
 	<img src="/images/AERzip_logo.png" alt="AERzip logo" height="300"/>
