@@ -15,7 +15,16 @@ class CompressedFileHeader:
         end_header_length (int): An int indicating the number of bytes required to store the end_header string.
         header_size (int): An int indicating the sum total of the lengths of each field in the header.
     """
+
     def __init__(self, compressor="ZSTD", address_size=4, timestamp_size=4):
+        """
+        Constructor of CompressedFileHeader objects.
+
+        Args:
+            compressor (string): A string indicating the compressor to be used.
+            address_size (int): An int indicating the size of the addresses.
+            timestamp_size (int): An int indicating the size of the timestamps.
+        """
         self.library_version = "AERzip v0.5.8"
         self.library_version_length = 13
 
