@@ -1,4 +1,20 @@
 class CompressedFileHeader:
+    """
+    Class that collects the main information of a compressed aedat file.
+
+    Attributes:
+        library_version (string): A string indicating the library version.
+        library_version_length (int): An int indicating the number of bytes required to store the library_version string.
+        compressor (string): A string indicating the compressor used.
+        compressor_length (int): An int indicating the number of bytes required to store the compressor string.
+        address_size (int): An int indicating the size of the addresses in the compressed file.
+        address_length (int): An int indicating the number of bytes required to store the address_size.
+        timestamp_size (int): An int indicating the size of the timestamps in the compressed file.
+        timestamp_length (int): An int indicating the number of bytes required to store the timestamp_size.
+        end_header (string): The string that represents the end of the header of the generic aedat files.
+        end_header_length (int): An int indicating the number of bytes required to store the end_header string.
+        header_size (int): An int indicating the sum total of the lengths of each field in the header.
+    """
     def __init__(self, compressor="ZSTD", address_size=4, timestamp_size=4):
         self.library_version = "AERzip v0.5.8"
         self.library_version_length = 13
@@ -20,7 +36,11 @@ class CompressedFileHeader:
 
     def toBytes(self):
         """
-        Returns the CompressedFileHeader object as a bytearray.
+        Returns:
+            header (bytearray): The CompressedFileHeader object as a bytearray.
+
+        Notes:
+            Each field of the header has a fixed position in the returned bytearray.
         """
         header = bytearray()
 
