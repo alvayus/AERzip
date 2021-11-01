@@ -9,4 +9,5 @@ sphinx:
 # Explicitly set the version of Python and its requirements
 python:
   install:
+    - version: 3.9
     - requirements: docs/requirements.txt
