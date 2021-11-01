@@ -1,7 +1,6 @@
 # AERzip 
 
 ![GitHub](https://img.shields.io/github/license/alvaroy96/AERzip?color=yellow&label=License&logo=License&logoColor=black)
-
 ![PyPI](https://img.shields.io/pypi/v/AERzip?color=yellow&label=AERzip&logo=AERzip&logoColor=black&style=plastic)
 
 ## About AERzip
@@ -12,7 +11,9 @@ AERzip is an open-source Python package with provides a good number of useful to
 
 You can install AERzip via pip thanks to its [PyPi](https://pypi.org/project/AERzip/) distribution:
 
-```pip install AERzip´´´
+```
+pip install AERzip
+´´´
 
 ## Documentation
 
