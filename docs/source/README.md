@@ -1,8 +1,4 @@
-![GitHub](https://img.shields.io/github/license/alvaroy96/AERzip?label=License&style=plastic)
-![PyPI](https://img.shields.io/pypi/v/AERzip?label=AERzip&style=plastic)
-![GitHub Release Date](https://img.shields.io/github/release-date/alvaroy96/aerzip?label=Release%20date&style=plastic)
-
-## Home
+## Quick introduction
 
 ### About AERzip
 

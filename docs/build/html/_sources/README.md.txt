@@ -1,7 +1,4 @@
-![GitHub](https://img.shields.io/github/license/alvaroy96/AERzip?color=yellow&label=License&logo=License&logoColor=black&style=plastic)
-![PyPI](https://img.shields.io/pypi/v/AERzip?color=yellow&label=AERzip&logo=AERzip&logoColor=black&style=plastic)
-
-## Home
+## Quick introduction
 
 ### About AERzip
 

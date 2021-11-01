@@ -1,6 +1,6 @@
 ![GitHub](https://img.shields.io/github/license/alvaroy96/AERzip?label=License&style=plastic)
-![PyPI](https://img.shields.io/pypi/v/AERzip?label=AERzip&style=plastic)
-![Read the Docs](https://img.shields.io/readthedocs/aerzip?label=Documentation&style=plastic)
+![PyPI](https://img.shields.io/pypi/v/AERzip?label=PyPi&style=plastic)
+![Read the Docs](https://img.shields.io/readthedocs/aerzip?label=ReadTheDocs&style=plastic)
 
 <p align="center">
 	<img src="/images/AERzip_logo.png" alt="AERzip logo" height="300"/>
