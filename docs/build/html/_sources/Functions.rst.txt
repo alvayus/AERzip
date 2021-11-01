@@ -1,0 +1,6 @@
+Functions
+---------
+
+.. toctree::
+   CompressionFunctions
+   ConversionFunctions

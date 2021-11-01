@@ -1,0 +1,45 @@
+AERzip package
+==============
+
+Submodules
+----------
+
+AERzip.CompressedFileHeader module
+----------------------------------
+
+.. automodule:: AERzip.CompressedFileHeader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+AERzip.compressionFunctions module
+----------------------------------
+
+.. automodule:: AERzip.compressionFunctions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+AERzip.conversionFunctions module
+---------------------------------
+
+.. automodule:: AERzip.conversionFunctions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+AERzip.main module
+------------------
+
+.. automodule:: AERzip.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: AERzip
+   :members:
+   :undoc-members:
+   :show-inheritance:
