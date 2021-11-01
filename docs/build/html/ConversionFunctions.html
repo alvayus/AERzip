@@ -79,6 +79,172 @@
 <p>This section shows the different conversion functions used in AERzip. As with the compression functions, there is a picture showing the functions needed to convert a data type into another, in the context of uncompressed data.</p>
 <img alt="_images/AERzip_ConversionFunctions.jpg" src="_images/AERzip_ConversionFunctions.jpg" />
 <p>There is the list of conversion functions:</p>
+<span class="target" id="module-AERzip.conversionFunctions"></span><dl class="py function">
+<dt class="sig sig-object py" id="AERzip.conversionFunctions.bytesToSpikesFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">bytesToSpikesFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.bytesToSpikesFile" title="Permalink to this definition"></a></dt>
+<dd><p>Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
+and timestamp_size parameters respectively, to a SpikesFile of raw spikes of the same shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytes_data</strong> (<em>bytearray</em>) – The input bytearray. It must contain raw spikes data (without headers).</p></li>
+<li><p><strong>address_size</strong> (<em>int</em>) – An int indicating the size of the addresses.</p></li>
+<li><p><strong>timestamp_size</strong> (<em>int</em>) – An int indicating the size of the timestamps.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output SpikesFile object from pyNAVIS. It contains raw spikes shaped
+as the raw spikes of the input bytearray.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>spikes_file (SpikesFile)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function is the inverse of the spikesFileToBytes function.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.conversionFunctions.checkBytes">
+<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">checkBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.checkBytes" title="Permalink to this definition"></a></dt>
+<dd><p>Checks if the bytes_data input bytearray contains a whole number of spikes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytes_data</strong> (<em>bytearray</em>) – The input bytearray. It must contain raw spikes data (without headers).</p></li>
+<li><p><strong>address_size</strong> (<em>int</em>) – An int indicating the size of the addresses.</p></li>
+<li><p><strong>timestamp_size</strong> (<em>int</em>) – An int indicating the size of the timestamps.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if bytes_data contains a whole number of spikes. Otherwise raise an exception.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.conversionFunctions.constructStruct">
+<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">constructStruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.constructStruct" title="Permalink to this definition"></a></dt>
+<dd><p>Constructs a numpy data type to represent the data structure of a bytearray.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>address_size</strong> (<em>int</em>) – An int indicating the size of the addresses.</p></li>
+<li><p><strong>timestamp_size</strong> (<em>int</em>) – An int indicating the size of the timestamps.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A data type required to interpret a bytearray.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>struct (type)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.conversionFunctions.getBytesToPrune">
+<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">getBytesToPrune</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.getBytesToPrune" title="Permalink to this definition"></a></dt>
+<dd><p>Gets the minimum number of bytes needed for spikes addresses and timestamps representation based on the input settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>settings</strong> (<em>MainSettings</em>) – A MainSettings object from pyNAVIS.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An int indicating the minimum number of bytes to represent the addresses.
+timestamp_size (int): An int indicating the minimum number of bytes to represent the timestamps.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>address_size (int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.conversionFunctions.pruneBytesToSpikesBytearray">
+<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">pruneBytesToSpikesBytearray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.pruneBytesToSpikesBytearray" title="Permalink to this definition"></a></dt>
+<dd><p>Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
+to a bytearray of raw spikes of c-bytes addresses and d-bytes timestamps, where
+a is settings.address_size field, b is settings.timestamp_size field and
+c and d are the new sizes input parameters (the desired sizes).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytes_data</strong> (<em>bytearray</em>) – The input bytearray. It must contain raw spikes data (without headers).</p></li>
+<li><p><strong>settings</strong> (<em>MainSettings</em>) – A MainSettings object from pyNAVIS. It must contain the address_size and timestamp_size fields.</p></li>
+<li><p><strong>new_address_size</strong> (<em>int</em>) – An int indicating the desired size of the addresses.</p></li>
+<li><p><strong>new_timestamp_size</strong> (<em>int</em>) – An int indicating the desired size of the timestamps.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output bytearray. It contains raw spikes shaped as desired.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pruned_bytes (bytearray)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If a and b are equal to c and d respectively, output bytearray spikes will be of the same shape that input bytearray spikes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.conversionFunctions.pruneBytesToSpikesFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">pruneBytesToSpikesFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.pruneBytesToSpikesFile" title="Permalink to this definition"></a></dt>
+<dd><p>Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
+to a SpikesFile of raw spikes of c-bytes addresses and d-bytes timestamps, where
+a is settings.address_size field, b is settings.timestamp_size field and
+c and d are the new sizes input parameters (the desired sizes).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytes_data</strong> (<em>bytearray</em>) – The input bytearray. It must contain raw spikes data (without headers).</p></li>
+<li><p><strong>settings</strong> (<em>MainSettings</em>) – A MainSettings object from pyNAVIS. It must contain the address_size and timestamp_size fields.</p></li>
+<li><p><strong>new_address_size</strong> (<em>int</em>) – An int indicating the desired size of the addresses.</p></li>
+<li><p><strong>new_timestamp_size</strong> (<em>int</em>) – An int indicating the desired size of the timestamps.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output SpikesFile object from pyNAVIS. It contains raw spikes shaped
+as desired.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>spikes_file (SpikesFile)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If a and b are equal to c and d respectively, output SpikesFile spikes will be of the same shape that
+input bytearray spikes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.conversionFunctions.spikesFileToBytes">
+<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">spikesFileToBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spikes_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.spikesFileToBytes" title="Permalink to this definition"></a></dt>
+<dd><p>Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
+and timestamp_size parameters respectively, to a bytearray of raw spikes of the same shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spikes_file</strong> (<em>SpikesFile</em>) – The input SpikesFile object from pyNAVIS. It must contain raw spikes data (without headers).</p></li>
+<li><p><strong>address_size</strong> (<em>int</em>) – An int indicating the size of the addresses.</p></li>
+<li><p><strong>timestamp_size</strong> (<em>int</em>) – An int indicating the size of the timestamps.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output bytearray. It contains raw spikes shaped as the raw spikes of the
+input SpikesFile.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bytes_data (bytearray)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function is the inverse of the bytesToSpikesFile function.</p>
+</dd></dl>
+
 </section>
 
 
