@@ -8,3 +8,6 @@ This section shows the different conversion functions used in AERzip. As with th
 There is the list of conversion functions:
 
 .. automodule:: AERzip.conversionFunctions
+   :members:
+   :undoc-members:
+   :show-inheritance:
