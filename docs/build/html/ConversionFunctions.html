@@ -79,9 +79,9 @@
 <p>This section shows the different conversion functions used in AERzip. As with the compression functions, there is a picture showing the functions needed to convert a data type into another, in the context of uncompressed data.</p>
 <img alt="_images/AERzip_ConversionFunctions.jpg" src="_images/AERzip_ConversionFunctions.jpg" />
 <p>There is the list of conversion functions:</p>
-<span class="target" id="module-AERzip.conversionFunctions"></span><dl class="py function">
-<dt class="sig sig-object py" id="AERzip.conversionFunctions.bytesToSpikesFile">
-<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">bytesToSpikesFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.bytesToSpikesFile" title="Permalink to this definition"></a></dt>
+<span class="target" id="module-AERzip.ConversionFunctions"></span><dl class="py function">
+<dt class="sig sig-object py" id="AERzip.ConversionFunctions.bytesToSpikesFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.ConversionFunctions.</span></span><span class="sig-name descname"><span class="pre">bytesToSpikesFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.ConversionFunctions.bytesToSpikesFile" title="Permalink to this definition"></a></dt>
 <dd><p>Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
 and timestamp_size parameters respectively, to a SpikesFile of raw spikes of the same shape.</p>
 <dl class="field-list simple">
@@ -106,8 +106,8 @@ as the raw spikes of the input bytearray.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="AERzip.conversionFunctions.checkBytes">
-<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">checkBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.checkBytes" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="AERzip.ConversionFunctions.checkBytes">
+<span class="sig-prename descclassname"><span class="pre">AERzip.ConversionFunctions.</span></span><span class="sig-name descname"><span class="pre">checkBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.ConversionFunctions.checkBytes" title="Permalink to this definition"></a></dt>
 <dd><p>Checks if the bytes_data input bytearray contains a whole number of spikes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -124,8 +124,8 @@ as the raw spikes of the input bytearray.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="AERzip.conversionFunctions.constructStruct">
-<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">constructStruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.constructStruct" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="AERzip.ConversionFunctions.constructStruct">
+<span class="sig-prename descclassname"><span class="pre">AERzip.ConversionFunctions.</span></span><span class="sig-name descname"><span class="pre">constructStruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.ConversionFunctions.constructStruct" title="Permalink to this definition"></a></dt>
 <dd><p>Constructs a numpy data type to represent the data structure of a bytearray.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -144,8 +144,8 @@ as the raw spikes of the input bytearray.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="AERzip.conversionFunctions.getBytesToPrune">
-<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">getBytesToPrune</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.getBytesToPrune" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="AERzip.ConversionFunctions.getBytesToPrune">
+<span class="sig-prename descclassname"><span class="pre">AERzip.ConversionFunctions.</span></span><span class="sig-name descname"><span class="pre">getBytesToPrune</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.ConversionFunctions.getBytesToPrune" title="Permalink to this definition"></a></dt>
 <dd><p>Gets the minimum number of bytes needed for spikes addresses and timestamps representation based on the input settings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -162,8 +162,8 @@ timestamp_size (int): An int indicating the minimum number of bytes to represent
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="AERzip.conversionFunctions.pruneBytesToSpikesBytearray">
-<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">pruneBytesToSpikesBytearray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.pruneBytesToSpikesBytearray" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="AERzip.ConversionFunctions.pruneBytesToSpikesBytearray">
+<span class="sig-prename descclassname"><span class="pre">AERzip.ConversionFunctions.</span></span><span class="sig-name descname"><span class="pre">pruneBytesToSpikesBytearray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.ConversionFunctions.pruneBytesToSpikesBytearray" title="Permalink to this definition"></a></dt>
 <dd><p>Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
 to a bytearray of raw spikes of c-bytes addresses and d-bytes timestamps, where
 a is settings.address_size field, b is settings.timestamp_size field and
@@ -190,8 +190,8 @@ c and d are the new sizes input parameters (the desired sizes).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="AERzip.conversionFunctions.pruneBytesToSpikesFile">
-<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">pruneBytesToSpikesFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.pruneBytesToSpikesFile" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="AERzip.ConversionFunctions.pruneBytesToSpikesFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.ConversionFunctions.</span></span><span class="sig-name descname"><span class="pre">pruneBytesToSpikesFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.ConversionFunctions.pruneBytesToSpikesFile" title="Permalink to this definition"></a></dt>
 <dd><p>Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
 to a SpikesFile of raw spikes of c-bytes addresses and d-bytes timestamps, where
 a is settings.address_size field, b is settings.timestamp_size field and
@@ -220,8 +220,8 @@ input bytearray spikes.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="AERzip.conversionFunctions.spikesFileToBytes">
-<span class="sig-prename descclassname"><span class="pre">AERzip.conversionFunctions.</span></span><span class="sig-name descname"><span class="pre">spikesFileToBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spikes_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.conversionFunctions.spikesFileToBytes" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="AERzip.ConversionFunctions.spikesFileToBytes">
+<span class="sig-prename descclassname"><span class="pre">AERzip.ConversionFunctions.</span></span><span class="sig-name descname"><span class="pre">spikesFileToBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spikes_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.ConversionFunctions.spikesFileToBytes" title="Permalink to this definition"></a></dt>
 <dd><p>Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
 and timestamp_size parameters respectively, to a bytearray of raw spikes of the same shape.</p>
 <dl class="field-list simple">
