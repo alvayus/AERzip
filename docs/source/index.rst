@@ -7,15 +7,11 @@ Home
 ====
 
 .. toctree::
-   :hidden:
-   :maxdepth: 1
    :caption: Contents:
 
-   Home <self>
+   README.md
    Classes
    Functions
-
-   README.md
 
 
 

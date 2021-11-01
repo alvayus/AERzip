@@ -1,7 +1,0 @@
-AERzip
-======
-
-.. toctree::
-   :maxdepth: 4
-
-   AERzip
