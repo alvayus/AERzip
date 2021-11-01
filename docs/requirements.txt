@@ -1,4 +1,0 @@
-# File: docs/requirements.txt
-
-sphinxcontrib.napoleon
-m2r2
