@@ -20,5 +20,5 @@ pip install AERzip
 
 ## Documentation
 
-The ReadTheDocs Documentation provides a lot of useful information about the AERzip functions. Part of this documentation can be found inside the own code, which has been documented using docstrings.
+The [ReadTheDocs Documentation](https://aerzip.readthedocs.io/en/latest/) provides a lot of useful information about the AERzip functions. Part of this documentation can be found inside the own code, which has been documented using docstrings.
 
