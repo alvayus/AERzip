@@ -1,5 +1,5 @@
 Data compression functions
-==========================
+--------------------------
 
 This section shows the different compression functions used in AERzip. As with the conversion functions, there is a picture showing the functions needed to convert a data type into another, in the context of compressed data.
 
