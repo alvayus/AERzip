@@ -38,9 +38,6 @@ class CompressedFileHeader:
         """
         Constructs a bytearray from each field in the CompressedFileHeader object.
 
-        Parameters:
-            None
-
         Returns:
             header (bytearray): The CompressedFileHeader object as a bytearray.
 
