@@ -15,8 +15,7 @@ Home
    Classes
    Functions
 
-
-.. mdinclude:: README.md
+   README.md
 
 
 
