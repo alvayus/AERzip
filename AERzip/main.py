@@ -7,7 +7,7 @@ from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
 from pyNAVIS import *
 
-from compressionFunctions import decompressDataFromFile, compressDataFromFile
+from CompressionFunctions import decompressDataFromFile, compressDataFromFile
 
 if __name__ == '__main__':
     root = Tk()

@@ -8,7 +8,7 @@ from pyNAVIS import *
 
 from AERzip.CompressedFileHeader import CompressedFileHeader
 # TODO: Test files
-from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, getBytesToPrune
+from AERzip.ConversionFunctions import bytesToSpikesFile, spikesFileToBytes, getBytesToPrune
 
 
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
