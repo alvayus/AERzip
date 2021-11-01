@@ -6,4 +6,4 @@ This section shows the different classes used in AERzip. There is only one right
 .. automodule:: AERzip.CompressedFileHeader
    :members:
    :undoc-members:
-   :show-inheritance:
+   :show-inheritance: 

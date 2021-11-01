@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Functions" href="Functions.html" />
-    <link rel="prev" title="Quick introduction" href="README.html" /> 
+    <link rel="prev" title="Quick introduction" href="QuickIntroduction.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,7 +41,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
-<li class="toctree-l1"><a class="reference internal" href="README.html">Quick introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="QuickIntroduction.html">Quick introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Classes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Functions.html">Functions</a></li>
 </ul>
@@ -77,10 +77,142 @@
 <dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">AERzip.CompressedFileHeader.</span></span><span class="sig-name descname"><span class="pre">CompressedFileHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ZSTD'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that collects the main information of a compressed aedat file.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.library_version">
+<span class="sig-name descname"><span class="pre">library_version</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.library_version" title="Permalink to this definition"></a></dt>
+<dd><p>A string indicating the library version.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.library_version_length">
+<span class="sig-name descname"><span class="pre">library_version_length</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.library_version_length" title="Permalink to this definition"></a></dt>
+<dd><p>An int indicating the number of bytes required to store the library_version string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.compressor">
+<span class="sig-name descname"><span class="pre">compressor</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.compressor" title="Permalink to this definition"></a></dt>
+<dd><p>A string indicating the compressor used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.compressor_length">
+<span class="sig-name descname"><span class="pre">compressor_length</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.compressor_length" title="Permalink to this definition"></a></dt>
+<dd><p>An int indicating the number of bytes required to store the compressor string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.address_size">
+<span class="sig-name descname"><span class="pre">address_size</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.address_size" title="Permalink to this definition"></a></dt>
+<dd><p>An int indicating the size of the addresses in the compressed file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.address_length">
+<span class="sig-name descname"><span class="pre">address_length</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.address_length" title="Permalink to this definition"></a></dt>
+<dd><p>An int indicating the number of bytes required to store the address_size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.timestamp_size">
+<span class="sig-name descname"><span class="pre">timestamp_size</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.timestamp_size" title="Permalink to this definition"></a></dt>
+<dd><p>An int indicating the size of the timestamps in the compressed file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.timestamp_length">
+<span class="sig-name descname"><span class="pre">timestamp_length</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.timestamp_length" title="Permalink to this definition"></a></dt>
+<dd><p>An int indicating the number of bytes required to store the timestamp_size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.end_header">
+<span class="sig-name descname"><span class="pre">end_header</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.end_header" title="Permalink to this definition"></a></dt>
+<dd><p>The string that represents the end of the header of the generic aedat files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.end_header_length">
+<span class="sig-name descname"><span class="pre">end_header_length</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.end_header_length" title="Permalink to this definition"></a></dt>
+<dd><p>An int indicating the number of bytes required to store the end_header string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.header_size">
+<span class="sig-name descname"><span class="pre">header_size</span></span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.header_size" title="Permalink to this definition"></a></dt>
+<dd><p>An int indicating the sum total of the lengths of each field in the header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.toBytes">
 <span class="sig-name descname"><span class="pre">toBytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.toBytes" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the CompressedFileHeader object as a bytearray.</p>
+<dd><p>Constructs a bytearray from each field in the CompressedFileHeader object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The CompressedFileHeader object as a bytearray.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>header (bytearray)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Each field of the header has a fixed position in the returned bytearray.</p>
 </dd></dl>
 
 </dd></dl>
@@ -91,7 +223,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="README.html" class="btn btn-neutral float-left" title="Quick introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="QuickIntroduction.html" class="btn btn-neutral float-left" title="Quick introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Functions.html" class="btn btn-neutral float-right" title="Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

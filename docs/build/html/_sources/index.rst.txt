@@ -19,6 +19,7 @@ Welcome to the AERzip documentation!
    Functions
 
 
+.. automodule:: AERzip
 
 
 
