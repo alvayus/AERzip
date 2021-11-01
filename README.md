@@ -4,7 +4,7 @@
 ![PyPI](https://img.shields.io/pypi/v/AERzip?color=yellow&label=AERzip&logo=AERzip&logoColor=black&style=plastic)
 
 <p align="center">
-	<img src="/images/AERzip_logo.png" alt="AERzip logo"/>
+	<img src="/images/AERzip_logo.png" alt="AERzip logo" height="400"/>
 </p>
 
 ## About AERzip
