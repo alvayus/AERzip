@@ -13,7 +13,7 @@ You can install AERzip via pip thanks to its [PyPi](https://pypi.org/project/AER
 
 ```
 pip install AERzip
-´´´
+```
 
 ## Documentation
 
