@@ -1,1 +1,2 @@
+sphinx.ext.autodoc
 myst_parser
