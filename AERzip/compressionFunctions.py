@@ -7,7 +7,6 @@ import zstandard
 from pyNAVIS import *
 
 from AERzip.CompressedFileHeader import CompressedFileHeader
-# TODO: Documentation and history on v1.0.0
 # TODO: Test files
 from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, getBytesToPrune
 
@@ -15,20 +14,22 @@ from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, get
 def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
                          settings, compressor, store=True, ignore_overwriting=True, verbose=True):
     """
-        Reads an original aedat file, extracts and compress its raw spikes data and returns a compressed file bytearray.
+    Reads an original aedat file, extracts and compress its raw spikes data and returns a compressed file bytearray.
 
-        Parameters:
-            src_events_dir (string): A string indicating the original aedat files folder.
-            dst_compressed_events_dir (string): A string indicating the compressed files folder.
-            dataset_name (string): A string indicating the dataset name. It must exist inside the compressed files folder.
-            file_name (string): A string indicating the file name. It must exist inside the dataset folder.
-            settings (MainSettings): A MainSettings object from pyNAVIS.
-            compressor (string): A string indicating the compressor to be used.
-            verbose (boolean): A boolean indicating whether or not debug comments are printed.
+    Parameters:
+        src_events_dir (string): A string indicating the original aedat files folder.
+        dst_compressed_events_dir (string): A string indicating the compressed files folder.
+        dataset_name (string): A string indicating the dataset name. It must exist inside the compressed files folder.
+        file_name (string): A string indicating the file name. It must exist inside the dataset folder.
+        settings (MainSettings): A MainSettings object from pyNAVIS.
+        compressor (string): A string indicating the compressor to be used.
+        store (boolean): A boolean indicating whether or not store the compressed file.
+        ignore_overwriting (boolean): A boolean indicating whether or not ignore overwriting.
+        verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
-        Returns:
-            compressed_file (bytearray): The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
-        """
+    Returns:
+        compressed_file (bytearray): The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
+    """
     # --- Check the file ---
     if store and not ignore_overwriting:
         checkCompressedFileExists(dst_compressed_events_dir, dataset_name, file_name)

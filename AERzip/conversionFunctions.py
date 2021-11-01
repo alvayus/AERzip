@@ -222,14 +222,14 @@ def getBytesToPrune(settings):
 
 def constructStruct(address_size, timestamp_size):
     """
-    Constructs a numpy data type to represent the data structure of an bytearray.
+    Constructs a numpy data type to represent the data structure of a bytearray.
 
     Parameters:
         address_size (int): An int indicating the size of the addresses.
         timestamp_size (int): An int indicating the size of the timestamps.
 
     Returns:
-        struct (dtype):
+        struct (type): A data type required to interpret a bytearray.
     """
     address_param = ">u" + str(address_size)
     timestamp_param = ">u" + str(timestamp_size)
