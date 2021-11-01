@@ -32,8 +32,7 @@ release = 'v0.6.0'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'm2r2'
+    'sphinx.ext.napoleon'
 ]
 
 source_suffix = ['.rst', '.md']
