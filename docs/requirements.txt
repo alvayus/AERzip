@@ -1,2 +1,4 @@
 sphinxcontrib-napoleon
 myst_parser
+lz4
+numpy
