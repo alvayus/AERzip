@@ -18,8 +18,4 @@ Welcome to the AERzip documentation!
    Classes
    Functions
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
 
