@@ -3,7 +3,7 @@
 ![Read the Docs](https://img.shields.io/readthedocs/aerzip?label=ReadTheDocs&style=plastic)
 
 <p align="center">
-	<img src="/images/AERzip_logo.png" alt="AERzip logo" height="300"/>
+	<img src="/images/AERzip_logo.png" alt="AERzip logo" height="225"/>
 </p>
 
 ## About AERzip
