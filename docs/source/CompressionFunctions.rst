@@ -7,7 +7,7 @@ This section shows the different compression functions used in AERzip. As with t
 
 There is the list of compression functions:
 
-.. automodule:: AERzip.CompressionFunctions
+.. automodule:: AERzip.compressionFunctions
    :members:
    :undoc-members:
    :show-inheritance:
