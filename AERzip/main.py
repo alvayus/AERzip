@@ -9,6 +9,8 @@ from pyNAVIS import *
 
 from compressionFunctions import decompressDataFromFile, compressDataFromFile
 
+from matplotlib.backends.backend_pdf import PdfPages
+
 if __name__ == '__main__':
     root = Tk()
     root.withdraw()  # we don't want a full GUI, so keep the root window from appearing
@@ -94,7 +96,8 @@ if __name__ == '__main__':
     gc.collect()  # Cleaning memory
     Plots.average_activity(spikes_file, new_settings, verbose=True)
     gc.collect()  # Cleaning memory
-    # Plots.difference_between_LR(raw_data, new_settings, verbose=True)
+    Plots.difference_between_LR(spikes_file, new_settings, verbose=True)
+    gc.collect()
 
     end_time = time.time()
     print("Plots generation took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
@@ -118,27 +121,34 @@ if __name__ == '__main__':
     print("\nShowing original file plots...")
     start_time = time.time()
 
-    Plots.spikegram(spikes_file, settings, verbose=True)
+    spk_fig = Plots.spikegram(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.sonogram(spikes_file, settings, verbose=True)
+    sng_fig = Plots.sonogram(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.histogram(spikes_file, settings, verbose=True)
+    _, hst_fig = Plots.histogram(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    Plots.average_activity(spikes_file, settings, verbose=True)
+    _, _, avg_fig = Plots.average_activity(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    # Plots.difference_between_LR(spikes_info, settings, verbose=True)
+    dlr_fig = Plots.difference_between_LR(spikes_file, settings, verbose=True)
+
+    plt.show()
 
     report_directory = directory + "/../reports/"
+
+    end_time = time.time()
+    print("Plots visualization took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
+    # Generate the plots PDF
+    print("\nGenerating original file plots...")
+    start_time = time.time()
 
     if not os.path.exists(report_directory + dataset + "/"):
         os.makedirs(report_directory + dataset + "/")
 
-    # TODO: Not PDF, just PNG
-    '''Functions.PDF_report(spikes_file, settings, report_directory + dataset +
-                         "/" + file + ".pdf", plots=["Spikegram", "Sonogram",
-                                                     "Histogram", "Average activity"])'''
+    ReportFunctions.PDF_report(path, settings, report_directory + dataset + "/" + file + ".pdf",
+                               plots=["Spikegram", "Sonogram", "Histogram",
+                                      "Average activity", "Difference between L/R"])
 
     end_time = time.time()
     print("Plots generation took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
-    plt.show()
