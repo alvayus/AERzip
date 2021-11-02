@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data compression functions &mdash; AERzip v0.6.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data conversion functions" href="ConversionFunctions.html" />
+    <link rel="prev" title="Functions" href="Functions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> AERzip
+            <img src="_static/AERzip_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="QuickIntroduction.html">Quick introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Classes.html">Classes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="Functions.html">Functions</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data compression functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ConversionFunctions.html">Data conversion functions</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AERzip</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="Functions.html">Functions</a> &raquo;</li>
+      <li>Data compression functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/CompressionFunctions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-compression-functions">
+<h1>Data compression functions<a class="headerlink" href="#data-compression-functions" title="Permalink to this headline"></a></h1>
+<p>This section shows the different compression functions used in AERzip. As with the conversion functions, there is a picture showing the functions needed to convert a data type into another, in the context of compressed data.</p>
+<img alt="_images/AERzip_CompressionFunctions.jpg" src="_images/AERzip_CompressionFunctions.jpg" />
+<p>There is the list of compression functions:</p>
+<span class="target" id="module-AERzip.compressionFunctions"></span><dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.bytesToCompressedFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">bytesToCompressedFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.bytesToCompressedFile" title="Permalink to this definition"></a></dt>
+<dd><p>Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
+and timestamp_size parameters respectively, to a bytearray of CompressedFileHeader and compressed spikes
+(compressed via the specified compressor) of the same shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytes_data</strong> (<em>bytearray</em>) – The input bytearray. It must contain raw spikes data (without headers).</p></li>
+<li><p><strong>address_size</strong> (<em>int</em>) – An int indicating the size of the addresses.</p></li>
+<li><p><strong>timestamp_size</strong> (<em>int</em>) – An int indicating the size of the timestamps.</p></li>
+<li><p><strong>compressor</strong> (<em>string</em>) – A string indicating the compressor to be used.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output bytearray. It contains the CompressedFileHeader bound to the compressed
+spikes data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>compressed_file (bytearray)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function is the inverse of the compressedFileToBytes function.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.checkCompressedFileExists">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">checkCompressedFileExists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dst_compressed_events_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.checkCompressedFileExists" title="Permalink to this definition"></a></dt>
+<dd><p>Checks if the specified compressed file exists. If it does, this function allows the user to
+decide whether to overwrite it or not. If the user decides not to overwrite the file, a new file path
+is generated to write the file to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dst_compressed_events_dir</strong> (<em>string</em>) – A string indicating the compressed files folder.</p></li>
+<li><p><strong>dataset_name</strong> (<em>string</em>) – A string indicating the dataset name. It must exist inside the compressed files folder.</p></li>
+<li><p><strong>file_name</strong> (<em>string</em>) – A string indicating the file name. It must exist inside the dataset folder.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output string that indicates where to write the file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>file_path (string)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.compressData">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">compressData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.compressData" title="Permalink to this definition"></a></dt>
+<dd><p>Decompress the input compressed spikes bytearray via the specified compressor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytes_data</strong> (<em>bytearray</em>) – The input bytearray. It must contain raw spikes data (without headers)</p></li>
+<li><p><strong>compressor</strong> (<em>string</em>) – A string indicating the compressor to be used.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output bytearray that contains the compressed spikes.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>compressed_data (bytearray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.compressDataFromFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">compressDataFromFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_events_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_compressed_events_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_overwriting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.compressDataFromFile" title="Permalink to this definition"></a></dt>
+<dd><p>Reads an original aedat file, extracts and compress its raw spikes data and returns a compressed file bytearray.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_events_dir</strong> (<em>string</em>) – A string indicating the original aedat files folder.</p></li>
+<li><p><strong>dst_compressed_events_dir</strong> (<em>string</em>) – A string indicating the compressed files folder.</p></li>
+<li><p><strong>dataset_name</strong> (<em>string</em>) – A string indicating the dataset name. It must exist inside the compressed files folder.</p></li>
+<li><p><strong>file_name</strong> (<em>string</em>) – A string indicating the file name. It must exist inside the dataset folder.</p></li>
+<li><p><strong>settings</strong> (<em>MainSettings</em>) – A MainSettings object from pyNAVIS.</p></li>
+<li><p><strong>compressor</strong> (<em>string</em>) – A string indicating the compressor to be used.</p></li>
+<li><p><strong>store</strong> (<em>boolean</em>) – A boolean indicating whether or not store the compressed file.</p></li>
+<li><p><strong>ignore_overwriting</strong> (<em>boolean</em>) – A boolean indicating whether or not ignore overwriting.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>compressed_file (bytearray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.compressedFileToBytes">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">compressedFileToBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressed_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.compressedFileToBytes" title="Permalink to this definition"></a></dt>
+<dd><p>Converts a bytearray of CompressedFileHeader and compressed spikes of a-bytes addresses and b-bytes timestamps,
+where a and b are address_size and timestamp_size ints which are inside the bytearray, to a bytearray of raw spikes
+of the same shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>compressed_file</strong> (<em>bytearray</em>) – The input bytearray that contains the CompressedFileHeader and the compressed spikes.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output bytearray. It contains raw spikes shaped as the compressed spikes of the
+compressed file.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bytes_data (bytearray)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function is the inverse of the bytesToCompressedFile function.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.compressedFileToSpikesFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">compressedFileToSpikesFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressed_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.compressedFileToSpikesFile" title="Permalink to this definition"></a></dt>
+<dd><p>Converts a bytearray of CompressedFileHeader and compressed spikes of a-bytes addresses and b-bytes timestamps,
+where a and b are address_size and timestamp_size ints which are inside the bytearray, to a SpikesFile of raw spikes
+of the same shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>compressed_file</strong> (<em>bytearray</em>) – The input bytearray that contains the CompressedFileHeader and the compressed spikes.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output SpikesFile object from pyNAVIS. It contains raw spikes shaped
+as the compressed spikes of the input bytearray.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>spikes_file (SpikesFile)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function is the inverse of the spikesFileToCompressedFile function.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.decompressData">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">decompressData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressed_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.decompressData" title="Permalink to this definition"></a></dt>
+<dd><p>Decompress the input compressed spikes bytearray via the specified compressor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>compressed_data</strong> (<em>bytearray</em>) – The input bytearray that contains the compressed spikes.</p></li>
+<li><p><strong>compressor</strong> (<em>string</em>) – A string indicating the compressor to be used.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output bytearray. It contains raw spikes.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>decompressed_data (bytearray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.decompressDataFromFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">decompressDataFromFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_compressed_events_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.decompressDataFromFile" title="Permalink to this definition"></a></dt>
+<dd><p>Reads a file as a compressed file, decompress it to extract its raw spikes data and returns a SpikesFile object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_compressed_events_dir</strong> (<em>string</em>) – A string indicating the compressed files folder.</p></li>
+<li><p><strong>dataset_name</strong> (<em>string</em>) – A string indicating the dataset name. It must exist inside the compressed files folder.</p></li>
+<li><p><strong>file_name</strong> (<em>string</em>) – A string indicating the file name. It must exist inside the dataset folder.</p></li>
+<li><p><strong>settings</strong> (<em>MainSettings</em>) – A MainSettings object from pyNAVIS.</p></li>
+<li><p><strong>compressor</strong> (<em>string</em>) – A string indicating the compressor to be used.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output SpikesFile object from pyNAVIS. It contains raw spikes.
+new_settings (MainSettings): A MainSettings object from pyNAVIS. It contains the CompressedFileHeader’s address_size and timestamp_size fields.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>spikes_file (SpikesFile)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>new_settings is returned in order to allow direct visualization of the files data using pyNAVIS plot functions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.extractCompressedData">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">extractCompressedData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressed_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.extractCompressedData" title="Permalink to this definition"></a></dt>
+<dd><p>Extracts the CompressedFileHeader object and the compressed spikes from an input bytearray.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>compressed_file</strong> (<em>bytearray</em><em>, </em><em>bytes</em>) – The input bytearray (or bytes). It contains the CompressedFileHeader bound to the compressed spikes.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output CompressedFileHeader object.
+compressed_data (bytearray): The output bytearray that contains the compressed spikes.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>header (<a class="reference internal" href="Classes.html#AERzip.CompressedFileHeader.CompressedFileHeader" title="AERzip.CompressedFileHeader.CompressedFileHeader">CompressedFileHeader</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.getCompressedFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">getCompressedFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressed_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.getCompressedFile" title="Permalink to this definition"></a></dt>
+<dd><p>Assembles the full compressed aedat file by joining the CompressedFileHeader object
+to the compressed spikes raw data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>compressed_data</strong> (<em>bytearray</em>) – The input bytearray that contains the compressed spikes.</p></li>
+<li><p><strong>address_size</strong> (<em>int</em>) – An int indicating the size of the addresses.</p></li>
+<li><p><strong>timestamp_size</strong> (<em>int</em>) – An int indicating the size of the timestamps.</p></li>
+<li><p><strong>compressor</strong> (<em>string</em>) – A string indicating the compressor to be used.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output bytearray. It contains the CompressedFileHeader bound to the compressed
+spikes data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>compressed_file (bytearray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.loadCompressedFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">loadCompressedFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_compressed_events_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.loadCompressedFile" title="Permalink to this definition"></a></dt>
+<dd><p>Extracts header and compressed data from a stored compressed file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_compressed_events_dir</strong> (<em>string</em>) – A string indicating the compressed files folder.</p></li>
+<li><p><strong>dataset_name</strong> (<em>string</em>) – A string indicating the dataset name. It must exist inside the compressed files folder.</p></li>
+<li><p><strong>file_name</strong> (<em>string</em>) – A string indicating the file name. It must exist inside the dataset folder.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>compressed_file (bytearray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.spikesFileToCompressedFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">spikesFileToCompressedFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spikes_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.spikesFileToCompressedFile" title="Permalink to this definition"></a></dt>
+<dd><p>Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
+and timestamp_size parameters respectively, to a bytearray of CompressedFileHeader and compressed spikes
+(compressed via the specified compressor) of the same shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spikes_file</strong> (<em>SpikesFile</em>) – The input SpikesFile object from pyNAVIS. It must contain raw spikes data (without headers).</p></li>
+<li><p><strong>address_size</strong> (<em>int</em>) – An int indicating the size of the addresses.</p></li>
+<li><p><strong>timestamp_size</strong> (<em>int</em>) – An int indicating the size of the timestamps.</p></li>
+<li><p><strong>compressor</strong> (<em>string</em>) – A string indicating the compressor to be used.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not debug comments are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output bytearray. It contains the CompressedFileHeader bound to the compressed
+spikes data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>compressed_file (bytearray)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function is the inverse of the compressedFileToSpikesFile function.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.compressionFunctions.storeCompressedFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.compressionFunctions.</span></span><span class="sig-name descname"><span class="pre">storeCompressedFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressed_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_compressed_events_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_overwriting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.compressionFunctions.storeCompressedFile" title="Permalink to this definition"></a></dt>
+<dd><p>Stores a compressed_file bytearray.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>compressed_file</strong> (<em>bytearray</em>) – The input bytearray that contains the CompressedFileHeader and the compressed spikes.</p></li>
+<li><p><strong>dst_compressed_events_dir</strong> (<em>string</em>) – A string indicating the compressed files folder.</p></li>
+<li><p><strong>dataset_name</strong> (<em>string</em>) – A string indicating the dataset name. It must exist inside the compressed files folder.</p></li>
+<li><p><strong>file_name</strong> (<em>string</em>) – A string indicating the file name. It must exist inside the dataset folder.</p></li>
+<li><p><strong>ignore_overwriting</strong> (<em>boolean</em>) – A boolean indicating whether or not ignore overwriting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Functions.html" class="btn btn-neutral float-left" title="Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ConversionFunctions.html" class="btn btn-neutral float-right" title="Data conversion functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Alvaro Ayuso Martinez.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
