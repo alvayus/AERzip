@@ -3,6 +3,7 @@ import os
 import time
 
 import lz4.frame
+import pylzma
 import zstandard
 from pyNAVIS import *
 
@@ -30,8 +31,9 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
         compressed_file (bytearray): The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
     """
     # --- Check the file ---
+    file_path = dst_compressed_events_dir + "/" + dataset_name + "/" + file_name
     if store and not ignore_overwriting:
-        checkCompressedFileExists(dst_compressed_events_dir, dataset_name, file_name)
+        file_path = checkCompressedFileExists(file_path)
 
     # --- Load data from original aedat file ---
     start_time = time.time()
@@ -72,7 +74,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     return compressed_file
 
 
-def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, settings, compressor, verbose=True):
+def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, settings, verbose=True):
     """
     Reads a file as a compressed file, decompress it to extract its raw spikes data and returns a SpikesFile object.
 
@@ -141,6 +143,8 @@ def compressData(bytes_data, compressor, verbose=True):
         compressed_data = cctx.compress(bytes_data)
     elif compressor == "LZ4":
         compressed_data = lz4.frame.compress(bytes_data)
+    elif compressor == "LZMA":
+        compressed_data = pylzma.compress(bytes_data)
     else:
         raise ValueError("Compressor not recognized")
 
@@ -170,6 +174,8 @@ def decompressData(compressed_data, compressor, verbose=False):
         decompressed_data = dctx.decompress(compressed_data)
     elif compressor == "LZ4":
         decompressed_data = lz4.frame.decompress(compressed_data)
+    elif compressor == "LZMA":
+        decompressed_data = pylzma.decompress(compressed_data)
     else:
         raise ValueError("Compressor not recognized")
 
@@ -180,29 +186,27 @@ def decompressData(compressed_data, compressor, verbose=False):
     return decompressed_data
 
 
-def storeCompressedFile(compressed_file, dst_compressed_events_dir, dataset_name,
-                        file_name, ignore_overwriting=True):
+# TODO: Checked
+def storeCompressedFile(compressed_file, dst_compressed_file_path, ignore_overwriting=True):
     """
     Stores a compressed_file bytearray.
 
     Parameters:
         compressed_file (bytearray): The input bytearray that contains the CompressedFileHeader and the compressed spikes.
-        dst_compressed_events_dir (string): A string indicating the compressed files folder.
-        dataset_name (string): A string indicating the dataset name. It must exist inside the compressed files folder.
-        file_name (string): A string indicating the file name. It must exist inside the dataset folder.
+        dst_compressed_file_path (string): The input string that indicates where the file is intended to be written.
         ignore_overwriting (boolean): A boolean indicating whether or not ignore overwriting.
 
     Returns:
         None
     """
     # Check the file
-    file_path = dst_compressed_events_dir + "/" + dataset_name + "/" + file_name
+    file_path = dst_compressed_file_path
     if not ignore_overwriting:
-        file_path = checkCompressedFileExists(file_path, dataset_name, file_name)
+        file_path = checkCompressedFileExists(file_path)
 
     # Check the destination folder
-    if not os.path.exists(dst_compressed_events_dir + "/" + dataset_name + "/"):
-        os.makedirs(dst_compressed_events_dir + "/" + dataset_name + "/")
+    if not os.path.exists(os.path.dirname(file_path)):
+        os.makedirs(os.path.dirname(file_path))
 
     # Write the file
     file = open(file_path, "wb")
@@ -444,21 +448,20 @@ def getCompressedFile(compressed_data, address_size, timestamp_size, compressor,
     return compressed_file
 
 
-def checkCompressedFileExists(dst_compressed_events_dir, dataset_name, file_name):
+# TODO: Checked
+def checkCompressedFileExists(dst_compressed_file_path):
     """
-    Checks if the specified compressed file exists. If it does, this function allows the user to
+    Checks if a compressed file already exits in the specified path. If it does, this function allows the user to
     decide whether to overwrite it or not. If the user decides not to overwrite the file, a new file path
     is generated to write the file to.
 
     Parameters:
-        dst_compressed_events_dir (string): A string indicating the compressed files folder.
-        dataset_name (string): A string indicating the dataset name. It must exist inside the compressed files folder.
-        file_name (string): A string indicating the file name. It must exist inside the dataset folder.
+        dst_compressed_file_path (string): The input string that indicates where the file is intended to be written.
 
     Returns:
-        file_path (string): The output string that indicates where to write the file
+        file_path (string): The output string that indicates where the file will be finally written.
     """
-    file_path = dst_compressed_events_dir + "/" + dataset_name + "/" + file_name
+    file_path = dst_compressed_file_path
 
     if os.path.exists(file_path):
         print("\nThe compressed aedat file already exists\n"
@@ -466,14 +469,12 @@ def checkCompressedFileExists(dst_compressed_events_dir, dataset_name, file_name
         option = input()
 
         if option == "N":
-            cut_file_name = file_name.replace(".aedat", "")
+            cut_ext = os.path.splitext(file_path)
 
             i = 1
-            while os.path.exists(
-                    dst_compressed_events_dir + "/" + dataset_name + "/" + cut_file_name + " (" + str(i) + ").aedat"):
+            while os.path.exists(cut_ext[0] + " (" + str(i) + ")" + cut_ext[1]):
                 i += 1
 
-            file_path = dst_compressed_events_dir + "/" + dataset_name + "/" + cut_file_name + " (" + str(
-                i) + ").aedat "
+            file_path = cut_ext[0] + " (" + str(i) + ")" + cut_ext[1]
 
     return file_path

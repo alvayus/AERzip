@@ -61,6 +61,8 @@ class CompressedFileHeader:
             header.extend(bytes("ZSTD".ljust(self.compressor_length), "utf-8"))
         elif self.compressor == "LZ4":
             header.extend(bytes("LZ4".ljust(self.compressor_length), "utf-8"))
+        elif self.compressor == "LZMA":
+            header.extend(bytes("LZMA".ljust(self.compressor_length), "utf-8"))
         else:
             raise ValueError("Compressor not recognized")
 
