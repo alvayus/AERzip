@@ -11,10 +11,8 @@ from compressionFunctions import decompressDataFromFile, compressDataFromFile
 
 # TODO: Test files
 # TODO: Fix and complete documentation
-# TODO: Timestamps compression by adapt_timestamps function. We could save the minimum in a byte and then rescue it
-# TODO: Extension header
-# TODO: Insert the maximum and minimum fields in the SpikesFile object of pyNAVIS
-# TODO: Insert the ordered and adapted fields in the SpikesFile object of pyNAVIS
+# TODO: u3 and spikegram in original files
+# TODO: CompressedEvents put compressor name
 
 
 if __name__ == '__main__':
@@ -22,16 +20,26 @@ if __name__ == '__main__':
     root.withdraw()  # we don't want a full GUI, so keep the root window from appearing
 
     # Find the original aedat file
-    print("Select a file in events folder")
+    print("Select an AEDAT file in events folder")
     path = askopenfilename(parent=root)
 
-    if path:
-        split_path = path.split("/")
-        len_split_path = len(split_path)
-    else:
-        raise ValueError("Not file selected. Select a new file")
+    while not path:
+        print("Not file selected. Select a new AEDAT file")
+        path = askopenfilename(parent=root)
 
-    if split_path[len_split_path - 3] != "events":
+    ext = os.path.splitext(path)[1]
+    dataset = os.path.dirname(path)
+    main_folder = os.path.dirname(dataset)
+
+    # TODO: Fix this
+
+    if main_folder != "events":
+        raise ValueError("Wrong folder. You must select an original AEDAT file contained in events folder")
+
+    if ext != ".aedat":
+        raise ValueError("This file is not an AEDAT file")
+
+    '''if split_path[len_split_path - 3] != "events":
         raise ValueError("Wrong folder. You must select a original aedat file in events folder")
 
     directory = "/".join(split_path[0:len_split_path - 2])
@@ -42,7 +50,7 @@ if __name__ == '__main__':
     len_split_file = len(split_file)
 
     if file.split(".")[len_split_file - 1] != "aedat":
-        raise ValueError("This file is not an aedat file")
+        raise ValueError("This file is not an aedat file")'''
 
     # Define source settings
     jAER_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=4, ts_tick=1,
@@ -74,14 +82,15 @@ if __name__ == '__main__':
         settings = None
 
     # Compress data
-    compressDataFromFile(directory, directory + "/../compressedEvents", dataset, file, settings,
-                         compressor="ZSTD", ignore_overwriting=False)
+    compressor = "ZSTD"
+    compressDataFromFile(directory, directory + "/../compressedEvents", dataset + "_" + compressor, file, settings,
+                         compressor=compressor, ignore_overwriting=False)
 
     # --- COMPRESSED DATA ---
     start_time = time.time()
     # Decompress the compressed aedat file
     spikes_file, new_settings = decompressDataFromFile(directory + "/../compressedEvents",
-                                                       dataset, file, settings, compressor="ZSTD")
+                                                       dataset, file, settings)
     gc.collect()  # Cleaning memory
 
     end_time = time.time()
