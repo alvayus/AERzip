@@ -201,11 +201,12 @@ def checkBytes(bytes_data, address_size, timestamp_size):
         return True
 
 
-def getBytesToPrune(settings):
+def getBytesToPrune(spikes_file, settings):
     """
     Gets the minimum number of bytes needed for spikes addresses and timestamps representation based on the input settings.
 
     Parameters:
+        spikes_file (SpikesFile): The input SpikesFile object from pyNAVIS.
         settings (MainSettings): A MainSettings object from pyNAVIS.
 
     Returns:
@@ -214,8 +215,7 @@ def getBytesToPrune(settings):
     """
     address_size = int(math.ceil(settings.num_channels * (settings.mono_stereo + 1) *
                                  (settings.on_off_both + 1) / 256))
-    # TODO: Timestamps
-    timestamp_size = 4
+    timestamp_size = int(math.ceil(spikes_file.max_ts / 256))
 
     return address_size, timestamp_size
 

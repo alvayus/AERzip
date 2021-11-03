@@ -7,7 +7,6 @@ import zstandard
 from pyNAVIS import *
 
 from AERzip.CompressedFileHeader import CompressedFileHeader
-# TODO: Test files
 from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, getBytesToPrune
 
 
@@ -41,12 +40,16 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
 
     spikes_file = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name, settings)
 
+    # Adapt timestamps to allow timestamp compression
+    if spikes_file.min_ts != 0:
+        Functions.adapt_timestamps(spikes_file, settings)
+
     end_time = time.time()
     if verbose:
         print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     # Get the bytes to be discarded
-    address_size, timestamp_size = getBytesToPrune(settings)
+    address_size, timestamp_size = getBytesToPrune(spikes_file, settings)
 
     if verbose:
         print("\nCompressing " + "/" + dataset_name + "/" + file_name + " with " + str(settings.address_size) +
@@ -309,7 +312,7 @@ def spikesFileToCompressedFile(spikes_file, address_size, timestamp_size, compre
     (compressed via the specified compressor) of the same shape.
 
     Parameters:
-        spikes_file (SpikesFile): The input SpikesFile object from pyNAVIS. It must contain raw spikes data (without headers).
+        spikes_file (SpikesFile): The input SpikesFile object from pyNAVIS. It must contain raw spikes data.
         address_size (int): An int indicating the size of the addresses.
         timestamp_size (int): An int indicating the size of the timestamps.
         compressor (string): A string indicating the compressor to be used.
@@ -345,7 +348,7 @@ def compressedFileToSpikesFile(compressed_file, verbose=False):
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
     Returns:
-        spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS. It contains raw spikes shaped
+        spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS. It contains raw spikes shaped.
         as the compressed spikes of the input bytearray.
 
     Notes:

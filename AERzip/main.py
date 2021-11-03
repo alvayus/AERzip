@@ -9,7 +9,13 @@ from pyNAVIS import *
 
 from compressionFunctions import decompressDataFromFile, compressDataFromFile
 
-from matplotlib.backends.backend_pdf import PdfPages
+# TODO: Test files
+# TODO: Fix and complete documentation
+# TODO: Timestamps compression by adapt_timestamps function. We could save the minimum in a byte and then rescue it
+# TODO: Extension header
+# TODO: Insert the maximum and minimum fields in the SpikesFile object of pyNAVIS
+# TODO: Insert the ordered and adapted fields in the SpikesFile object of pyNAVIS
+
 
 if __name__ == '__main__':
     root = Tk()
@@ -78,9 +84,6 @@ if __name__ == '__main__':
                                                        dataset, file, settings, compressor="ZSTD")
     gc.collect()  # Cleaning memory
 
-    # Adapting timestamps
-    spikes_file.timestamps = Functions.adapt_timestamps(spikes_file.timestamps, settings)
-
     end_time = time.time()
     print("Total time: " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
@@ -99,11 +102,12 @@ if __name__ == '__main__':
     Plots.difference_between_LR(spikes_file, new_settings, verbose=True)
     gc.collect()
 
+    plt.show()
+
     end_time = time.time()
     print("Plots generation took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
-    plt.show()
-    gc.collect()  # Cleaning memory
+    gc.collect()
 
     # --- ORIGINAL DATA ---
     # Load the original aedat file. Prints added to show loading time
@@ -113,9 +117,6 @@ if __name__ == '__main__':
     end_time = time.time()
     print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
     gc.collect()  # Cleaning memory
-
-    # Adapting timestamps
-    spikes_file.timestamps = Functions.adapt_timestamps(spikes_file.timestamps, settings)
 
     # Plots
     print("\nShowing original file plots...")
@@ -133,14 +134,14 @@ if __name__ == '__main__':
 
     plt.show()
 
-    report_directory = directory + "/../reports/"
-
     end_time = time.time()
     print("Plots visualization took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     # Generate the plots PDF
     print("\nGenerating original file plots...")
     start_time = time.time()
+
+    report_directory = directory + "/../reports/"
 
     if not os.path.exists(report_directory + dataset + "/"):
         os.makedirs(report_directory + dataset + "/")
