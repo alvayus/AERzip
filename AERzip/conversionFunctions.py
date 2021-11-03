@@ -121,11 +121,13 @@ def bytesToSpikesFile(bytes_data, address_size, timestamp_size, verbose=True):
     checkBytes(bytes_data, address_size, timestamp_size)
 
     # Separate addresses and timestamps
-    struct = constructStruct(address_size, timestamp_size)
+    # TODO: struct = constructStruct(address_size, timestamp_size)
+    spikes_struct = np.dtype([("addresses", ">u1", address_size),
+                              ("timestamps", ">u1", timestamp_size)])
 
-    spikes = np.frombuffer(bytes_data, struct)
-    addresses = spikes['f0']
-    timestamps = spikes['f1']
+    spikes = np.frombuffer(bytes_data, spikes_struct)
+    addresses = np.array(spikes['addresses'], copy=False).astype(">u4")
+    timestamps = np.array(spikes['timestamps'], copy=False).astype(">u4")
 
     # Return the SpikesFile
     spikes_file = SpikesFile(addresses, timestamps)
@@ -161,13 +163,28 @@ def spikesFileToBytes(spikes_file, address_size, timestamp_size, verbose=True):
         print("spikesFileToBytes: Converting SpikesFile to spikes bytes")
 
     # Prune bytes before compression (if parameter sizes are not original sizes)
-    address_param = ">u" + str(address_size)
-    timestamp_param = ">u" + str(timestamp_size)
+    '''address_param = ">u" + str(4)
+    timestamp_param = ">u" + str(4)
     struct = np.dtype(address_param + ", " + timestamp_param)
 
     bytes_data = np.zeros(len(spikes_file.addresses), dtype=struct)
     bytes_data['f0'] = spikes_file.addresses.astype(dtype=np.dtype(address_param), copy=False)
-    bytes_data['f1'] = spikes_file.timestamps.astype(dtype=np.dtype(timestamp_param), copy=False)
+    bytes_data['f1'] = spikes_file.timestamps.astype(dtype=np.dtype(timestamp_param), copy=False)'''
+
+    # TODO: This works better for PyLZMA
+    address_struct = np.dtype([("pruned", ">u1", 4 - address_size),
+                               ("addresses", ">u1", address_size)])
+    timestamp_struct = np.dtype([("pruned", ">u1", 4 - timestamp_size),
+                                 ("timestamps", ">u1", timestamp_size)])
+    spikes_struct = np.dtype([("addresses", ">u1", address_size),
+                              ("timestamps", ">u1", timestamp_size)])
+
+    addresses = np.array(spikes_file.addresses, copy=False).view(address_struct)
+    timestamps = np.array(spikes_file.timestamps, copy=False).view(timestamp_struct)
+
+    bytes_data = np.zeros(len(spikes_file.addresses), dtype=spikes_struct)
+    bytes_data['addresses'] = addresses['addresses']
+    bytes_data['timestamps'] = timestamps['timestamps']
 
     # Return the spikes bytearray (pruned or not)
     bytes_data = bytes_data.tobytes()
@@ -213,9 +230,13 @@ def getBytesToPrune(spikes_file, settings):
         address_size (int): An int indicating the minimum number of bytes to represent the addresses.
         timestamp_size (int): An int indicating the minimum number of bytes to represent the timestamps.
     """
+    # Addresses
     address_size = int(math.ceil(settings.num_channels * (settings.mono_stereo + 1) *
                                  (settings.on_off_both + 1) / 256))
-    timestamp_size = int(math.ceil(spikes_file.max_ts / 256))
+
+    # Timestamps
+    dec2bin = bin(spikes_file.max_ts)[2:]
+    timestamp_size = int(math.ceil(len(dec2bin) / 8))
 
     return address_size, timestamp_size
 
