@@ -25,7 +25,7 @@ class CompressedFileHeader:
             address_size (int): An int indicating the size of the addresses.
             timestamp_size (int): An int indicating the size of the timestamps.
         """
-        self.library_version = "AERzip v0.6.1"
+        self.library_version = "AERzip v0.6.2"
         self.library_version_length = 13
 
         self.compressor = compressor
