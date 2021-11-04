@@ -215,3 +215,23 @@ def getBytesToPrune(spikes_file, settings):
     timestamp_size = int(math.ceil(len(dec2bin) / 8))
 
     return address_size, timestamp_size
+
+
+# TODO: Checked
+def constructStruct(first_field, first_field_size, second_field, second_file_size):
+    """
+    Constructs a numpy data type of two fields to represent the data structure of a bytearray.
+
+    Parameters:
+        first_field (string): A string indicating the name of the first field.
+        first_field_size (int, tuple): An int or tuple indicating the number of bytes of the elements of the first field.
+        second_field (string): A string indicating the name of the second field.
+        second_file_size (int, tuple): An int or tuple indicating the number of bytes of the elements of the second field.
+
+    Returns:
+        struct (type): A data type required to interpret a bytearray.
+    """
+
+    struct = np.dtype([(first_field, ">u1", first_field_size), (second_field, ">u1", second_file_size)])
+
+    return struct
