@@ -370,7 +370,7 @@ def compressedFileToSpikesFile(compressed_file, settings, verbose=False):
     decompressed_data = decompressData(compressed_data, header)
 
     # Call to bytesToSpikesFile function
-    spikes_file, new_settings = bytesToSpikesFile(decompressed_data, settings)
+    spikes_file, new_settings = bytesToSpikesFile(decompressed_data, settings, header)
 
     if verbose:
         print("compressedFileToSpikesFile: Compressed file bytearray decompressed into a SpikesFile")

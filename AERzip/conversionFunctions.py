@@ -7,7 +7,7 @@ from pyNAVIS import SpikesFile
 
 
 # TODO: Checked
-def bytesToSpikesFile(bytes_data, options, verbose=True):
+def bytesToSpikesFile(bytes_data, settings, header, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are options.address_size
     and options.timestamp_size parameters respectively, to a SpikesFile of raw spikes of the same shape (or with 4-byte
@@ -15,7 +15,8 @@ def bytesToSpikesFile(bytes_data, options, verbose=True):
 
     Parameters:
         bytes_data (bytearray): The input bytearray. It must contain raw spikes data (without headers).
-        options (MainSettings, CompressedFileHeader): A MainSettings object from pyNAVIS or CompressedFileHeader that contains information about the spikes_file.
+        settings (MainSettings): A MainSettings object from pyNAVIS. It should contain information about the original file.
+        header (CompressedFileHeader): A CompressedFileHeader object. It should contain information about the compressed file.
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
     Returns:
@@ -35,14 +36,14 @@ def bytesToSpikesFile(bytes_data, options, verbose=True):
         print("bytesToSpikesFile: Converting spikes bytes to SpikesFile")
 
     # This is needed to work with 3-byte addresses or timestamps
-    if options.address_size == 3 or options.timestamp_size == 3:
+    if header.address_size == 3 or header.timestamp_size == 3:
         # Separate addresses and timestamps
-        spikes_struct = constructStruct("addresses", (options.address_size,), "timestamps", (options.timestamp_size,))
+        spikes_struct = constructStruct("addresses", (header.address_size,), "timestamps", (header.timestamp_size,))
         spikes = np.frombuffer(bytes_data, spikes_struct)
 
         # Fill addresses and timestamps with zeros to reach 4-bytes per element
-        address_struct = constructStruct("zeros", (4 - options.address_size,), "addresses", (options.address_size,))
-        timestamp_struct = constructStruct("zeros", (4 - options.timestamp_size,), "timestamps", (options.timestamp_size,))
+        address_struct = constructStruct("zeros", (4 - header.address_size,), "addresses", (header.address_size,))
+        timestamp_struct = constructStruct("zeros", (4 - header.timestamp_size,), "timestamps", (header.timestamp_size,))
         filled_addresses = np.zeros(len(spikes), dtype=address_struct)
         filled_timestamps = np.zeros(len(spikes), dtype=timestamp_struct)
         filled_addresses['addresses'] = spikes['addresses']
@@ -54,7 +55,7 @@ def bytesToSpikesFile(bytes_data, options, verbose=True):
 
     else:
         # Separate addresses and timestamps
-        struct = np.dtype(">u" + str(options.address_size) + ", " + ">u" + str(options.timestamp_size))
+        struct = np.dtype(">u" + str(header.address_size) + ", " + ">u" + str(header.timestamp_size))
         spikes = np.frombuffer(bytes_data, struct)
         addresses = spikes['f0']
         timestamps = spikes['f1']
@@ -63,9 +64,9 @@ def bytesToSpikesFile(bytes_data, options, verbose=True):
     spikes_file = SpikesFile(addresses, timestamps)
 
     # Return the modified options
-    new_settings = copy.deepcopy(options)
-    new_settings.address_size = options.address_size
-    new_settings.timestamp_size = options.timestamp_size
+    new_settings = copy.deepcopy(settings)
+    new_settings.address_size = header.address_size
+    new_settings.timestamp_size = header.timestamp_size
 
     end_time = time.time()
     if verbose:

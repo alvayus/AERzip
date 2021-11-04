@@ -94,6 +94,7 @@ if __name__ == '__main__':
 
     # --- COMPRESSED DATA ---
     start_time = time.time()
+
     # Decompress the compressed aedat file
     spikes_file, new_settings = decompressDataFromFile(dst_path, settings)
     gc.collect()  # Cleaning memory
