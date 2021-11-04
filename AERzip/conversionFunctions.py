@@ -215,22 +215,3 @@ def getBytesToPrune(spikes_file, settings):
     timestamp_size = int(math.ceil(len(dec2bin) / 8))
 
     return address_size, timestamp_size
-
-
-# TODO: CHECK this
-def constructStruct(address_size, timestamp_size):
-    """
-    Constructs a numpy data type to represent the data structure of a bytearray.
-
-    Parameters:
-        address_size (int): An int indicating the size of the addresses.
-        timestamp_size (int): An int indicating the size of the timestamps.
-
-    Returns:
-        struct (type): A data type required to interpret a bytearray.
-    """
-    address_param = ">u" + str(address_size)
-    timestamp_param = ">u" + str(timestamp_size)
-    struct = np.dtype(address_param + ", " + timestamp_param)
-
-    return struct
