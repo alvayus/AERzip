@@ -334,10 +334,11 @@ def spikesFileToCompressedFile(spikes_file, settings, address_size, timestamp_si
         This function is the inverse of the compressedFileToSpikesFile function.
     """
     # Call to spikesFileToBytes function
-    spikes_bytes = spikesFileToBytes(spikes_file, settings, address_size, timestamp_size, compressor)
+    spikes_bytes, header = spikesFileToBytes(spikes_file, settings, address_size, timestamp_size, compressor)
 
     # Call to bytesToCompressedFile function
-    compressed_file = bytesToCompressedFile(spikes_bytes, address_size, timestamp_size, compressor)
+    compressed_file = bytesToCompressedFile(spikes_bytes, header.address_size, header.timestamp_size,
+                                            header.compressor)
 
     if verbose:
         print("Done! SpikesFile compressed into a compressed file bytearray")

@@ -7,6 +7,9 @@ from pyNAVIS import SpikesFile
 
 
 # TODO: Checked
+from AERzip.CompressedFileHeader import CompressedFileHeader
+
+
 def bytesToSpikesFile(bytes_data, settings, header, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are options.address_size
@@ -22,6 +25,7 @@ def bytesToSpikesFile(bytes_data, settings, header, verbose=True):
     Returns:
         spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS. It contains raw spikes shaped
         as the raw spikes of the input bytearray.
+        header (CompressedFileHeader): The header of the compressed file.
 
     Notes:
         This function is the inverse of the spikesFileToBytes function.
@@ -93,8 +97,8 @@ def spikesFileToBytes(spikes_file, options, new_address_size, new_timestamp_size
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
     Returns:
-        bytes_data (bytearray): The output bytearray. It contains raw spikes shaped as the raw spikes of the
-        input SpikesFile.
+        bytes_data (bytearray): The output bytearray. It contains raw spikes shaped as the raw spikes of the input SpikesFile.
+        header (CompressedFileHeader): A CompressedFileHeader object. It contains information about the compressed file (maybe not yet created).
 
     Notes:
         This function is the inverse of the bytesToSpikesFile function.
@@ -110,6 +114,8 @@ def spikesFileToBytes(spikes_file, options, new_address_size, new_timestamp_size
     if verbose:
         print("spikesFileToBytes: Converting SpikesFile to spikes bytes")
 
+    header = CompressedFileHeader(compressor, new_address_size, new_timestamp_size)
+
     if compressor != "LZMA":
         # Viewing addresses and timestamps as 4-bytes data usually allows to achieve a better compression,
         # regardless of their original sizes
@@ -119,6 +125,11 @@ def spikesFileToBytes(spikes_file, options, new_address_size, new_timestamp_size
         bytes_data = np.zeros(len(spikes_file.addresses), dtype=struct)
         bytes_data['f0'] = spikes_file.addresses.astype(dtype=struct[0], copy=False)
         bytes_data['f1'] = spikes_file.timestamps.astype(dtype=struct[1], copy=False)
+
+        # It is important to update the sizes because they will be written in the file to read them later
+        header.address_size = 4
+        header.timestamp_size = 4
+
     else:
         # In the case of compressing with LZMA compressor, it is better to prune the bytes because
         # we can achieve practically the same compressed file size in a reasonably smaller time. This
@@ -148,10 +159,9 @@ def spikesFileToBytes(spikes_file, options, new_address_size, new_timestamp_size
 
     end_time = time.time()
     if verbose:
-        print("spikesFileToBytes: Data conversion has took " + '{0:.3f}'.format(
-            end_time - start_time) + " seconds")
+        print("spikesFileToBytes: Data conversion has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
-    return bytes_data
+    return bytes_data, header
 
 
 # TODO: Checked
