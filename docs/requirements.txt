@@ -1,6 +1,9 @@
 sphinxcontrib-napoleon
 myst_parser
-lz4
-numpy
-zstandard
+
 pyNAVIS
+numpy
+
+lz4
+zstandard
+pylzma
