@@ -1,3 +1,4 @@
+import copy
 import math
 import time
 
@@ -61,12 +62,17 @@ def bytesToSpikesFile(bytes_data, options, verbose=True):
     # Return the SpikesFile
     spikes_file = SpikesFile(addresses, timestamps)
 
+    # Return the modified options
+    new_settings = copy.deepcopy(options)
+    new_settings.address_size = options.address_size
+    new_settings.timestamp_size = options.timestamp_size
+
     end_time = time.time()
     if verbose:
         print("bytesToSpikesFile: Data conversion has took " + '{0:.3f}'.format(
             end_time - start_time) + " seconds")
 
-    return spikes_file
+    return spikes_file, new_settings
 
 
 # TODO: Checked

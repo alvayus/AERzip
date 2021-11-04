@@ -89,7 +89,7 @@ if __name__ == '__main__':
         settings = MatLab_settings_32ch_mono
 
     # Compress data
-    compressor = "ZSTD"
+    compressor = "LZMA"
     _, dst_path = compressDataFromFile(path, settings, compressor=compressor, ignore_overwriting=False)
 
     # --- COMPRESSED DATA ---

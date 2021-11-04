@@ -120,12 +120,7 @@ def decompressDataFromFile(src_file_path, settings, verbose=True):
     start_time = time.time()
 
     # Call to bytesToSpikesFile function
-    header, spikes_file = compressedFileToSpikesFile(compressed_file, settings)
-
-    # Return the modified settings
-    new_settings = copy.deepcopy(settings)
-    new_settings.address_size = header.address_size
-    new_settings.timestamp_size = header.timestamp_size
+    header, spikes_file, new_settings = compressedFileToSpikesFile(compressed_file, settings)
 
     end_time = time.time()
     if verbose:
@@ -375,12 +370,12 @@ def compressedFileToSpikesFile(compressed_file, settings, verbose=False):
     decompressed_data = decompressData(compressed_data, header)
 
     # Call to bytesToSpikesFile function
-    spikes_file = bytesToSpikesFile(decompressed_data, settings)
+    spikes_file, new_settings = bytesToSpikesFile(decompressed_data, settings)
 
     if verbose:
         print("compressedFileToSpikesFile: Compressed file bytearray decompressed into a SpikesFile")
 
-    return header, spikes_file
+    return header, spikes_file, new_settings
 
 
 # TODO: Checked
