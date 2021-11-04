@@ -120,7 +120,7 @@ def decompressDataFromFile(src_file_path, settings, verbose=True):
     start_time = time.time()
 
     # Call to bytesToSpikesFile function
-    header, spikes_file = compressedFileToSpikesFile(compressed_file)
+    header, spikes_file = compressedFileToSpikesFile(compressed_file, settings)
 
     # Return the modified settings
     new_settings = copy.deepcopy(settings)
@@ -351,7 +351,7 @@ def spikesFileToCompressedFile(spikes_file, settings, address_size, timestamp_si
 
 
 # TODO: Checked
-def compressedFileToSpikesFile(compressed_file, verbose=False):
+def compressedFileToSpikesFile(compressed_file, settings, verbose=False):
     """
     Converts a bytearray of CompressedFileHeader and compressed spikes of a-bytes addresses and b-bytes timestamps,
     where a and b are address_size and timestamp_size ints which are inside the bytearray, to a SpikesFile of raw spikes
@@ -359,11 +359,11 @@ def compressedFileToSpikesFile(compressed_file, verbose=False):
 
     Parameters:
         compressed_file (bytearray): The input bytearray that contains the CompressedFileHeader and the compressed spikes.
+        settings (MainSettings): A MainSettings object from pyNAVIS.
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
     Returns:
-        spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS. It contains raw spikes shaped.
-        as the compressed spikes of the input bytearray.
+        spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS.
 
     Notes:
         This function is the inverse of the spikesFileToCompressedFile function.
@@ -375,7 +375,7 @@ def compressedFileToSpikesFile(compressed_file, verbose=False):
     decompressed_data = decompressData(compressed_data, header)
 
     # Call to bytesToSpikesFile function
-    spikes_file = bytesToSpikesFile(decompressed_data, header)
+    spikes_file = bytesToSpikesFile(decompressed_data, settings)
 
     if verbose:
         print("compressedFileToSpikesFile: Compressed file bytearray decompressed into a SpikesFile")

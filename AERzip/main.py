@@ -10,7 +10,7 @@ from pyNAVIS import *
 from compressionFunctions import decompressDataFromFile, compressDataFromFile
 
 # TODO: Test files
-# TODO: Fix and complete documentation and images
+# TODO: Fix and complete documentation and images (remove prunedBytes)
 # TODO: u3 and spikegram in original files
 # TODO: Writing in AEDAT 4.0?
 # TODO: Add a bytesToPrunedBytes function
