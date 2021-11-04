@@ -11,16 +11,12 @@ from AERzip.CompressedFileHeader import CompressedFileHeader
 from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, getBytesToPrune
 
 
-def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name, file_name,
-                         settings, compressor, store=True, ignore_overwriting=True, verbose=True):
+def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore_overwriting=True, verbose=True):
     """
     Reads an original aedat file, extracts and compress its raw spikes data and returns a compressed file bytearray.
 
     Parameters:
-        src_events_dir (string): A string indicating the original aedat files folder.
-        dst_compressed_events_dir (string): A string indicating the compressed files folder.
-        dataset_name (string): A string indicating the dataset name. It must exist inside the compressed files folder.
-        file_name (string): A string indicating the file name. It must exist inside the dataset folder.
+        src_file_path (string): A string indicating the original aedat file path.
         settings (MainSettings): A MainSettings object from pyNAVIS.
         compressor (string): A string indicating the compressor to be used.
         store (boolean): A boolean indicating whether or not store the compressed file.
@@ -31,16 +27,26 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
         compressed_file (bytearray): The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
     """
     # --- Check the file ---
-    file_path = dst_compressed_events_dir + "/" + dataset_name + "/" + file_name
+    split_path = src_file_path.split("/")
+    split_path[len(split_path) - 2] = split_path[len(split_path) - 2] + "_" + compressor
+    split_path[len(split_path) - 3] = "compressedEvents"
+    split_path[0] = split_path[0] + "\\"
+
+    dst_file_path = os.path.join(*split_path)
     if store and not ignore_overwriting:
-        file_path = checkCompressedFileExists(file_path)
+        dst_file_path = checkCompressedFileExists(dst_file_path)
+
+    file = os.path.basename(src_file_path)
+    dir_path = os.path.dirname(src_file_path)
+    dataset = os.path.basename(dir_path)
+    main_folder = os.path.basename(os.path.dirname(dir_path))
 
     # --- Load data from original aedat file ---
     start_time = time.time()
     if verbose:
-        print("\nLoading " + "/" + dataset_name + "/" + file_name + " (original aedat file)")
+        print("\nLoading " + "/" + main_folder + "/" + dataset + "/" + file + " (original aedat file)")
 
-    spikes_file = Loaders.loadAEDAT(src_events_dir + "/" + dataset_name + "/" + file_name, settings)
+    spikes_file = Loaders.loadAEDAT(src_file_path, settings)
 
     # Adapt timestamps to allow timestamp compression
     if spikes_file.min_ts != 0:
@@ -54,7 +60,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
     address_size, timestamp_size = getBytesToPrune(spikes_file, settings)
 
     if verbose:
-        print("\nCompressing " + "/" + dataset_name + "/" + file_name + " with " + str(settings.address_size) +
+        print("\nCompressing " + "/" + main_folder + "/" + dataset + "/" + file + " with " + str(settings.address_size) +
               "-byte addresses and " + str(settings.timestamp_size) + "-byte timestamps into an aedat file with " +
               str(address_size) + "-byte addresses and " + str(timestamp_size) + "-byte timestamps via " +
               compressor + " compressor")
@@ -65,7 +71,7 @@ def compressDataFromFile(src_events_dir, dst_compressed_events_dir, dataset_name
 
     # --- Store the data ---
     if store:
-        storeCompressedFile(compressed_file, dst_compressed_events_dir, dataset_name, file_name)
+        storeCompressedFile(compressed_file, dst_file_path)
 
     end_time = time.time()
     if verbose:
@@ -242,6 +248,7 @@ def loadCompressedFile(src_compressed_events_dir, dataset_name, file_name):
     return compressed_file
 
 
+# TODO: Checked
 def bytesToCompressedFile(bytes_data, address_size, timestamp_size, compressor, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size

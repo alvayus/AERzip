@@ -19,38 +19,40 @@ if __name__ == '__main__':
     root = Tk()
     root.withdraw()  # we don't want a full GUI, so keep the root window from appearing
 
-    # Find the original aedat file
+    # Select a file
     print("Select an AEDAT file in events folder")
     path = askopenfilename(parent=root)
 
+    # Until file is selected
     while not path:
         print("Not file selected. Select a new AEDAT file")
         path = askopenfilename(parent=root)
 
     ext = os.path.splitext(path)[1]
-    dataset = os.path.dirname(path)
-    main_folder = os.path.dirname(dataset)
+    dir_path = os.path.dirname(path)
+    dataset = os.path.basename(dir_path)
+    main_folder = os.path.basename(os.path.dirname(dir_path))
 
-    # TODO: Fix this
+    # Until file is an original AEDAT file (in events folder)
+    while not main_folder == "events" or dataset == "events" or not ext == ".aedat":
+        if main_folder != "events":
+            print("Wrong folder. You must select an original AEDAT file contained in events folder with the following"
+                  "path: '../events/dataset/file.aedat'")
 
-    if main_folder != "events":
-        raise ValueError("Wrong folder. You must select an original AEDAT file contained in events folder")
+        if ext != ".aedat":
+            print("This file is not an AEDAT file. You must select a file with extension '.aedat'")
 
-    if ext != ".aedat":
-        raise ValueError("This file is not an AEDAT file")
+        path = askopenfilename(parent=root)
 
-    '''if split_path[len_split_path - 3] != "events":
-        raise ValueError("Wrong folder. You must select a original aedat file in events folder")
+        # Until file is selected again
+        while not path:
+            print("Not file selected. Select a new AEDAT file")
+            path = askopenfilename(parent=root)
 
-    directory = "/".join(split_path[0:len_split_path - 2])
-    dataset = split_path[len_split_path - 2]
-    file = split_path[len_split_path - 1]
-
-    split_file = file.split(".")
-    len_split_file = len(split_file)
-
-    if file.split(".")[len_split_file - 1] != "aedat":
-        raise ValueError("This file is not an aedat file")'''
+        ext = os.path.splitext(path)[1]
+        dir_path = os.path.dirname(path)
+        dataset = os.path.basename(dir_path)
+        main_folder = os.path.basename(os.path.dirname(dir_path))
 
     # Define source settings
     jAER_settings = MainSettings(num_channels=64, mono_stereo=1, on_off_both=1, address_size=4, ts_tick=1,
@@ -70,6 +72,10 @@ if __name__ == '__main__':
 
     number = int(input("Enter your option: "))
 
+    while not number or not 1 <= number <= 4:
+        number = int(input("This is not a number or not a number in the range 1-4. \nPlease, enter your option again: "))
+
+    settings = None
     if number == 1:
         settings = jAER_settings
     elif number == 2:
@@ -78,14 +84,12 @@ if __name__ == '__main__':
         settings = MatLab_settings_mono
     elif number == 4:
         settings = MatLab_settings_32ch_mono
-    else:
-        settings = None
 
     # Compress data
     compressor = "ZSTD"
-    compressDataFromFile(directory, directory + "/../compressedEvents", dataset + "_" + compressor, file, settings,
-                         compressor=compressor, ignore_overwriting=False)
+    compressDataFromFile(path, settings, compressor=compressor, ignore_overwriting=False)
 
+    # TODO: Seguir por aquí -----------------------------------------------------------------------------------
     # --- COMPRESSED DATA ---
     start_time = time.time()
     # Decompress the compressed aedat file

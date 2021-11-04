@@ -140,6 +140,7 @@ def bytesToSpikesFile(bytes_data, address_size, timestamp_size, verbose=True):
     return spikes_file
 
 
+# TODO: CHECK this
 def spikesFileToBytes(spikes_file, address_size, timestamp_size, verbose=True):
     """
     Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
@@ -172,12 +173,12 @@ def spikesFileToBytes(spikes_file, address_size, timestamp_size, verbose=True):
     bytes_data['f1'] = spikes_file.timestamps.astype(dtype=np.dtype(timestamp_param), copy=False)'''
 
     # TODO: This works better for PyLZMA
-    address_struct = np.dtype([("pruned", ">u1", 4 - address_size),
-                               ("addresses", ">u1", address_size)])
-    timestamp_struct = np.dtype([("pruned", ">u1", 4 - timestamp_size),
-                                 ("timestamps", ">u1", timestamp_size)])
-    spikes_struct = np.dtype([("addresses", ">u1", address_size),
-                              ("timestamps", ">u1", timestamp_size)])
+    address_struct = np.dtype([("pruned", ">u1", (4 - address_size,)),
+                               ("addresses", ">u1", (address_size,))])
+    timestamp_struct = np.dtype([("pruned", ">u1", (4 - timestamp_size,)),
+                                 ("timestamps", ">u1", (timestamp_size,))])
+    spikes_struct = np.dtype([("addresses", ">u1", (address_size,)),
+                              ("timestamps", ">u1", (timestamp_size,))])
 
     addresses = np.array(spikes_file.addresses, copy=False).view(address_struct)
     timestamps = np.array(spikes_file.timestamps, copy=False).view(timestamp_struct)
