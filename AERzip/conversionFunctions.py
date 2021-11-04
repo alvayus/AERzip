@@ -95,6 +95,7 @@ def pruneBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp
     return spikes_file
 
 
+# TODO: CHECK this
 def bytesToSpikesFile(bytes_data, address_size, timestamp_size, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
@@ -219,6 +220,7 @@ def checkBytes(bytes_data, address_size, timestamp_size):
         return True
 
 
+# TODO: Checked
 def getBytesToPrune(spikes_file, settings):
     """
     Gets the minimum number of bytes needed for spikes addresses and timestamps representation based on the input settings.
@@ -242,6 +244,7 @@ def getBytesToPrune(spikes_file, settings):
     return address_size, timestamp_size
 
 
+# TODO: CHECK this
 def constructStruct(address_size, timestamp_size):
     """
     Constructs a numpy data type to represent the data structure of a bytearray.

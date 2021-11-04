@@ -12,7 +12,6 @@ from compressionFunctions import decompressDataFromFile, compressDataFromFile
 # TODO: Test files
 # TODO: Fix and complete documentation
 # TODO: u3 and spikegram in original files
-# TODO: CompressedEvents put compressor name
 
 
 if __name__ == '__main__':
@@ -29,6 +28,7 @@ if __name__ == '__main__':
         path = askopenfilename(parent=root)
 
     ext = os.path.splitext(path)[1]
+    file = os.path.basename(path)
     dir_path = os.path.dirname(path)
     dataset = os.path.basename(dir_path)
     main_folder = os.path.basename(os.path.dirname(dir_path))
@@ -50,6 +50,7 @@ if __name__ == '__main__':
             path = askopenfilename(parent=root)
 
         ext = os.path.splitext(path)[1]
+        file = os.path.basename(path)
         dir_path = os.path.dirname(path)
         dataset = os.path.basename(dir_path)
         main_folder = os.path.basename(os.path.dirname(dir_path))
@@ -87,14 +88,12 @@ if __name__ == '__main__':
 
     # Compress data
     compressor = "ZSTD"
-    compressDataFromFile(path, settings, compressor=compressor, ignore_overwriting=False)
+    _, dst_path = compressDataFromFile(path, settings, compressor=compressor, ignore_overwriting=False)
 
-    # TODO: Seguir por aquí -----------------------------------------------------------------------------------
     # --- COMPRESSED DATA ---
     start_time = time.time()
     # Decompress the compressed aedat file
-    spikes_file, new_settings = decompressDataFromFile(directory + "/../compressedEvents",
-                                                       dataset, file, settings)
+    spikes_file, new_settings = decompressDataFromFile(dst_path, settings)
     gc.collect()  # Cleaning memory
 
     end_time = time.time()
@@ -125,8 +124,8 @@ if __name__ == '__main__':
     # --- ORIGINAL DATA ---
     # Load the original aedat file. Prints added to show loading time
     start_time = time.time()
-    print("\nLoading " + "/" + dataset + "/" + file + " (original aedat file)")
-    spikes_file = Loaders.loadAEDAT(directory + "/" + dataset + "/" + file, settings)
+    print("\nLoading " + "/" + main_folder + "/" + dataset + "/" + file + " (original aedat file)")
+    spikes_file = Loaders.loadAEDAT(path, settings)
     end_time = time.time()
     print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
     gc.collect()  # Cleaning memory
@@ -135,26 +134,26 @@ if __name__ == '__main__':
     print("\nShowing original file plots...")
     start_time = time.time()
 
-    spk_fig = Plots.spikegram(spikes_file, settings, verbose=True)
+    Plots.spikegram(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    sng_fig = Plots.sonogram(spikes_file, settings, verbose=True)
+    Plots.sonogram(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    _, hst_fig = Plots.histogram(spikes_file, settings, verbose=True)
+    Plots.histogram(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    _, _, avg_fig = Plots.average_activity(spikes_file, settings, verbose=True)
+    Plots.average_activity(spikes_file, settings, verbose=True)
     gc.collect()  # Cleaning memory
-    dlr_fig = Plots.difference_between_LR(spikes_file, settings, verbose=True)
+    Plots.difference_between_LR(spikes_file, settings, verbose=True)
 
     plt.show()
 
     end_time = time.time()
     print("Plots visualization took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
-    # Generate the plots PDF
+    # --- REPORTS ---
     print("\nGenerating original file plots...")
     start_time = time.time()
 
-    report_directory = directory + "/../reports/"
+    report_directory = os.path.dirname(dir_path) + "/../reports/"
 
     if not os.path.exists(report_directory + dataset + "/"):
         os.makedirs(report_directory + dataset + "/")

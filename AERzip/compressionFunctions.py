@@ -11,6 +11,7 @@ from AERzip.CompressedFileHeader import CompressedFileHeader
 from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, getBytesToPrune
 
 
+# TODO: Checked
 def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore_overwriting=True, verbose=True):
     """
     Reads an original aedat file, extracts and compress its raw spikes data and returns a compressed file bytearray.
@@ -77,19 +78,17 @@ def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore
     if verbose:
         print("Compression achieved in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
-    return compressed_file
+    return compressed_file, dst_file_path
 
 
-def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, settings, verbose=True):
+# TODO: Checked
+def decompressDataFromFile(src_file_path, settings, verbose=True):
     """
     Reads a file as a compressed file, decompress it to extract its raw spikes data and returns a SpikesFile object.
 
     Parameters:
-        src_compressed_events_dir (string): A string indicating the compressed files folder.
-        dataset_name (string): A string indicating the dataset name. It must exist inside the compressed files folder.
-        file_name (string): A string indicating the file name. It must exist inside the dataset folder.
+        src_file_path (string): A string indicating the compressed aedat file path.
         settings (MainSettings): A MainSettings object from pyNAVIS.
-        compressor (string): A string indicating the compressor to be used.
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
     Returns:
@@ -100,11 +99,16 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
         new_settings is returned in order to allow direct visualization of the files data using pyNAVIS plot functions.
     """
     # --- Load data from compressed aedat file ---
+    file = os.path.basename(src_file_path)
+    dir_path = os.path.dirname(src_file_path)
+    dataset = os.path.basename(dir_path)
+    main_folder = os.path.basename(os.path.dirname(dir_path))
+
     start_time = time.time()
     if verbose:
-        print("\nLoading " + "/" + dataset_name + "/" + file_name + " (compressed aedat file)")
+        print("\nLoading " + "/" + main_folder + "/" + dataset + "/" + file + " (compressed aedat file)")
 
-    compressed_file = loadCompressedFile(src_compressed_events_dir, dataset_name, file_name)
+    compressed_file = loadCompressedFile(src_file_path)
 
     end_time = time.time()
     if verbose:
@@ -112,7 +116,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
 
     # --- Decompress the data ---
     if verbose:
-        print("\nDecompressing " + "/" + dataset_name + "/" + file_name)
+        print("\nDecompressing " + "/" + main_folder + "/" + dataset + "/" + file)
     start_time = time.time()
 
     # Call to bytesToSpikesFile function
@@ -130,6 +134,7 @@ def decompressDataFromFile(src_compressed_events_dir, dataset_name, file_name, s
     return spikes_file, new_settings
 
 
+# TODO: Checked
 def compressData(bytes_data, compressor, verbose=True):
     """
     Decompress the input compressed spikes bytearray via the specified compressor.
@@ -161,6 +166,7 @@ def compressData(bytes_data, compressor, verbose=True):
     return compressed_data
 
 
+# TODO: Checked
 def decompressData(compressed_data, compressor, verbose=False):
     """
     Decompress the input compressed spikes bytearray via the specified compressor.
@@ -220,26 +226,19 @@ def storeCompressedFile(compressed_file, dst_compressed_file_path, ignore_overwr
     file.close()
 
 
-def loadCompressedFile(src_compressed_events_dir, dataset_name, file_name):
+# TODO: Checked
+def loadCompressedFile(src_file_path):
     """
     Extracts header and compressed data from a stored compressed file.
 
     Parameters:
-        src_compressed_events_dir (string): A string indicating the compressed files folder.
-        dataset_name (string): A string indicating the dataset name. It must exist inside the compressed files folder.
-        file_name (string): A string indicating the file name. It must exist inside the dataset folder.
+        src_file_path (string): A string indicating the compressed aedat file path.
 
     Returns:
         compressed_file (bytearray): The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
     """
-    # Check the file path
-    file_path = src_compressed_events_dir + "/" + dataset_name + "/" + file_name
-    if not os.path.exists(file_path):
-        raise FileNotFoundError("Unable to find the specified compressed aedat file: "
-                                + "/" + dataset_name + "/" + file_name)
-
     # Read all the file
-    file = open(file_path, "rb")
+    file = open(src_file_path, "rb")
     compressed_file = file.read()
 
     # Close the file
@@ -287,6 +286,7 @@ def bytesToCompressedFile(bytes_data, address_size, timestamp_size, compressor, 
     return compressed_file
 
 
+# TODO: Checked
 def compressedFileToBytes(compressed_file, verbose=True):
     """
     Converts a bytearray of CompressedFileHeader and compressed spikes of a-bytes addresses and b-bytes timestamps,
@@ -316,6 +316,7 @@ def compressedFileToBytes(compressed_file, verbose=True):
     return bytes_data
 
 
+# TODO: Checked
 def spikesFileToCompressedFile(spikes_file, address_size, timestamp_size, compressor, verbose=True):
     """
     Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
@@ -348,6 +349,7 @@ def spikesFileToCompressedFile(spikes_file, address_size, timestamp_size, compre
     return compressed_file
 
 
+# TODO: Checked
 def compressedFileToSpikesFile(compressed_file, verbose=False):
     """
     Converts a bytearray of CompressedFileHeader and compressed spikes of a-bytes addresses and b-bytes timestamps,
@@ -380,6 +382,7 @@ def compressedFileToSpikesFile(compressed_file, verbose=False):
     return header, spikes_file
 
 
+# TODO: Checked
 def extractCompressedData(compressed_file, verbose=False):
     """
     Extracts the CompressedFileHeader object and the compressed spikes from an input bytearray.
@@ -424,6 +427,7 @@ def extractCompressedData(compressed_file, verbose=False):
     return header, compressed_data
 
 
+# TODO: Checked
 def getCompressedFile(compressed_data, address_size, timestamp_size, compressor, verbose=False):
     """
     Assembles the full compressed aedat file by joining the CompressedFileHeader object
