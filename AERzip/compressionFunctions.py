@@ -68,7 +68,7 @@ def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore
     start_time = time.time()
 
     # --- Compress the data ---
-    compressed_file = spikesFileToCompressedFile(spikes_file, address_size, timestamp_size, compressor)
+    compressed_file = spikesFileToCompressedFile(spikes_file, settings, address_size, timestamp_size, compressor)
 
     # --- Store the data ---
     if store:
@@ -317,7 +317,7 @@ def compressedFileToBytes(compressed_file, verbose=True):
 
 
 # TODO: Checked
-def spikesFileToCompressedFile(spikes_file, address_size, timestamp_size, compressor, verbose=True):
+def spikesFileToCompressedFile(spikes_file, settings, address_size, timestamp_size, compressor, verbose=True):
     """
     Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
     and timestamp_size parameters respectively, to a bytearray of CompressedFileHeader and compressed spikes
@@ -325,6 +325,7 @@ def spikesFileToCompressedFile(spikes_file, address_size, timestamp_size, compre
 
     Parameters:
         spikes_file (SpikesFile): The input SpikesFile object from pyNAVIS. It must contain raw spikes data.
+        settings (MainSettings): A MainSettings object from pyNAVIS.
         address_size (int): An int indicating the size of the addresses.
         timestamp_size (int): An int indicating the size of the timestamps.
         compressor (string): A string indicating the compressor to be used.
@@ -338,7 +339,7 @@ def spikesFileToCompressedFile(spikes_file, address_size, timestamp_size, compre
         This function is the inverse of the compressedFileToSpikesFile function.
     """
     # Call to spikesFileToBytes function
-    spikes_bytes = spikesFileToBytes(spikes_file, address_size, timestamp_size)
+    spikes_bytes = spikesFileToBytes(spikes_file, settings, address_size, timestamp_size, compressor)
 
     # Call to bytesToCompressedFile function
     compressed_file = bytesToCompressedFile(spikes_bytes, address_size, timestamp_size, compressor)
