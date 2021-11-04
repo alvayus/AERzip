@@ -5,6 +5,7 @@ import numpy as np
 from pyNAVIS import SpikesFile
 
 
+# TODO: CHECK this
 def pruneBytesToSpikesBytearray(bytes_data, settings, new_address_size,
                                 new_timestamp_size, verbose=True):
     """
@@ -53,6 +54,7 @@ def pruneBytesToSpikesBytearray(bytes_data, settings, new_address_size,
     return pruned_bytes
 
 
+# TODO: CHECK this
 def pruneBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp_size, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps
@@ -93,15 +95,14 @@ def pruneBytesToSpikesFile(bytes_data, settings, new_address_size, new_timestamp
 
 
 # TODO: CHECK this
-def bytesToSpikesFile(bytes_data, address_size, timestamp_size, verbose=True):
+def bytesToSpikesFile(bytes_data, header, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
     and timestamp_size parameters respectively, to a SpikesFile of raw spikes of the same shape.
 
     Parameters:
         bytes_data (bytearray): The input bytearray. It must contain raw spikes data (without headers).
-        address_size (int): An int indicating the size of the addresses.
-        timestamp_size (int): An int indicating the size of the timestamps.
+        header (CompressedFileHeader): The input CompressedFileHeader object.
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
     Returns:
@@ -115,14 +116,29 @@ def bytesToSpikesFile(bytes_data, address_size, timestamp_size, verbose=True):
     if verbose:
         print("bytesToSpikesFile: Converting spikes bytes to SpikesFile")
 
-    # Separate addresses and timestamps
-    # TODO: struct = constructStruct(address_size, timestamp_size)
-    spikes_struct = np.dtype([("addresses", ">u1", address_size),
-                              ("timestamps", ">u1", timestamp_size)])
+    if header.compressor != "LZMA":
+        # Separate addresses and timestamps
+        spikes_struct = np.dtype(">u4, >u4")
+        spikes = np.frombuffer(bytes_data, spikes_struct)
+        addresses = spikes['f0']
+        timestamps = spikes['f1']
 
-    spikes = np.frombuffer(bytes_data, spikes_struct)
-    addresses = np.array(spikes['addresses'], copy=False).astype(">u4")
-    timestamps = np.array(spikes['timestamps'], copy=False).astype(">u4")
+    else:
+        # Separate addresses and timestamps
+        spikes_struct = constructStruct("addresses", (header.address_size,), "timestamps", (header.timestamp_size,))
+        spikes = np.frombuffer(bytes_data, spikes_struct)
+
+        # Fill addresses and timestamps with zeros to reach 4-bytes per element
+        address_struct = constructStruct("zeros", (4 - header.address_size,), "addresses", (header.address_size,))
+        timestamp_struct = constructStruct("zeros", (4 - header.timestamp_size,), "timestamps", (header.timestamp_size,))
+        filled_addresses = np.zeros(len(spikes), dtype=address_struct)
+        filled_timestamps = np.zeros(len(spikes), dtype=timestamp_struct)
+        filled_addresses['addresses'] = spikes['addresses']
+        filled_timestamps['timestamps'] = spikes['timestamps']
+
+        # View these filled addresses and timestamps as 4-byte ints
+        addresses = filled_addresses.view(">u4")
+        timestamps = filled_timestamps.view(">u4")
 
     # Return the SpikesFile
     spikes_file = SpikesFile(addresses, timestamps)
@@ -163,7 +179,6 @@ def spikesFileToBytes(spikes_file, settings, address_size, timestamp_size, compr
     if compressor != "LZMA":
         # Viewing addresses and timestamps as 4-bytes data usually allows to achieve a better compression,
         # regardless of their original sizes
-
         param = ">u4"
         struct = np.dtype(param + ", " + param)
 
@@ -174,7 +189,6 @@ def spikesFileToBytes(spikes_file, settings, address_size, timestamp_size, compr
         # In the case of compressing with LZMA compressor, it is better to prune the bytes because
         # we can achieve practically the same compressed file size in a reasonably smaller time. This
         # pruning only happens when size parameters are greater than the original sizes of the addresses and timestamps
-
         org_address_size = settings.address_size
         org_timestamp_size = settings.timestamp_size
 
