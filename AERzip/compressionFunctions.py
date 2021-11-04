@@ -167,13 +167,13 @@ def compressData(bytes_data, compressor, verbose=True):
 
 
 # TODO: Checked
-def decompressData(compressed_data, compressor, verbose=False):
+def decompressData(compressed_data, header, verbose=False):
     """
     Decompress the input compressed spikes bytearray via the specified compressor.
 
     Parameters:
         compressed_data (bytearray): The input bytearray that contains the compressed spikes.
-        compressor (string): A string indicating the compressor to be used.
+        header (CompressedFileHeader): The input CompressedFileHeader object.
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
     Returns:
@@ -181,12 +181,12 @@ def decompressData(compressed_data, compressor, verbose=False):
     """
     start_time = time.time()
 
-    if compressor == "ZSTD":
+    if header.compressor == "ZSTD":
         dctx = zstandard.ZstdDecompressor()
         decompressed_data = dctx.decompress(compressed_data)
-    elif compressor == "LZ4":
+    elif header.compressor == "LZ4":
         decompressed_data = lz4.frame.decompress(compressed_data)
-    elif compressor == "LZMA":
+    elif header.compressor == "LZMA":
         decompressed_data = pylzma.decompress(compressed_data)
     else:
         raise ValueError("Compressor not recognized")
@@ -372,10 +372,10 @@ def compressedFileToSpikesFile(compressed_file, verbose=False):
     header, compressed_data = extractCompressedData(compressed_file)
 
     # Decompress the data
-    decompressed_data = decompressData(compressed_data, header.compressor)
+    decompressed_data = decompressData(compressed_data, header)
 
     # Call to bytesToSpikesFile function
-    spikes_file = bytesToSpikesFile(decompressed_data, header.address_size, header.timestamp_size)
+    spikes_file = bytesToSpikesFile(decompressed_data, header)
 
     if verbose:
         print("compressedFileToSpikesFile: Compressed file bytearray decompressed into a SpikesFile")
