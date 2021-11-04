@@ -34,9 +34,6 @@ def pruneBytesToSpikesBytearray(bytes_data, settings, new_address_size,
               str(new_address_size) + "-bytes addresses and " + str(new_timestamp_size) +
               "-bytes timestamps")
 
-    # Check if the data is correct (with original aedat file sizes)
-    checkBytes(bytes_data, settings.address_size, settings.timestamp_size)
-
     # Read addresses and timestamps (with original aedat file sizes)
     struct = constructStruct(settings.address_size, settings.timestamp_size)
 
@@ -118,9 +115,6 @@ def bytesToSpikesFile(bytes_data, address_size, timestamp_size, verbose=True):
     if verbose:
         print("bytesToSpikesFile: Converting spikes bytes to SpikesFile")
 
-    # Check if the data is correct
-    checkBytes(bytes_data, address_size, timestamp_size)
-
     # Separate addresses and timestamps
     # TODO: struct = constructStruct(address_size, timestamp_size)
     spikes_struct = np.dtype([("addresses", ">u1", address_size),
@@ -197,27 +191,6 @@ def spikesFileToBytes(spikes_file, address_size, timestamp_size, verbose=True):
             end_time - start_time) + " seconds")
 
     return bytes_data
-
-
-def checkBytes(bytes_data, address_size, timestamp_size):
-    """
-    Checks if the bytes_data input bytearray contains a whole number of spikes.
-
-    Parameters:
-        bytes_data (bytearray): The input bytearray. It must contain raw spikes data (without headers).
-        address_size (int): An int indicating the size of the addresses.
-        timestamp_size (int): An int indicating the size of the timestamps.
-
-    Returns:
-        True if bytes_data contains a whole number of spikes. Otherwise raise an exception.
-    """
-    bytes_per_spike = address_size + timestamp_size
-    bytes_data_length = len(bytes_data)
-    num_spikes = bytes_data_length / bytes_per_spike
-    if not num_spikes.is_integer():
-        raise ValueError("Spikes are not a whole number. Something went wrong with the file")
-    else:
-        return True
 
 
 # TODO: Checked
