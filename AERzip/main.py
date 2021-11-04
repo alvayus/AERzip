@@ -89,7 +89,19 @@ if __name__ == '__main__':
         settings = MatLab_settings_32ch_mono
 
     # Compress data
-    compressor = "LZMA"
+    print("\nCurrently these are the possible compressors:\n\n"
+          "1) ZSTD (Best speed, good compression)\n"
+          "2) LZMA (Worst speed, best compression)\n"
+          "3) LZ4 (Good speed, good compression)\n")
+
+    compressors = ["ZSTD", "LZMA", "LZ4"]
+
+    number = int(input("Enter your option: "))
+    while not number or not 1 <= number <= 4:
+        number = input("This is not a number or not a number in the range 1-3. \nPlease, enter your option again: ")
+
+    compressor = compressors[number-1]
+
     _, dst_path = compressDataFromFile(path, settings, compressor=compressor, ignore_overwriting=False)
 
     # --- COMPRESSED DATA ---
@@ -167,4 +179,3 @@ if __name__ == '__main__':
 
     end_time = time.time()
     print("Plots generation took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-
