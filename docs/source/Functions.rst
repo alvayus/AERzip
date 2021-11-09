@@ -1,7 +1,7 @@
 Functions
 ---------
 
-.. image:: ../../images/AERzip_Complete.jpg
+.. image:: ../../images/AERzip_Complete.png
 
 .. toctree::
    CompressionFunctions
