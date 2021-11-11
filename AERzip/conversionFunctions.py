@@ -197,6 +197,8 @@ def spikesFileAsType(spikes_file, input_options, output_options):
         if input_options.address_size > output_options.address_size:
             address_struct = constructStruct("pruned", (input_options.address_size - output_options.address_size,),
                                              "not_pruned", (output_options.address_size,))
+
+            # There can be a problem if addresses are not encoded in big endian
             addresses = np.array(spikes_file.addresses, copy=False).view(address_struct)['not_pruned']
 
         # Filling and no operation cases
@@ -221,6 +223,8 @@ def spikesFileAsType(spikes_file, input_options, output_options):
         if input_options.timestamp_size > output_options.timestamp_size:
             timestamp_struct = constructStruct("pruned", (input_options.timestamp_size - output_options.timestamp_size,),
                                                "not_pruned", (output_options.timestamp_size,))
+
+            # There can be a problem if timestamps are not encoded in big endian
             timestamps = np.array(spikes_file.timestamps, copy=False).view(timestamp_struct)['not_pruned']
 
         # Filling and no operation cases
@@ -230,9 +234,19 @@ def spikesFileAsType(spikes_file, input_options, output_options):
             timestamps = np.zeros(len(spikes_file.timestamps), dtype=timestamp_struct)
             timestamps['timestamps'] = np.array(spikes_file.timestamps, copy=False)
 
-    # ----- BYTES -----
+    # ----- BYTES_DATA -----
     # Create an array that contains the retyped addresses and timestamps
-    spikes_struct = np.dtype(addresses.dtype + ", " + timestamps.dtype)
+    if output_options.address_size == 3:
+        address_param = ">3u1"
+    else:
+        address_param = ">u" + str(output_options.address_size)
+
+    if output_options.timestamp_size == 3:
+        timestamp_param = ">3u1"
+    else:
+        timestamp_param = ">u" + str(output_options.timestamp_size)
+
+    spikes_struct = np.dtype(address_param + ", " + timestamp_param)
     new_spikes_file = np.zeros(len(addresses), dtype=spikes_struct)
     new_spikes_file['f0'] = addresses
     new_spikes_file['f1'] = timestamps
