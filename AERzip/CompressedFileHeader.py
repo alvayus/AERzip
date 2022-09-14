@@ -1,3 +1,6 @@
+from setup import setup_args
+
+
 class CompressedFileHeader:
     """
     Class that collects the main information of a compressed aedat file.
@@ -25,23 +28,22 @@ class CompressedFileHeader:
             address_size (int): An int indicating the size of the addresses.
             timestamp_size (int): An int indicating the size of the timestamps.
         """
-        self.library_version = "AERzip v0.6.5"
-        self.library_version_length = 13
+        self.library_version = "AERzip v" + setup_args["version"]
+        self.library_version_length = 20
 
         self.compressor = compressor
-        self.compressor_length = 5
+        self.compressor_length = 10
 
         self.address_size = address_size
-        self.address_length = 1
+        self.address_length = 4  # 32-bit int
 
         self.timestamp_size = timestamp_size
-        self.timestamp_length = 1
+        self.timestamp_length = 4  # 32-bit int
 
         self.end_header = "#End Of ASCII Header\r\n"
-        self.end_header_length = 22
+        self.end_header_length = len(bytes(self.end_header))
 
-        self.header_size = self.library_version_length + self.compressor_length + \
-                           self.address_length + self.timestamp_length + self.end_header_length
+        self.header_size = self.library_version_length + self.compressor_length + self.address_length + self.timestamp_length + self.end_header_length
 
     def toBytes(self):
         """
@@ -57,19 +59,14 @@ class CompressedFileHeader:
 
         header.extend(bytes(self.library_version.ljust(self.library_version_length), "utf-8"))
 
-        if self.compressor == "ZSTD":
-            header.extend(bytes("ZSTD".ljust(self.compressor_length), "utf-8"))
-        elif self.compressor == "LZ4":
-            header.extend(bytes("LZ4".ljust(self.compressor_length), "utf-8"))
-        elif self.compressor == "LZMA":
-            header.extend(bytes("LZMA".ljust(self.compressor_length), "utf-8"))
+        if self.compressor == "ZSTD" or self.compressor == "LZ4" or self.compressor == "LZMA":
+            header.extend(bytes(self.compressor.ljust(self.compressor_length), "utf-8"))
         else:
             raise ValueError("Compressor not recognized")
 
-        header.extend((self.address_size - 1).to_bytes(self.address_length, "big"))
-        header.extend((self.timestamp_size - 1).to_bytes(self.timestamp_length, "big"))
+        header.extend(self.address_size.to_bytes(self.address_length, "big"))
+        header.extend(self.timestamp_size.to_bytes(self.timestamp_length, "big"))
 
-        # End of header
         header.extend(bytes(self.end_header.ljust(self.end_header_length), "utf-8"))
 
         return header
