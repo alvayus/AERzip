@@ -5,8 +5,6 @@ import time
 import numpy as np
 from pyNAVIS import SpikesFile
 
-from AERzip.CompressedFileHeader import CompressedFileHeader
-
 
 def bytesToSpikesFile(bytes_data, input_options, verbose=True):
     """
