@@ -8,7 +8,7 @@ import zstandard
 from pyNAVIS import *
 
 from AERzip.CompressedFileHeader import CompressedFileHeader
-from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, getBytesToPrune
+from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, calcBytesToPrune
 
 
 # TODO: Checked
@@ -58,7 +58,7 @@ def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore
         print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     # Get the bytes to be discarded
-    address_size, timestamp_size = getBytesToPrune(spikes_file, settings)
+    address_size, timestamp_size = calcBytesToPrune(spikes_file, settings)
 
     if verbose:
         print("\nCompressing " + "/" + main_folder + "/" + dataset + "/" + file + " with " + str(settings.address_size) +
@@ -371,7 +371,7 @@ def compressedFileToSpikesFile(compressed_file, settings, verbose=False):
     decompressed_data = decompressData(compressed_data, header)
 
     # Call to bytesToSpikesFile function
-    spikes_file, new_settings = bytesToSpikesFile(decompressed_data, settings, header)
+    spikes_file, new_settings = bytesToSpikesFile(decompressed_data, settings)
 
     if verbose:
         print("compressedFileToSpikesFile: Compressed file bytearray decompressed into a SpikesFile")

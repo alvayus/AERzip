@@ -144,8 +144,7 @@ class JAERSettingsTest(unittest.TestCase):
         self.assertEqual(self.spikes_file.timestamps.tolist(), new_spikes_file[0].timestamps.tolist())
 
         # --- LZMA ---
-        self.header = calcBytesToPrune(self.spikes_file,
-                                       self.settings)  # Update header because it has been previously modified
+        self.header = calcBytesToPrune(self.spikes_file, self.settings)  # Update header because it has been previously modified
         self.header.compressor = "LZMA"
 
         bytes_data = spikesFileToBytes(self.spikes_file, self.settings, self.header, False)

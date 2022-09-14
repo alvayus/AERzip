@@ -7,11 +7,11 @@ from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
 from pyNAVIS import *
 
+from AERzip import compressionFunctions
 from compressionFunctions import decompressDataFromFile, compressDataFromFile
 
 # TODO: Test files
 # TODO: Fix and complete documentation and images (remove prunedBytes)
-# TODO: u3 and spikegram in original files
 # TODO: Writing in AEDAT 4.0?
 # TODO: Add a bytesToPrunedBytes function
 
@@ -46,10 +46,13 @@ if __name__ == '__main__':
 
         path = askopenfilename(parent=root)
 
-        # Until file is selected again
+        '''# Until file is selected again
         while not path:
             print("Not file selected. Select a new AEDAT file")
-            path = askopenfilename(parent=root)
+            path = askopenfilename(parent=root)'''
+
+        if not path:
+            raise Exception("No file has been selected.")
 
         ext = os.path.splitext(path)[1]
         file = os.path.basename(path)
@@ -100,7 +103,7 @@ if __name__ == '__main__':
     while not number or not 1 <= number <= 4:
         number = input("This is not a number or not a number in the range 1-3. \nPlease, enter your option again: ")
 
-    compressor = compressors[number-1]
+    compressor = compressors[number - 1]
 
     _, dst_path = compressDataFromFile(path, settings, compressor=compressor, ignore_overwriting=False)
 

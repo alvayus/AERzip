@@ -1,0 +1,15 @@
+# Pruebas de paquete
+cd C:\Users\alvco\Desktop\Estudios\Doctorado\Herramientas\AERzip
+py -m build
+-> Borrar versiones anteriores
+twine upload --repository testpypi dist/*
+pip install --index-url https://test.pypi.org/simple/ AERzip --upgrade
+
+https://packaging.python.org/guides/using-testpypi/
+
+# Versión final
+py -m build
+twine upload dist/*
+pip install AERzip
+
+https://packaging.python.org/tutorials/packaging-projects/
