@@ -26,7 +26,7 @@ class JAERSettingsTest(unittest.TestCase):
 
         # Load a spikes file with 4-byte addresses (prunable to 1-byte addresses) and 4-byte timestamps (prunable to
         # 3 byte addresses)
-        self.spikes_file = Loaders.loadAEDAT("enun_stereo_64ch_ONOFF_addr4b_ts1.aedat", self.settings)
+        self.spikes_file = Loaders.loadAEDAT("events/dataset/enun_stereo_64ch_ONOFF_addr4b_ts1.aedat", self.settings)
 
         # Create header object (compression)
         self.header = calcBytesToPrune(self.spikes_file, self.settings)
