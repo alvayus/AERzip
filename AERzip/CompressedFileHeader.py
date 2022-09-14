@@ -1,6 +1,3 @@
-from setup import setup_args
-
-
 class CompressedFileHeader:
     """
     Class that collects the main information of a compressed aedat file.
@@ -28,7 +25,7 @@ class CompressedFileHeader:
             address_size (int): An int indicating the size of the addresses.
             timestamp_size (int): An int indicating the size of the timestamps.
         """
-        self.library_version = "AERzip v" + setup_args["version"]
+        self.library_version = "AERzip v0.6.5"
         self.library_version_length = 20
 
         self.compressor = compressor
@@ -41,7 +38,7 @@ class CompressedFileHeader:
         self.timestamp_length = 4  # 32-bit int
 
         self.end_header = "#End Of ASCII Header\r\n"
-        self.end_header_length = len(bytes(self.end_header))
+        self.end_header_length = len(bytes(self.end_header, "utf-8"))
 
         self.header_size = self.library_version_length + self.compressor_length + self.address_length + self.timestamp_length + self.end_header_length
 

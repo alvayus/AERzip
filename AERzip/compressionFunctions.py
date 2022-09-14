@@ -11,7 +11,6 @@ from AERzip.CompressedFileHeader import CompressedFileHeader
 from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, calcBytesToPrune
 
 
-# TODO: Checked
 def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore_overwriting=True, verbose=True):
     """
     Reads an original aedat file, extracts and compress its raw spikes data and returns a compressed file bytearray.
@@ -62,8 +61,7 @@ def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore
 
     if verbose:
         print("\nCompressing " + "/" + main_folder + "/" + dataset + "/" + file + " with " + str(settings.address_size) +
-              "-byte addresses and " + str(settings.timestamp_size) + "-byte timestamps into an aedat file with " +
-              str(address_size) + "-byte addresses and " + str(timestamp_size) + "-byte timestamps via " +
+              "-byte addresses and " + str(settings.timestamp_size) + "-byte timestamps via " +
               compressor + " compressor")
     start_time = time.time()
 
@@ -81,7 +79,6 @@ def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore
     return compressed_file, dst_file_path
 
 
-# TODO: Checked
 def decompressDataFromFile(src_file_path, settings, verbose=True):
     """
     Reads a file as a compressed file, decompress it to extract its raw spikes data and returns a SpikesFile object.
@@ -120,7 +117,7 @@ def decompressDataFromFile(src_file_path, settings, verbose=True):
     start_time = time.time()
 
     # Call to bytesToSpikesFile function
-    header, spikes_file, new_settings = compressedFileToSpikesFile(compressed_file, settings)
+    header, spikes_file, new_settings = compressedFileToSpikesFile(compressed_file)
 
     end_time = time.time()
     if verbose:
@@ -129,7 +126,6 @@ def decompressDataFromFile(src_file_path, settings, verbose=True):
     return spikes_file, new_settings
 
 
-# TODO: Checked
 def compressData(bytes_data, compressor, verbose=True):
     """
     Decompress the input compressed spikes bytearray via the specified compressor.
@@ -161,7 +157,6 @@ def compressData(bytes_data, compressor, verbose=True):
     return compressed_data
 
 
-# TODO: Checked
 def decompressData(compressed_data, header, verbose=False):
     """
     Decompress the input compressed spikes bytearray via the specified compressor.
@@ -193,7 +188,6 @@ def decompressData(compressed_data, header, verbose=False):
     return decompressed_data
 
 
-# TODO: Checked
 def storeCompressedFile(compressed_file, dst_compressed_file_path, ignore_overwriting=True):
     """
     Stores a compressed_file bytearray.
@@ -221,7 +215,6 @@ def storeCompressedFile(compressed_file, dst_compressed_file_path, ignore_overwr
     file.close()
 
 
-# TODO: Checked
 def loadCompressedFile(src_file_path):
     """
     Extracts header and compressed data from a stored compressed file.
@@ -242,7 +235,6 @@ def loadCompressedFile(src_file_path):
     return compressed_file
 
 
-# TODO: Checked
 def bytesToCompressedFile(bytes_data, address_size, timestamp_size, compressor, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
@@ -281,7 +273,6 @@ def bytesToCompressedFile(bytes_data, address_size, timestamp_size, compressor, 
     return compressed_file
 
 
-# TODO: Checked
 def compressedFileToBytes(compressed_file, verbose=True):
     """
     Converts a bytearray of CompressedFileHeader and compressed spikes of a-bytes addresses and b-bytes timestamps,
@@ -311,8 +302,7 @@ def compressedFileToBytes(compressed_file, verbose=True):
     return bytes_data
 
 
-# TODO: Checked
-def spikesFileToCompressedFile(spikes_file, settings, address_size, timestamp_size, compressor, verbose=True):
+def spikesFileToCompressedFile(spikes_file, settings, desired_address_size, desired_timestamp_size, compressor, verbose=True):
     """
     Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
     and timestamp_size parameters respectively, to a bytearray of CompressedFileHeader and compressed spikes
@@ -321,8 +311,8 @@ def spikesFileToCompressedFile(spikes_file, settings, address_size, timestamp_si
     Parameters:
         spikes_file (SpikesFile): The input SpikesFile object from pyNAVIS. It must contain raw spikes data.
         settings (MainSettings): A MainSettings object from pyNAVIS.
-        address_size (int): An int indicating the size of the addresses.
-        timestamp_size (int): An int indicating the size of the timestamps.
+        desired_address_size (int): An int indicating the size of the addresses.
+        desired_timestamp_size (int): An int indicating the size of the timestamps.
         compressor (string): A string indicating the compressor to be used.
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
@@ -333,12 +323,21 @@ def spikesFileToCompressedFile(spikes_file, settings, address_size, timestamp_si
     Notes:
         This function is the inverse of the compressedFileToSpikesFile function.
     """
+    if compressor != "LZMA":
+        if verbose:
+            print("spikesFileToCompressedFile: Considering 4-byte addresses and timestamps before the compression "
+                  "process when NOT using LZMA as the compression algorithm")
+        final_address_size = 4
+        final_timestamp_size = 4
+    else:
+        final_address_size = desired_address_size
+        final_timestamp_size = desired_timestamp_size
+
     # Call to spikesFileToBytes function
-    spikes_bytes, header = spikesFileToBytes(spikes_file, settings, address_size, timestamp_size, compressor)
+    spikes_bytes = spikesFileToBytes(spikes_file, settings, final_address_size, final_timestamp_size)
 
     # Call to bytesToCompressedFile function
-    compressed_file = bytesToCompressedFile(spikes_bytes, header.address_size, header.timestamp_size,
-                                            header.compressor)
+    compressed_file = bytesToCompressedFile(spikes_bytes, final_address_size, final_timestamp_size, compressor)
 
     if verbose:
         print("Done! SpikesFile compressed into a compressed file bytearray")
@@ -346,8 +345,7 @@ def spikesFileToCompressedFile(spikes_file, settings, address_size, timestamp_si
     return compressed_file
 
 
-# TODO: Checked
-def compressedFileToSpikesFile(compressed_file, settings, verbose=False):
+def compressedFileToSpikesFile(compressed_file, verbose=False):
     """
     Converts a bytearray of CompressedFileHeader and compressed spikes of a-bytes addresses and b-bytes timestamps,
     where a and b are address_size and timestamp_size ints which are inside the bytearray, to a SpikesFile of raw spikes
@@ -355,7 +353,6 @@ def compressedFileToSpikesFile(compressed_file, settings, verbose=False):
 
     Parameters:
         compressed_file (bytearray): The input bytearray that contains the CompressedFileHeader and the compressed spikes.
-        settings (MainSettings): A MainSettings object from pyNAVIS.
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
     Returns:
@@ -371,7 +368,7 @@ def compressedFileToSpikesFile(compressed_file, settings, verbose=False):
     decompressed_data = decompressData(compressed_data, header)
 
     # Call to bytesToSpikesFile function
-    spikes_file, new_settings = bytesToSpikesFile(decompressed_data, settings)
+    spikes_file, new_settings = bytesToSpikesFile(decompressed_data, header)
 
     if verbose:
         print("compressedFileToSpikesFile: Compressed file bytearray decompressed into a SpikesFile")
@@ -379,7 +376,6 @@ def compressedFileToSpikesFile(compressed_file, settings, verbose=False):
     return header, spikes_file, new_settings
 
 
-# TODO: Checked
 def extractCompressedData(compressed_file, verbose=False):
     """
     Extracts the CompressedFileHeader object and the compressed spikes from an input bytearray.
@@ -408,14 +404,14 @@ def extractCompressedData(compressed_file, verbose=False):
 
     start_index = end_index
     end_index = start_index + header.address_length
-    header.address_size = int.from_bytes(compressed_file[start_index:end_index], "big") + 1
+    header.address_size = int.from_bytes(compressed_file[start_index:end_index], "big")
 
     start_index = end_index
     end_index = start_index + header.timestamp_length
-    header.timestamp_size = int.from_bytes(compressed_file[start_index:end_index], "big") + 1
+    header.timestamp_size = int.from_bytes(compressed_file[start_index:end_index], "big")
 
     start_index = end_index + header.end_header_length
-    compressed_data = compressed_file[start_index:]
+    compressed_data = bytes(compressed_file[start_index:])
 
     end_time = time.time()
     if verbose:
@@ -424,7 +420,6 @@ def extractCompressedData(compressed_file, verbose=False):
     return header, compressed_data
 
 
-# TODO: Checked
 def getCompressedFile(compressed_data, address_size, timestamp_size, compressor, verbose=False):
     """
     Assembles the full compressed aedat file by joining the CompressedFileHeader object
@@ -456,7 +451,6 @@ def getCompressedFile(compressed_data, address_size, timestamp_size, compressor,
     return compressed_file
 
 
-# TODO: Checked
 def checkCompressedFileExists(dst_compressed_file_path):
     """
     Checks if a compressed file already exits in the specified path. If it does, this function allows the user to

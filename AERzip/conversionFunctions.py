@@ -108,7 +108,7 @@ def bytesToSpikesFile(bytes_data, input_options, verbose=True):
     return spikes_file, output_options
 
 
-def spikesFileToBytes(spikes_file, input_options, output_options, verbose=True):
+def spikesFileToBytes(spikes_file, settings, final_address_size, final_timestamp_size, verbose=True):
     """
     Converts a SpikesFile of raw spikes of a-byte addresses and b-byte timestamps, where a and b are input_options.address_size
     and input_options.timestamp_size fields respectively, to:
@@ -144,121 +144,65 @@ def spikesFileToBytes(spikes_file, input_options, output_options, verbose=True):
     """
     if verbose:
         start_time = time.time()
-        print("spikesFileToBytes: Converting SpikesFile to spikes bytes")
+        print("spikesFileToBytes: Converting the SpikesFile to raw bytes")
 
-    # Case 2. If compressing with LZMA, case 1 (default output_options values)
-    if not hasattr(output_options, 'compressor') or output_options.compressor != "LZMA":
-        output_options.address_size = 4
-        output_options.timestamp_size = 4
-
-    bytes_data = spikesFileAsType(spikes_file, input_options, output_options)
-
-    if verbose:
-        end_time = time.time()
-        print("spikesFileToBytes: Data conversion has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-
-    return bytes_data
-
-
-def spikesFileAsType(spikes_file, input_options, output_options):
-    """
-    Converts a-byte addresses and b-byte timestamps from a SpikesFile, where a and b are input_options.address_size and
-    input_options.timestamps_size fields respectively, to c-byte addresses and d-byte timestamps, where c and d are
-    output_options.address_size and output_options.timestamp_size fields respectively, returned in a bytearray.
-
-    Parameters:
-        spikes_file (SpikesFile): The input SpikesFile object from pyNAVIS. It must contain raw spikes data (without headers).
-        input_options (MainSettings, CompressedFileHeader): A MainSettings object from pyNAVIS or CompressedFileHeader that contains information about the input spikes_file.
-        output_options (MainSettings, CompressedFileHeader): A MainSettings object from pyNAVIS or CompressedFileHeader that contains information about the output timestamps.
-
-    Returns:
-        bytes_data (bytearray): The output bytearray that contains the retyped addresses and timestamps (ordered by spikes).
-
-    Notes:
-        This function considers sizes between 1 and 4. There is a difference between working with 1, 2 or 4 byte and 3
-        byte numpy types, because Python does not allow to work with the last one.
-
-        This functions should be a SpikesFile to SpikesFile converter, but due to in the case of 3-byte types it is
-        impossible to create a SpikesFile, the retyped addresses and timestamps are returned into a ordered bytearray.
-        The bytearray is ordered by index of the spikes, joining timestamps with the addresses. For example:
-
-        spikes_file.addresses = [1, 2, 3, 4...]
-        spikes_file.timestamps = [1000, 2000, 3000, 4000...]
-        new_spikes_file = [(1, 1000), (2, 2000), (3, 3000), (4, 4000)...]
-
-        bytes_data = new_spikes_file.tobytes() (numpy function which generates the bytearray from the bytes of each element
-        in an ordered form).
-
-        The bytearray would contain the bytes of 1, then 1000, then 2, then 2000, etc... with the number of bytes
-        specified by each element's data type. It contains the information as desired (output_options) and it is decoded
-        in the bytesToSpikesFile function.
-
-        By default numpy astype function is executed in unsafe mode, which means that any data conversions may be done.
-        This is useful to convert from greater sizes to lower sizes and viceversa. Anyway, calcBytesToPrune always return
-        the minimum number of bytes required for this operations, so in the case you use this function there should not
-        be a loss of information (it should be possible to use the safe mode).
-
-        You can find more information about numpy data types and numpy astype function in:
-        https://numpy.org/doc/stable/reference/arrays.dtypes.html
-        https://numpy.org/doc/stable/reference/generated/numpy.ndarray.astype.html
-    """
     # ----- ADDRESSES -----
     # 1-byte, 2-byte or 4-byte output addresses (pruning, no operation and filling cases)
-    if output_options.address_size != 3:
-        address_struct = np.dtype(">u" + str(output_options.address_size))
+    if final_address_size != 3:
+        address_struct = np.dtype(">u" + str(final_address_size))
         addresses = spikes_file.addresses.astype(dtype=address_struct, copy=False)
 
     # 3-byte output addresses
     else:
         # Pruning case
-        if input_options.address_size > output_options.address_size:
-            address_struct = constructStruct("pruned", (input_options.address_size - output_options.address_size,),
-                                             "not_pruned", (output_options.address_size,))
+        if settings.address_size > final_address_size:
+            address_struct = constructStruct("pruned", (settings.address_size - final_address_size,),
+                                             "not_pruned", (final_address_size,))
 
             # There can be a problem if addresses are not encoded in big endian
             addresses = np.array(spikes_file.addresses, copy=False).view(address_struct)['not_pruned']
 
         # Filling and no operation cases
         else:
-            address_struct = constructStruct("zeros", (output_options.address_size - input_options.address_size,),
-                                             "addresses", (output_options.address_size,))
+            address_struct = constructStruct("zeros", (final_address_size - settings.address_size,),
+                                             "addresses", (final_address_size,))
             addresses = np.zeros(len(spikes_file.addresses), dtype=address_struct)
             addresses['addresses'] = np.array(spikes_file.addresses, copy=False)
 
     # ----- TIMESTAMPS -----
     # 1-byte, 2-byte or 4-byte output timestamps (pruning, no operation and filling cases)
-    if output_options.timestamp_size != 3:
-        timestamp_struct = np.dtype(">u" + str(output_options.timestamp_size))
+    if final_timestamp_size != 3:
+        timestamp_struct = np.dtype(">u" + str(final_timestamp_size))
         timestamps = spikes_file.timestamps.astype(dtype=timestamp_struct, copy=False)
 
     # 3-byte output timestamps
     else:
         # Pruning case
-        if input_options.timestamp_size > output_options.timestamp_size:
-            timestamp_struct = constructStruct("pruned", (input_options.timestamp_size - output_options.timestamp_size,),
-                                               "not_pruned", (output_options.timestamp_size,))
+        if settings.timestamp_size > final_timestamp_size:
+            timestamp_struct = constructStruct("pruned", (settings.timestamp_size - final_timestamp_size,),
+                                               "not_pruned", (final_timestamp_size,))
 
             # There can be a problem if timestamps are not encoded in big endian
             timestamps = np.array(spikes_file.timestamps, copy=False).view(timestamp_struct)['not_pruned']
 
         # Filling and no operation cases
         else:
-            timestamp_struct = constructStruct("zeros", (output_options.timestamp_size - input_options.timestamp_size,),
-                                               "timestamps", (output_options.timestamp_size,))
+            timestamp_struct = constructStruct("zeros", (final_timestamp_size - settings.timestamp_size,),
+                                               "timestamps", (final_timestamp_size,))
             timestamps = np.zeros(len(spikes_file.timestamps), dtype=timestamp_struct)
             timestamps['timestamps'] = np.array(spikes_file.timestamps, copy=False)
 
     # ----- BYTES_DATA -----
     # Create an array that contains the retyped addresses and timestamps
-    if output_options.address_size == 3:
+    if final_address_size == 3:
         address_param = ">3u1"
     else:
-        address_param = ">u" + str(output_options.address_size)
+        address_param = ">u" + str(final_address_size)
 
-    if output_options.timestamp_size == 3:
+    if final_timestamp_size == 3:
         timestamp_param = ">3u1"
     else:
-        timestamp_param = ">u" + str(output_options.timestamp_size)
+        timestamp_param = ">u" + str(final_timestamp_size)
 
     spikes_struct = np.dtype(address_param + ", " + timestamp_param)
     new_spikes_file = np.zeros(len(addresses), dtype=spikes_struct)
@@ -268,6 +212,10 @@ def spikesFileAsType(spikes_file, input_options, output_options):
     # Numpy tobytes() function already joins addresses with timestamps spike by spike due to
     # the spikes_struct structure
     bytes_data = new_spikes_file.tobytes()
+
+    if verbose:
+        end_time = time.time()
+        print("spikesFileToBytes: Data conversion has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return bytes_data
 
@@ -295,10 +243,7 @@ def calcBytesToPrune(spikes_file, settings):
     dec2bin = bin(spikes_file.max_ts)[2:]
     timestamp_size = int(math.ceil(len(dec2bin) / 8))
 
-    # Return the new CompressedFileHeader object
-    header = CompressedFileHeader(address_size=address_size, timestamp_size=timestamp_size)
-
-    return header
+    return address_size, timestamp_size
 
 
 def constructStruct(first_field, first_field_size, second_field, second_file_size):
