@@ -41,6 +41,7 @@ class JAERSettingsTest(unittest.TestCase):
             new_spikes_file, _ = bytesToSpikesFile(bytes_data, compressed_settings)
 
             # Compare original and final spikes_file
+            self.assertIsNot(spikes_file, new_spikes_file)
             self.assertEqual(spikes_file.addresses.tolist(), new_spikes_file.addresses.tolist())
             self.assertEqual(spikes_file.timestamps.tolist(), new_spikes_file.timestamps.tolist())
             self.assertEqual(spikes_file.max_ts, new_spikes_file.max_ts)
