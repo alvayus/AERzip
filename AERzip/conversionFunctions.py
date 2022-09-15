@@ -233,6 +233,7 @@ def calcRequiredBytes(spikes_file, settings):
     Notes:
         This function only works for uncompressed files. Compressed files already contain this information within their headers.
     """
+    # TODO: Documentation, only for NAS (not for other types of AEDAT files)
     # Address size
     address_size = int(math.ceil(settings.num_channels * (settings.mono_stereo + 1) *
                                  (settings.on_off_both + 1) / 256))
