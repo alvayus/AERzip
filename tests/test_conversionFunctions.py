@@ -3,7 +3,7 @@ import unittest
 from pyNAVIS import MainSettings, Loaders
 
 from AERzip.CompressedFileHeader import CompressedFileHeader
-from AERzip.conversionFunctions import calcBytesToPrune, spikesFileToBytes, bytesToSpikesFile
+from AERzip.conversionFunctions import calcRequiredBytes, spikesFileToBytes, bytesToSpikesFile
 
 
 class JAERSettingsTest(unittest.TestCase):

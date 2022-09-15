@@ -218,7 +218,7 @@ def spikesFileToBytes(spikes_file, settings, final_address_size, final_timestamp
     return bytes_data
 
 
-def calcBytesToPrune(spikes_file, settings):
+def calcRequiredBytes(spikes_file, settings):
     """
     Calculates the minimum numbers of bytes required for address and timestamp representation based on the input settings
     and returns a CompressedFileHeader object that contains them.
