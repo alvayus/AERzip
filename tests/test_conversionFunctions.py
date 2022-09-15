@@ -40,18 +40,14 @@ class JAERSettingsTest(unittest.TestCase):
             file_settings = self.files_data[i][1]
 
             # Getting target sizes
-            final_address_size, final_timestamp_size = calcRequiredBytes(spikes_file, file_settings)
+            address_size, timestamp_size = calcRequiredBytes(spikes_file, file_settings)
 
             # spikes_file to raw bytes
-            bytes_data = spikesFileToBytes(spikes_file, file_settings, final_address_size, final_timestamp_size,
-                                           verbose=False)
+            bytes_data = spikesFileToBytes(spikes_file, file_settings.address_size, file_settings.timestamp_size,
+                                           address_size, timestamp_size, verbose=False)
 
             # Raw bytes to spikes_file
-            compressed_settings = copy.deepcopy(file_settings)
-            compressed_settings.address_size = final_address_size
-            compressed_settings.timestamp_size = final_timestamp_size
-
-            new_spikes_file, _ = bytesToSpikesFile(bytes_data, compressed_settings, verbose=False)
+            new_spikes_file, _, _ = bytesToSpikesFile(bytes_data, address_size, timestamp_size, verbose=False)
 
             # Compare original and final spikes_file
             self.assertIsNot(spikes_file, new_spikes_file)

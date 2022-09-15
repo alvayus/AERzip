@@ -6,24 +6,25 @@ import numpy as np
 from pyNAVIS import SpikesFile
 
 
-def bytesToSpikesFile(bytes_data, input_options, verbose=True):
+def bytesToSpikesFile(bytes_data, initial_address_size, initial_timestamp_size, verbose=True):
     """
-    Converts a bytearray of raw spikes of a-byte addresses and b-byte timestamps, where a and b are input_options address_size
-    and timestamp_size fields respectively, to a SpikesFile of raw spikes of the same shape (or with 4-byte addresses or
-    timestamps if a or b are equal to 3 bytes).
+    Converts a bytearray of raw spikes of a-byte addresses and b-byte timestamps, where a and b are initial_address_size
+    and initial_timestamp_size fields, respectively, to a SpikesFile of raw spikes of the same shape (or with 4-byte
+    addresses or timestamps if a or b are equal to 3 bytes).
 
-    Parameters:
-        bytes_data (bytearray): The input bytearray. It must contain raw spikes data (without headers).
-        input_options (MainSettings, CompressedFileHeader): A MainSettings object from pyNAVIS or CompressedFileHeader that contains information about the input bytes_data.
-        verbose (boolean): A boolean indicating whether or not debug comments are printed.
+    This is the inverse function of the spikesFileToBytes function.
 
-    Returns:
-        spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS.
-        output_options (MainSettings, CompressedFileHeader): A MainSettings object from pyNAVIS or CompressedFileHeader that contains information about the output spikes_file.
+    :param bytearray bytes_data: The input bytearray. It must contain raw spikes data (without headers).
+    :param int initial_address_size: An int indicating the size of the addresses in bytes_data.
+    :param int initial_timestamp_size: An int indicating the size of the timestamps in bytes_data.
+    :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    Notes:
-        This function is the inverse of the spikesFileToBytes function.
+    :return:
+    - spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS.
+    - final_address_size (int): An int indicating the size of the addresses in the final SpikesFile.
+    - final_timestamp_size (int): An int indicating the size of the timestamps in the final SpikesFile.
 
+    .. notes:
         When input_options sizes are 3 bytes it is needed to work differently due to NumPy and Python does not support
         np.uint24 (or working with data types of 3 bytes). It cost more time that viewing the arrays as np.uint8 (1 byte),
         np.uint16 (2 bytes) or np.uint32 (4 bytes). When processing 3-byte addresses or timestamps, the returned
@@ -31,68 +32,59 @@ def bytesToSpikesFile(bytes_data, input_options, verbose=True):
 
         Based on the above comment, there are two different cases that must be considered:
 
-        1) If the input_options size fields are equal to 3 bytes, output_options size fields will be 4 bytes. You can
-        find more information about this in the spikesFileToBytes function.
+        1) If the input_options size fields are equal to 3 bytes, final_address_size and final_timestamp_size will be 4
+        bytes.
 
-        2) Otherwise, output_options size fields will have the same value as in the input_options.
-
-        On the other hand, this function can have two different inputs and it is needed to consider these situations:
-
-        1) When **input_settings** is associated with a bytearray extracted from an **original AEDAT file** (you
-        want to convert the bytes of the SpikesFile extracted from the original AEDAT file into a
-        SpikesFile again) **input_settings should be a MainSettings object**.
-
-        2) When **input_settings** is associated with a bytearray extracted from a **compressed AEDAT file** (you
-        want to convert the bytes extracted from the compressed AEDAT file into a SpikesFile), **input_settings should
-        be a CompressedFileHeader object**.
+        2) Otherwise, these will have the same value as in the input_options.
 
         Currently all compressed files use 4-byte addresses and timestamps except those which were compressing with the
-        LZMA compressor. You can find more information about this in the spikesFileToBytes function.
+        LZMA compressor. You can find more information about this in the spikesFileToCompressedFile function.
     """
     if verbose:
         start_time = time.time()
         print("bytesToSpikesFile: Converting spikes bytes to SpikesFile")
 
-    # Create the new options
-    output_options = copy.deepcopy(input_options)
+    # Storing new sizes
+    final_address_size = copy.deepcopy(initial_address_size)
+    final_timestamp_size = copy.deepcopy(initial_timestamp_size)
 
-    if output_options.address_size == 3:
+    if final_address_size == 3:
         address_param = ">3u1"
     else:
-        address_param = ">u" + str(output_options.address_size)
+        address_param = ">u" + str(final_address_size)
 
-    if output_options.timestamp_size == 3:
+    if final_timestamp_size == 3:
         timestamp_param = ">3u1"
     else:
-        timestamp_param = ">u" + str(output_options.timestamp_size)
+        timestamp_param = ">u" + str(final_timestamp_size)
 
     # Separate addresses and timestamps
     spikes_struct = np.dtype(address_param + ", " + timestamp_param)
     spikes = np.frombuffer(bytes_data, spikes_struct)
 
-    if input_options.address_size == 3:
+    if initial_address_size == 3:
         # Filling timestamps to reach 4-byte ints
-        address_struct = constructStruct("zeros", (4 - input_options.address_size,),
-                                         "addresses", (input_options.address_size,))
+        address_struct = constructStruct("zeros", (4 - initial_address_size,),
+                                         "addresses", (initial_address_size,))
         addresses = np.zeros(len(spikes['f0']), dtype=address_struct)
         addresses['addresses'] = np.array(spikes['f0'], copy=False)
         addresses = addresses.view(">u4")
 
         # Modify the output_options with the new size
-        output_options.address_size = 4
+        final_address_size = 4
     else:
         addresses = spikes['f0']
 
-    if input_options.timestamp_size == 3:
+    if initial_timestamp_size == 3:
         # Filling timestamps to reach 4-byte ints
-        timestamp_struct = constructStruct("zeros", (4 - input_options.timestamp_size,),
-                                           "timestamps", (input_options.timestamp_size,))
+        timestamp_struct = constructStruct("zeros", (4 - initial_timestamp_size,),
+                                           "timestamps", (initial_timestamp_size,))
         timestamps = np.zeros(len(spikes['f1']), dtype=timestamp_struct)
         timestamps['timestamps'] = np.array(spikes['f1'], copy=False)
         timestamps = timestamps.view(">u4")
 
         # Modify the output_options with the new size
-        output_options.timestamp_size = 4
+        final_timestamp_size = 4
     else:
         timestamps = spikes['f1']
 
@@ -103,42 +95,26 @@ def bytesToSpikesFile(bytes_data, input_options, verbose=True):
         end_time = time.time()
         print("bytesToSpikesFile: Data conversion has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
-    return spikes_file, output_options
+    return spikes_file, final_address_size, final_timestamp_size
 
 
-def spikesFileToBytes(spikes_file, settings, final_address_size, final_timestamp_size, verbose=True):
+def spikesFileToBytes(spikes_file, initial_address_size, initial_timestamp_size, final_address_size,
+                      final_timestamp_size, verbose=True):
     """
-    Converts a SpikesFile of raw spikes of a-byte addresses and b-byte timestamps, where a and b are input_options.address_size
-    and input_options.timestamp_size fields respectively, to:
+    Converts a SpikesFile of raw spikes of a-byte addresses and b-byte timestamps, where a and b are specified by
+    settings, to a bytearray of raw spikes of c-byte addresses and d-byte timestamps, where c and d are
+    final_address_size and final_timestamp_size, respectively.
 
-    1) A bytearray of raw spikes of c-byte addresses and d-byte timestamps, where c and d are output_options.address_size
-    and output_options.timestamps_size fields respectively, **when you intend to compress it and you are using LZMA compressor
-    (spikesFileAsType function uses default output_options values)**.
+    This is the inverse function of the bytesToSpikesFile function.
 
-    2) A bytearray of raw spikes of 4-byte addresses and timestamps **when you intend to compress it and you are not using
-    LZMA compressor** or **when input_options is not a CompressedFileHeader (MainSettings does not have a compressor
-    field) and you do not intend to compress the bytearray**.
+    :param SpikesFile spikes_file: The input SpikesFile object from pyNAVIS.
+    :param int initial_address_size: An int indicating the size of the addresses in spikes_file.
+    :param int initial_timestamp_size: An int indicating the size of the timestamps in spikes_file.
+    :param int final_address_size: An int indicating the size of the addresses in the final bytearray.
+    :param int final_timestamp_size: An int indicating the size of the timestamps in the final bytearray.
+    :param boolean verbose: A boolean indicating whether or not debug comments must be printed.
 
-    Parameters:
-        spikes_file (SpikesFile): The input SpikesFile object from pyNAVIS. It must contain raw spikes data (without headers).
-        input_options (MainSettings, CompressedFileHeader): A MainSettings object from pyNAVIS or CompressedFileHeader that contains information about the input spikes_file.
-        output_options (MainSettings, CompressedFileHeader): A MainSettings object from pyNAVIS or CompressedFileHeader that contains information about the output bytes_data.
-        verbose (boolean): A boolean indicating whether or not debug comments are printed.
-
-    Returns:
-        bytes_data (bytearray): The output bytearray.
-
-    Notes:
-        This function is the inverse of the bytesToSpikesFile function.
-
-        If you want to store a compressed file from a SpikesFile you must pass a CompressedFileHeader object
-        as the output_options parameter and specify the compressor to be used. This is important to work properly in
-        the different cases. In order to this, if you use a MainSettings object as output_options and later you set the
-        compressor, you could have problems while encoding or decoding the compressed file information.
-
-        In the case of compressing with LZMA compressor, it is better to prune the bytes because we can achieve
-        practically the same compressed file size in a reasonably smaller time. Otherwise, viewing addresses and
-        timestamps as 4-bytes data usually allows to achieve a better compression, regardless of their original sizes.
+    :return bytearray bytes_data: The output bytearray.
     """
     if verbose:
         start_time = time.time()
@@ -153,8 +129,8 @@ def spikesFileToBytes(spikes_file, settings, final_address_size, final_timestamp
     # 3-byte output addresses
     else:
         # Pruning case
-        if settings.address_size > final_address_size:
-            address_struct = constructStruct("pruned", (settings.address_size - final_address_size,),
+        if initial_address_size > final_address_size:
+            address_struct = constructStruct("pruned", (initial_address_size - final_address_size,),
                                              "not_pruned", (final_address_size,))
 
             # There can be a problem if addresses are not encoded in big endian
@@ -162,7 +138,7 @@ def spikesFileToBytes(spikes_file, settings, final_address_size, final_timestamp
 
         # Filling and no operation cases
         else:
-            address_struct = constructStruct("zeros", (final_address_size - settings.address_size,),
+            address_struct = constructStruct("zeros", (final_address_size - initial_address_size,),
                                              "addresses", (final_address_size,))
             addresses = np.zeros(len(spikes_file.addresses), dtype=address_struct)
             addresses['addresses'] = np.array(spikes_file.addresses, copy=False)
@@ -176,8 +152,8 @@ def spikesFileToBytes(spikes_file, settings, final_address_size, final_timestamp
     # 3-byte output timestamps
     else:
         # Pruning case
-        if settings.timestamp_size > final_timestamp_size:
-            timestamp_struct = constructStruct("pruned", (settings.timestamp_size - final_timestamp_size,),
+        if initial_timestamp_size > final_timestamp_size:
+            timestamp_struct = constructStruct("pruned", (initial_timestamp_size - final_timestamp_size,),
                                                "not_pruned", (final_timestamp_size,))
 
             # There can be a problem if timestamps are not encoded in big endian
@@ -185,7 +161,7 @@ def spikesFileToBytes(spikes_file, settings, final_address_size, final_timestamp
 
         # Filling and no operation cases
         else:
-            timestamp_struct = constructStruct("zeros", (final_timestamp_size - settings.timestamp_size,),
+            timestamp_struct = constructStruct("zeros", (final_timestamp_size - initial_timestamp_size,),
                                                "timestamps", (final_timestamp_size,))
             timestamps = np.zeros(len(spikes_file.timestamps), dtype=timestamp_struct)
             timestamps['timestamps'] = np.array(spikes_file.timestamps, copy=False)
@@ -209,31 +185,29 @@ def spikesFileToBytes(spikes_file, settings, final_address_size, final_timestamp
 
     # Numpy tobytes() function already joins addresses with timestamps spike by spike due to
     # the spikes_struct structure
-    bytes_data = new_spikes_file.tobytes()
+    data_bytes = new_spikes_file.tobytes()
 
     if verbose:
         end_time = time.time()
         print("spikesFileToBytes: Data conversion has took " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
-    return bytes_data
+    return data_bytes
 
 
 def calcRequiredBytes(spikes_file, settings):
     """
-    Calculates the minimum numbers of bytes required for address and timestamp representation based on the input settings
-    and returns a CompressedFileHeader object that contains them.
+    Calculates the minimum number of bytes required for address and timestamp representation based on the input settings
+    and returns them. This function only works for uncompressed files because compressed files already contain this
+    information within their headers.
 
-    Parameters:
-        spikes_file (SpikesFile): The input SpikesFile object from pyNAVIS.
-        settings (MainSettings): A MainSettings object from pyNAVIS.
+    Note that, since input settings are contained in a MainSettings object from pyNAVIS, this function is only useful
+    for NAS aedat files.
 
-    Returns:
-        header (CompressedFileHeader): A CompressedFileHeader object.
+    :param SpikesFile spikes_file: The input SpikesFile object from pyNAVIS.
+    :param MainSettings settings: A MainSettings object from pyNAVIS.
 
-    Notes:
-        This function only works for uncompressed files. Compressed files already contain this information within their headers.
+    :return CompressedFileHeader header: A CompressedFileHeader object.
     """
-    # TODO: Documentation, only for NAS (not for other types of AEDAT files)
     # Address size
     address_size = int(math.ceil(settings.num_channels * (settings.mono_stereo + 1) *
                                  (settings.on_off_both + 1) / 256))
@@ -247,16 +221,15 @@ def calcRequiredBytes(spikes_file, settings):
 
 def constructStruct(first_field, first_field_size, second_field, second_file_size):
     """
-    Constructs a numpy data type of two fields to represent the data structure of a bytearray.
+    Constructs a numpy data type of two fields to represent the data structure of a bytearray. This function has been
+    internally used to simplify the AERzip's code, but it should not be needed in an external use of the package.
 
-    Parameters:
-        first_field (string): A string indicating the name of the first field.
-        first_field_size (int, tuple): An int or tuple indicating the number of bytes of the elements of the first field.
-        second_field (string): A string indicating the name of the second field.
-        second_file_size (int, tuple): An int or tuple indicating the number of bytes of the elements of the second field.
+    :param string first_field: A string indicating the name of the first field.
+    :param (int, tuple) first_field_size: An int or tuple indicating the number of bytes of the elements of the first field.
+    :param string second_field: A string indicating the name of the second field.
+    :param (int, tuple) second_file_size: An int or tuple indicating the number of bytes of the elements of the second field.
 
-    Returns:
-        struct (type): A data type required to interpret a bytearray.
+    :return struct: A numpy data type structure required to interpret a bytearray.
     """
 
     struct = np.dtype([(first_field, ">u1", first_field_size), (second_field, ">u1", second_file_size)])
