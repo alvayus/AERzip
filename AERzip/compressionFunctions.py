@@ -26,6 +26,7 @@ def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore
     Returns:
         compressed_file (bytearray): The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
     """
+    # TODO: Only for NAS? Because it uses MainSettings as parameter. This is a problem for compatibility
     # --- Check the file ---
     split_path = src_file_path.split("/")
     split_path[len(split_path) - 2] = split_path[len(split_path) - 2] + "_" + compressor
@@ -66,7 +67,8 @@ def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore
     start_time = time.time()
 
     # --- Compress the data ---
-    compressed_file = spikesFileToCompressedFile(spikes_file, settings, address_size, timestamp_size, compressor)
+    compressed_file = spikesFileToCompressedFile(spikes_file, settings.address_size, settings.timestamp_size,
+                                                 address_size, timestamp_size, compressor, verbose=verbose)
 
     # --- Store the data ---
     if store:
@@ -162,7 +164,7 @@ def decompressData(compressed_data, header, verbose=False):
     Decompress the input compressed spikes bytearray via the specified compressor.
 
     Parameters:
-        compressed_data (bytearray): The input bytearray that contains the compressed spikes.
+        compressed_data (bytearray, bytes): The input bytearray that contains the compressed spikes.
         header (CompressedFileHeader): The input CompressedFileHeader object.
         verbose (boolean): A boolean indicating whether or not debug comments are printed.
 
@@ -302,7 +304,8 @@ def compressedFileToBytes(compressed_file, verbose=True):
     return bytes_data
 
 
-def spikesFileToCompressedFile(spikes_file, settings, desired_address_size, desired_timestamp_size, compressor, verbose=True):
+def spikesFileToCompressedFile(spikes_file, initial_address_size, initial_timestamp_size, desired_address_size,
+                               desired_timestamp_size, compressor, verbose=True):
     """
     Converts a SpikesFile of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
     and timestamp_size parameters respectively, to a bytearray of CompressedFileHeader and compressed spikes
@@ -322,6 +325,10 @@ def spikesFileToCompressedFile(spikes_file, settings, desired_address_size, desi
 
     Notes:
         This function is the inverse of the compressedFileToSpikesFile function.
+
+        In the case of compressing with LZMA compressor, it is better to prune the bytes because we can achieve
+        practically the same compressed file size in a reasonably smaller time. Otherwise, viewing addresses and
+        timestamps as 4-bytes data usually allows to achieve a better compression, regardless of their original sizes.
     """
     if compressor != "LZMA":
         if verbose:
@@ -334,10 +341,12 @@ def spikesFileToCompressedFile(spikes_file, settings, desired_address_size, desi
         final_timestamp_size = desired_timestamp_size
 
     # Call to spikesFileToBytes function
-    spikes_bytes = spikesFileToBytes(spikes_file, settings, final_address_size, final_timestamp_size)
+    spikes_bytes = spikesFileToBytes(spikes_file, initial_address_size, initial_timestamp_size, final_address_size,
+                                     final_timestamp_size, verbose=verbose)
 
     # Call to bytesToCompressedFile function
-    compressed_file = bytesToCompressedFile(spikes_bytes, final_address_size, final_timestamp_size, compressor)
+    compressed_file = bytesToCompressedFile(spikes_bytes, final_address_size, final_timestamp_size, compressor,
+                                            verbose=verbose)
 
     if verbose:
         print("Done! SpikesFile compressed into a compressed file bytearray")
@@ -368,25 +377,25 @@ def compressedFileToSpikesFile(compressed_file, verbose=False):
     decompressed_data = decompressData(compressed_data, header)
 
     # Call to bytesToSpikesFile function
-    spikes_file, new_settings = bytesToSpikesFile(decompressed_data, header)
+    spikes_file, final_address_size, final_timestamp_size = bytesToSpikesFile(decompressed_data, header.address_size,
+                                                                              header.timestamp_size, verbose=verbose)
 
     if verbose:
         print("compressedFileToSpikesFile: Compressed file bytearray decompressed into a SpikesFile")
 
-    return header, spikes_file, new_settings
+    return header, spikes_file, final_address_size, final_timestamp_size
 
 
 def extractCompressedData(compressed_file, verbose=False):
     """
     Extracts the CompressedFileHeader object and the compressed spikes from an input bytearray.
 
-    Parameters:
-        compressed_file (bytearray, bytes): The input bytearray (or bytes). It contains the CompressedFileHeader bound to the compressed spikes.
-        verbose (boolean): A boolean indicating whether or not debug comments are printed.
+    :param bytearray, bytes compressed_file: The input bytearray (or bytes). It contains the CompressedFileHeader bound to the compressed spikes.
+    :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    Returns:
-        header (CompressedFileHeader): The output CompressedFileHeader object.
-        compressed_data (bytearray): The output bytearray that contains the compressed spikes.
+    :return:
+    - header (CompressedFileHeader): The output CompressedFileHeader object.
+    - compressed_data (bytearray): The output bytearray that contains the compressed spikes.
     """
     start_time = time.time()
 
@@ -403,14 +412,22 @@ def extractCompressedData(compressed_file, verbose=False):
     header.compressor = compressed_file[start_index:end_index].decode("utf-8").strip()
 
     start_index = end_index
-    end_index = start_index + header.address_length
+    end_index = start_index + header.address_size_length
     header.address_size = int.from_bytes(compressed_file[start_index:end_index], "big")
 
     start_index = end_index
-    end_index = start_index + header.timestamp_length
+    end_index = start_index + header.timestamp_size_length
     header.timestamp_size = int.from_bytes(compressed_file[start_index:end_index], "big")
 
-    start_index = end_index + header.end_header_length
+    start_index = end_index
+    end_index = start_index + header.optional_length
+    header.optional = compressed_file[start_index:end_index]
+
+    start_index = end_index
+    end_index = start_index + header.header_end_length
+    header.header_end = compressed_file[start_index:end_index].decode("utf-8")
+
+    start_index = end_index
     compressed_data = bytes(compressed_file[start_index:])
 
     end_time = time.time()

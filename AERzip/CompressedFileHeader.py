@@ -17,23 +17,23 @@ class CompressedFileHeader:
     constructor method, in order to allow compatibility between different versions of AERzip.
     """
 
-    def __init__(self, compressor, address_size, timestamp_size):
+    def __init__(self, compressor=None, address_size=None, timestamp_size=None):
         # Checks before object creation
-        if not (compressor == "ZSTD" or compressor == "LZ4" or compressor == "LZMA"):
+        if compressor is not None and not (compressor == "ZSTD" or compressor == "LZ4" or compressor == "LZMA"):
             raise ValueError("Only ZSTD, LZ4 or LZMA compression algorithms are supported for now")
 
         # Sizes of fixed fields
-        self.__library_version_length = 20
-        self.__compressor_length = 10
-        self.__address_size_length = 4  # 32-bit int
-        self.__timestamp_size_length = 4  # 32-bit int
-        self.__optional_length = 40
-        self.__optional_available = 40  # Allows to control the space available in the optional field
-        self.__header_end_length = 22  # Size of fixed string "#End Of ASCII Header\r\n"
-        self.__header_length = self.__library_version_length + self.__compressor_length + self.__address_size_length + self.__timestamp_size_length + self.__optional_length + self.__header_end_length
+        self.library_version_length = 20
+        self.compressor_length = 10
+        self.address_size_length = 4  # 32-bit int
+        self.timestamp_size_length = 4  # 32-bit int
+        self.optional_length = 40
+        self.optional_available = 40  # Allows to control the space available in the optional field
+        self.header_end_length = 22  # Size of fixed string "#End Of ASCII Header\r\n"
+        self.header_length = self.library_version_length + self.compressor_length + self.address_size_length + self.timestamp_size_length + self.optional_length + self.header_end_length
 
         # Values for fixed fields
-        self.library_version = "AERzip v0.6.5"
+        self.library_version = "AERzip v0.6.5"  # TODO: Use AERzip's version
         self.compressor = compressor
         self.address_size = address_size
         self.timestamp_size = timestamp_size
@@ -48,11 +48,11 @@ class CompressedFileHeader:
         """
         data_bytes_len = len(data_bytes)
 
-        if data_bytes_len > self.__optional_available:
+        if data_bytes_len > self.optional_available:
             raise MemoryError("The optional field has reached its maximum capacity. No more information can be added")
 
         self.optional.extend(data_bytes)
-        self.__optional_available -= data_bytes_len
+        self.optional_available -= data_bytes_len
 
     def toBytes(self):
         """
@@ -65,16 +65,16 @@ class CompressedFileHeader:
         header_bytes = bytearray()
 
         # Fixed fields
-        header_bytes.extend(bytes(self.library_version.ljust(self.__library_version_length), "utf-8"))
-        header_bytes.extend(bytes(self.compressor.ljust(self.__compressor_length), "utf-8"))
-        header_bytes.extend(self.address_size.to_bytes(self.__address_size_length, "big"))
-        header_bytes.extend(self.timestamp_size.to_bytes(self.__timestamp_size_length, "big"))
+        header_bytes.extend(bytes(self.library_version.ljust(self.library_version_length), "utf-8"))
+        header_bytes.extend(bytes(self.compressor.ljust(self.compressor_length), "utf-8"))
+        header_bytes.extend(self.address_size.to_bytes(self.address_size_length, "big"))
+        header_bytes.extend(self.timestamp_size.to_bytes(self.timestamp_size_length, "big"))
 
         # MainSetting fields (with or without pruning)
-        header_bytes.extend(self.optional.ljust(self.__optional_length))
+        header_bytes.extend(self.optional.ljust(self.optional_length))
 
         # End of the header
-        header_bytes.extend(bytes(self.header_end.ljust(self.__header_end_length), "utf-8"))
+        header_bytes.extend(bytes(self.header_end.ljust(self.header_end_length), "utf-8"))
 
         return header_bytes
 
