@@ -37,7 +37,7 @@ class CompressedFileHeader:
         self.compressor = compressor
         self.address_size = address_size
         self.timestamp_size = timestamp_size
-        self.optional = bytearray()
+        self.optional = bytearray().ljust(self.optional_length)
         self.header_end = "#End Of ASCII Header\r\n"
 
     def addOptional(self, data_bytes):
@@ -51,7 +51,9 @@ class CompressedFileHeader:
         if data_bytes_len > self.optional_available:
             raise MemoryError("The optional field has reached its maximum capacity. No more information can be added")
 
-        self.optional.extend(data_bytes)
+        start_index = self.optional_length - self.optional_available
+        end_index = start_index + data_bytes_len
+        self.optional[start_index:end_index] = data_bytes
         self.optional_available -= data_bytes_len
 
     def toBytes(self):
