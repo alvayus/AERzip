@@ -2,7 +2,10 @@ import unittest
 
 from pyNAVIS import MainSettings, Loaders
 
-from AERzip.compressionFunctions import compressDataFromFile, compressedFileToSpikesFile
+from AERzip.CompressedFileHeader import CompressedFileHeader
+from AERzip.compressionFunctions import compressDataFromFile, compressedFileToSpikesFile, checkCompressedFileExists, \
+    spikesFileToCompressedFile, compressData, getCompressedFile
+from AERzip.conversionFunctions import calcRequiredBytes
 
 
 class CompressionFunctionTests(unittest.TestCase):
@@ -22,6 +25,9 @@ class CompressionFunctionTests(unittest.TestCase):
                                                                address_size=2, timestamp_size=4, ts_tick=0.2,
                                                                bin_size=10000)
 
+        # Defining compression algorithms
+        self.compression_algorithms = ["ZSTD", "LZMA", "LZ4"]
+
         # Loading spikes_files
         self.files_data = [
             ("events/dataset/enun_stereo_64ch_ONOFF_addr4b_ts1.aedat", self.file_settings_stereo_64ch_4a_4t_ts1),
@@ -34,13 +40,11 @@ class CompressionFunctionTests(unittest.TestCase):
             self.spikes_files.append(Loaders.loadAEDAT(file_data[0], file_data[1]))
 
     def test_compressAndDecompress(self):
-        compression_algorithms = ["ZSTD", "LZMA", "LZ4"]
-
         for i in range(len(self.spikes_files)):
             spikes_file = self.spikes_files[i]
             file_data = self.files_data[i]
 
-            for algorithm in compression_algorithms:
+            for algorithm in self.compression_algorithms:
                 # Compressing the spikes_file
                 compressed_file, _ = compressDataFromFile(file_data[0], file_data[1], algorithm, store=False, verbose=False)
 
@@ -52,6 +56,43 @@ class CompressionFunctionTests(unittest.TestCase):
                 self.assertEqual(spikes_file.addresses.tolist(), spikes_file.addresses.tolist())
                 self.assertEqual(spikes_file.timestamps.tolist(), spikes_file.timestamps.tolist())
                 self.assertEqual(header.header_end, "#End Of ASCII Header\r\n")
+
+    '''def test_getCompressedFile(self):
+        compression_algorithms = ["ZSTD", "LZMA", "LZ4"]
+        
+        for i in range(len(self.spikes_files)):
+            # Target spikes_file
+            spikes_file = self.spikes_files[i]
+            files_data = self.files_data[i]
+            
+            # Get the bytes to be discarded
+            final_address_size, final_timestamp_size = calcRequiredBytes(spikes_file, files_data[1])
+            
+            for algorithm in self.compression_algorithms: 
+                # Compress the original spikes_file
+                compressed_file = spikesFileToCompressedFile(spikes_file, files_data[1].address_size, 
+                                                             files_data[1].timestamp_size, final_address_size, 
+                                                             final_timestamp_size, algorithm, verbose=False)
+                
+                # '''
+    def test_getCompressedFile(self):
+        for algorithm in self.compression_algorithms:
+            # Test header
+            header = CompressedFileHeader(algorithm, 3, 4)
+
+            # Test compressed data
+            compressed_data = compressData("This is a text".encode("utf-8"), algorithm, verbose=False)
+
+            # Get the compressed file bytearray
+            compressed_file = getCompressedFile(header, compressed_data)
+
+    def test_checkCompressedFileExists(self):
+        initial_file_path = "events/dataset/enun_stereo_64ch_ONOFF_addr4b_ts1.aedat"
+        initial_file_path_split = initial_file_path.split(".")
+        final_file_path = checkCompressedFileExists(initial_file_path)
+
+        self.assertEqual(final_file_path, initial_file_path_split[0] + "(" + str(3) + ")." +
+                         initial_file_path_split[1])  # Enter 'N' as input value
 
 
 if __name__ == '__main__':
