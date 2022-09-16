@@ -7,14 +7,11 @@ from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
 from pyNAVIS import *
 
-from AERzip import compressionFunctions
-from compressionFunctions import decompressDataFromFile, compressDataFromFile
-
 # TODO: Test files
 # TODO: Fix and complete documentation and images (remove prunedBytes)
 # TODO: Writing in AEDAT 4.0?
 # TODO: Add a bytesToPrunedBytes function
-
+from AERzip.compressionFunctions import compressDataFromFile, decompressDataFromFile
 
 if __name__ == '__main__':
     root = Tk()
