@@ -231,7 +231,7 @@ def loadCompressedFile(src_file_path):
     return compressed_file
 
 
-def bytesToCompressedFile(bytes_data, address_size, timestamp_size, compressor, verbose=True):
+def bytesToCompressedFile(bytes_data, header, verbose=True):
     """
     Converts a bytearray of raw spikes of a-bytes addresses and b-bytes timestamps, where a and b are address_size
     and timestamp_size parameters respectively, to a bytearray of CompressedFileHeader and compressed spikes
@@ -252,10 +252,10 @@ def bytesToCompressedFile(bytes_data, address_size, timestamp_size, compressor, 
         print("bytesToCompressedFile: Converting spikes bytes into a spikes compressed file...")
 
     # Compress the data
-    compressed_data = compressData(bytes_data, compressor, verbose=False)
+    compressed_data = compressData(bytes_data, header.compressor, verbose=False)
 
     # Join header with compressed data
-    compressed_file = getCompressedFile(compressed_data, address_size, timestamp_size, compressor)
+    compressed_file = getCompressedFile(header, compressed_data)
 
     end_time = time.time()
     if verbose:
@@ -327,9 +327,11 @@ def spikesFileToCompressedFile(spikes_file, initial_address_size, initial_timest
     spikes_bytes = spikesFileToBytes(spikes_file, initial_address_size, initial_timestamp_size, final_address_size,
                                      final_timestamp_size, verbose=verbose)
 
+    # Create the header of the compressed file
+    header = CompressedFileHeader(compressor, final_address_size, final_timestamp_size)
+
     # Call to bytesToCompressedFile function
-    compressed_file = bytesToCompressedFile(spikes_bytes, final_address_size, final_timestamp_size, compressor,
-                                            verbose=verbose)
+    compressed_file = bytesToCompressedFile(spikes_bytes, header, verbose=verbose)
 
     if verbose:
         print("Done! SpikesFile compressed into a compressed file bytearray")
