@@ -11,7 +11,7 @@ from pyNAVIS import *
 # TODO: Fix and complete documentation and images (remove prunedBytes)
 # TODO: Writing in AEDAT 4.0?
 # TODO: Add a bytesToPrunedBytes function
-from AERzip.compressionFunctions import compressDataFromFile, decompressDataFromFile
+from AERzip.compressionFunctions import compressDataFromStoredFile, decompressDataFromFile
 
 if __name__ == '__main__':
     root = Tk()
@@ -102,7 +102,7 @@ if __name__ == '__main__':
 
     compressor = compressors[number - 1]
 
-    _, dst_path = compressDataFromFile(path, settings, compressor=compressor, ignore_overwriting=False)
+    _, dst_path = compressDataFromStoredFile(path, settings, compressor=compressor, ignore_overwriting=False)
 
     # --- COMPRESSED DATA ---
     start_time = time.time()

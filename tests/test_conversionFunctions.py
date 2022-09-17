@@ -51,7 +51,20 @@ class JAERSettingsTest(unittest.TestCase):
 
             # Compare original and final spikes_file
             self.assertIsNot(spikes_file, new_spikes_file)
-            self.assertEqual(spikes_file.__dict__, new_spikes_file.__dict__)
+
+            spikes_file_dict = copy.deepcopy(spikes_file).__dict__
+            spikes_file_dict.pop("addresses")
+            spikes_file_dict.pop("timestamps")
+
+            new_spikes_file_dict = copy.deepcopy(new_spikes_file).__dict__
+            new_spikes_file_dict.pop("addresses")
+            new_spikes_file_dict.pop("timestamps")
+
+            self.assertEqual(spikes_file_dict, new_spikes_file_dict)
+            for j in range(len(spikes_file.addresses)):
+                self.assertEqual(spikes_file.addresses[j], new_spikes_file.addresses[j])
+            for k in range(len(spikes_file.timestamps)):
+                self.assertEqual(spikes_file.timestamps[k], new_spikes_file.timestamps[k])
 
 
 if __name__ == '__main__':

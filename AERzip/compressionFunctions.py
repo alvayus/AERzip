@@ -11,43 +11,46 @@ from AERzip.CompressedFileHeader import CompressedFileHeader
 from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, calcRequiredBytes
 
 
-def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore_overwriting=True, verbose=True):
+def compressDataFromStoredFile(file_path, address_size, timestamp_size, compressor, store=True, verbose=True):
+    # TODO: Related to compressDataFromStoredNASFile function
+    pass
+
+
+def compressDataFromStoredNASFile(initial_file_path, settings, compressor, store=True, ask_user=False, overwrite=False,
+                                  verbose=True):
     """
     Reads an original aedat file, extracts and compress its raw spikes data and returns a compressed file bytearray.
 
-    Parameters:
-        src_file_path (string): A string indicating the original aedat file path.
-        settings (MainSettings): A MainSettings object from pyNAVIS.
-        compressor (string): A string indicating the compressor to be used.
-        store (boolean): A boolean indicating whether or not store the compressed file.
-        ignore_overwriting (boolean): A boolean indicating whether or not ignore overwriting.
-        verbose (boolean): A boolean indicating whether or not debug comments are printed.
+    :param string initial_file_path: A string indicating the original aedat file path.
+    :param MainSettings settings: A MainSettings object from pyNAVIS containing information about the file.
+    :param string compressor: A string indicating the compressor to be used.
+    :param boolean store: A boolean indicating whether or not store the compressed file.
+    :param boolean ask_user: A boolean indicating whether or not to prompt the user to overwrite a file that has been found at the specified path.
+    :param boolean overwrite: A boolean indicating wheter or not a file that has been found at the specified path must be or not be overwritten.
+    :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    Returns:
-        compressed_file (bytearray): The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
+    :return bytearray compressed_file: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
     """
-    # TODO: Only for NAS? Because it uses MainSettings as parameter. This is a problem for compatibility
-    # --- Check the file ---
-    split_path = src_file_path.split("/")
-    split_path[len(split_path) - 2] = split_path[len(split_path) - 2] + "_" + compressor
-    split_path[len(split_path) - 3] = "compressedEvents"
-    split_path[0] = split_path[0] + "\\"
+    file_name = os.path.basename(initial_file_path)
+    dir_name = os.path.dirname(initial_file_path)
+    dataset_name = os.path.basename(dir_name)
+    main_folder = os.path.basename(os.path.dirname(dir_name))
+    final_file_path = initial_file_path
 
-    dst_file_path = os.path.join(*split_path)
-    if store and not ignore_overwriting:
-        dst_file_path = checkFileExists(dst_file_path)
-
-    file = os.path.basename(src_file_path)
-    dir_path = os.path.dirname(src_file_path)
-    dataset = os.path.basename(dir_path)
-    main_folder = os.path.basename(os.path.dirname(dir_path))
+    # --- If the final compress file should be stored, check the path ---
+    if store:
+        split_path = initial_file_path.split("/")
+        split_path[len(split_path) - 2] = split_path[len(split_path) - 2] + "_" + compressor
+        split_path[len(split_path) - 3] = "compressedEvents"
+        split_path[0] = split_path[0] + "\\"
+        final_file_path = checkFileExists(os.path.join(*split_path))
 
     # --- Load data from original aedat file ---
     start_time = time.time()
     if verbose:
-        print("\nLoading " + "/" + main_folder + "/" + dataset + "/" + file + " (original aedat file)")
+        print("\nLoading " + "/" + main_folder + "/" + dataset_name + "/" + file_name + " (original aedat file)")
 
-    spikes_file = Loaders.loadAEDAT(src_file_path, settings)
+    spikes_file = Loaders.loadAEDAT(initial_file_path, settings)
 
     # Adapt timestamps to allow timestamp compression
     if spikes_file.min_ts != 0:
@@ -58,27 +61,28 @@ def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore
         print("Original file loaded in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     # Get the bytes to be discarded
-    address_size, timestamp_size = calcRequiredBytes(spikes_file, settings)
+    desired_address_size, desired_timestamp_size = calcRequiredBytes(spikes_file, settings)
 
     if verbose:
-        print("\nCompressing " + "/" + main_folder + "/" + dataset + "/" + file + " with " + str(settings.address_size) +
-              "-byte addresses and " + str(settings.timestamp_size) + "-byte timestamps via " +
-              compressor + " compressor")
+        print("\nCompressing " + "/" + main_folder + "/" + dataset_name + "/" + file_name + " with " +
+              str(settings.address_size) + "-byte addresses and " + str(settings.timestamp_size) +
+              "-byte timestamps via " + compressor + " compressor")
     start_time = time.time()
 
     # --- Compress the data ---
     compressed_file = spikesFileToCompressedFile(spikes_file, settings.address_size, settings.timestamp_size,
-                                                 address_size, timestamp_size, compressor, verbose=verbose)
+                                                 desired_address_size, desired_timestamp_size, compressor,
+                                                 verbose=verbose)
 
     # --- Store the data ---
     if store:
-        storeFile(compressed_file, dst_file_path)
+        storeFile(compressed_file, final_file_path, ask_user=ask_user, overwrite=overwrite)
 
     end_time = time.time()
     if verbose:
         print("Compression achieved in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
-    return compressed_file, dst_file_path
+    return compressed_file, final_file_path
 
 
 def decompressDataFromFile(src_file_path, verbose=True):
@@ -146,11 +150,8 @@ def bytesToCompressedFile(bytes_data, header, verbose=True):
     if verbose:
         print("bytesToCompressedFile: Converting spikes bytes into a spikes compressed file...")
 
-    # Compress the data
-    compressed_data = compressData(bytes_data, header.compressor, verbose=False)
-
     # Join header with compressed data
-    compressed_file = getCompressedFile(header, compressed_data)
+    compressed_file = getCompressedFile(header, bytes_data)
 
     end_time = time.time()
     if verbose:
@@ -171,18 +172,18 @@ def compressedFileToBytes(compressed_file, verbose=True):
     :param bytearray compressed_file: The input bytearray that contains the CompressedFileHeader and the compressed spikes.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return bytearray bytes_data: The output bytearray. It contains raw spikes shaped as the compressed spikes of the compressed file.
+    :return bytearray decompressed_data: The output bytearray. It contains raw spikes shaped as the compressed spikes of the compressed file.
     """
     # Extract the compressed spikes
     header, compressed_data = extractCompressedData(compressed_file)
 
     # Decompress the data
-    bytes_data = decompressData(compressed_data, header.compressor)
+    decompressed_data = decompressData(compressed_data, header.compressor)
 
     if verbose:
         print("compressedFileToBytes: Compressed file bytearray decompressed into a raw spikes bytearray")
 
-    return bytes_data, header
+    return decompressed_data, header
 
 
 def spikesFileToCompressedFile(spikes_file, initial_address_size, initial_timestamp_size, desired_address_size,
@@ -248,10 +249,10 @@ def compressedFileToSpikesFile(compressed_file, verbose=False):
     :return SpikesFile spikes_file: The output SpikesFile object from pyNAVIS.
     """
     # Call to compressedFileToBytes function
-    bytes_data, header = compressedFileToBytes(compressed_file, verbose=verbose)
+    data, header = compressedFileToBytes(compressed_file, verbose=verbose)
 
     # Call to bytesToSpikesFile function
-    spikes_file, final_address_size, final_timestamp_size = bytesToSpikesFile(bytes_data, header.address_size,
+    spikes_file, final_address_size, final_timestamp_size = bytesToSpikesFile(data, header.address_size,
                                                                               header.timestamp_size, verbose=verbose)
 
     if verbose:

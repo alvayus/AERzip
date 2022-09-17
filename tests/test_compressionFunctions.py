@@ -1,12 +1,12 @@
+import os
 import unittest
 
 from pyNAVIS import MainSettings, Loaders
 
 from AERzip.CompressedFileHeader import CompressedFileHeader
-from AERzip.compressionFunctions import compressDataFromFile, compressedFileToSpikesFile, checkFileExists, \
-    spikesFileToCompressedFile, compressData, getCompressedFile, extractCompressedData, loadFile, \
-    decompressData
-from AERzip.conversionFunctions import calcRequiredBytes
+from AERzip.compressionFunctions import compressDataFromStoredFile, compressedFileToSpikesFile, checkFileExists, \
+    getCompressedFile, extractCompressedData, decompressData, compressDataFromStoredNASFile, loadFile, \
+    spikesFileToCompressedFile
 
 
 class CompressionFunctionTests(unittest.TestCase):
@@ -40,35 +40,44 @@ class CompressionFunctionTests(unittest.TestCase):
         for file_data in self.files_data:
             self.spikes_files.append(Loaders.loadAEDAT(file_data[0], file_data[1]))
 
-    '''def test_compressAndDecompress(self):
+    # TODO: test_decompressDataFromFile
+
+    def test_compressAndDecompress(self):
         for i in range(len(self.spikes_files)):
             spikes_file = self.spikes_files[i]
             file_data = self.files_data[i]
 
             for algorithm in self.compression_algorithms:
                 # Compressing the spikes_file
-                compressed_file, _ = compressDataFromFile(file_data[0], file_data[1], algorithm, store=False,
-                                                          verbose=False)
+                compressed_file, _ = compressDataFromStoredNASFile(file_data[0], file_data[1], algorithm, store=False,
+                                                                   ask_user=False, overwrite=False, verbose=False)
 
                 # Decompressing the spikes_file
-                header, spikes_file, final_address_size, final_timestamp_size = compressedFileToSpikesFile(
-                    compressed_file, verbose=False)
+                header, spikes_file, final_address_size, final_timestamp_size = \
+                    compressedFileToSpikesFile(compressed_file, verbose=False)
 
                 # Compare original and final spikes_file
                 self.assertEqual(header.compressor, algorithm)
                 self.assertEqual(spikes_file.addresses.tolist(), spikes_file.addresses.tolist())
                 self.assertEqual(spikes_file.timestamps.tolist(), spikes_file.timestamps.tolist())
-                self.assertEqual(header.header_end, "#End Of ASCII Header\r\n")'''
+                self.assertEqual(header.header_end, "#End Of ASCII Header\r\n")
 
-    # TODO: Change test, it's using not compressed files
-    '''def test_compressedFileToFromSpikesFile(self):
+    def test_compressedFileToFromSpikesFile(self):
         for file_data in self.files_data:
             for algorithm in self.compression_algorithms:
+                # Get associated compressed file path
+                split_path = file_data[0].split("/")
+                split_path[len(split_path) - 2] = split_path[len(split_path) - 2] + "_" + algorithm
+                split_path[len(split_path) - 3] = "compressedEvents"
+                split_path[0] = split_path[0] + "\\"
+                compressed_file_path = os.path.join(*split_path)
+
                 # Read compressed file
-                compressed_file = loadFile(file_data[0])
+                compressed_file = loadFile(compressed_file_path)
 
                 # Call to compressedFileToSpikesFile function
-                header, spikes_file, final_address_size, final_timestamp_size = compressedFileToSpikesFile(compressed_file)
+                header, spikes_file, final_address_size, final_timestamp_size = \
+                    compressedFileToSpikesFile(compressed_file)
 
                 # Call to spikesFileToCompressedFile function
                 new_compressed_file = spikesFileToCompressedFile(spikes_file, final_address_size, final_timestamp_size,
@@ -77,7 +86,7 @@ class CompressionFunctionTests(unittest.TestCase):
 
                 # Compare compressed_files
                 self.assertIsNot(compressed_file, new_compressed_file)
-                self.assertEqual(compressed_file, new_compressed_file)'''
+                self.assertEqual(compressed_file, new_compressed_file)
 
     def test_getCompressedFile(self):
         for algorithm in self.compression_algorithms:
