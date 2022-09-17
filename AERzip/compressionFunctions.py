@@ -35,7 +35,7 @@ def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore
 
     dst_file_path = os.path.join(*split_path)
     if store and not ignore_overwriting:
-        dst_file_path = checkCompressedFileExists(dst_file_path)
+        dst_file_path = checkFileExists(dst_file_path)
 
     file = os.path.basename(src_file_path)
     dir_path = os.path.dirname(src_file_path)
@@ -72,7 +72,7 @@ def compressDataFromFile(src_file_path, settings, compressor, store=True, ignore
 
     # --- Store the data ---
     if store:
-        storeCompressedFile(compressed_file, dst_file_path)
+        storeFile(compressed_file, dst_file_path)
 
     end_time = time.time()
     if verbose:
@@ -105,7 +105,7 @@ def decompressDataFromFile(src_file_path, verbose=True):
     if verbose:
         print("\nLoading " + "/" + main_folder + "/" + dataset + "/" + file + " (compressed aedat file)")
 
-    compressed_file = loadCompressedFile(src_file_path)
+    compressed_file = loadFile(src_file_path)
 
     end_time = time.time()
     if verbose:
@@ -124,111 +124,6 @@ def decompressDataFromFile(src_file_path, verbose=True):
         print("Decompression achieved in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
     return spikes_file, new_settings
-
-
-def compressData(bytes_data, compressor, verbose=True):
-    """
-    Compress the input data via the specified compressor.
-
-    :param bytearray, bytes bytes_data: The input data.
-    :param string compressor: A string indicating the compressor to be used.
-    :param boolean verbose: A boolean indicating whether or not debug comments are printed.
-
-    :return bytearray compressed_data: The output data (compressed data).
-    """
-    start_time = time.time()
-
-    if compressor == "ZSTD":
-        cctx = zstandard.ZstdCompressor()
-        compressed_data = cctx.compress(bytes_data)
-    elif compressor == "LZ4":
-        compressed_data = lz4.frame.compress(bytes_data)
-    elif compressor == "LZMA":
-        compressed_data = pylzma.compress(bytes_data)
-    else:
-        raise ValueError("Compressor not recognized")
-
-    end_time = time.time()
-    if verbose:
-        print("-> Compressed data in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-
-    return compressed_data
-
-
-def decompressData(compressed_data, compressor, verbose=False):
-    """
-    Decompress the input compressed data via the specified compressor.
-
-    :param bytearray, bytes compressed_data: The input data.
-    :param string compressor: A string indicating the compressor to be used.
-    :param boolean verbose: A boolean indicating whether or not debug comments are printed.
-
-    :return bytearray decompressed_data: The output data (decompressed data).
-    """
-    start_time = time.time()
-
-    if compressor == "ZSTD":
-        dctx = zstandard.ZstdDecompressor()
-        decompressed_data = dctx.decompress(compressed_data)
-    elif compressor == "LZ4":
-        decompressed_data = lz4.frame.decompress(compressed_data)
-    elif compressor == "LZMA":
-        decompressed_data = pylzma.decompress(compressed_data)
-    else:
-        raise ValueError("Compressor not recognized")
-
-    end_time = time.time()
-    if verbose:
-        print("-> Decompressed data in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
-
-    return decompressed_data
-
-
-def storeCompressedFile(compressed_file, dst_compressed_file_path, ignore_overwriting=True):
-    """
-    Stores a compressed_file bytearray.
-
-    Parameters:
-        compressed_file (bytearray): The input bytearray that contains the CompressedFileHeader and the compressed spikes.
-        dst_compressed_file_path (string): The input string that indicates where the file is intended to be written.
-        ignore_overwriting (boolean): A boolean indicating whether or not ignore overwriting.
-
-    Returns:
-        None
-    """
-    # TODO: This function stores any file. Change documentation?
-    # Check the file
-    file_path = dst_compressed_file_path
-    if not ignore_overwriting:
-        file_path = checkCompressedFileExists(file_path)
-
-    # Check the destination folder
-    if not os.path.exists(os.path.dirname(file_path)):
-        os.makedirs(os.path.dirname(file_path))
-
-    # Write the file
-    file = open(file_path, "wb")
-    file.write(compressed_file)
-    file.close()
-
-
-def loadCompressedFile(src_file_path):
-    """
-    Extracts header and compressed data from a stored compressed file.
-
-    :param string src_file_path: A string indicating the compressed aedat file path.
-
-    :return bytearray compressed_file: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
-    """
-    # TODO: This function reads any file. Change documentation?
-    # Read all the file
-    file = open(src_file_path, "rb")
-    compressed_file = file.read()
-
-    # Close the file
-    file.close()
-
-    return compressed_file
 
 
 def bytesToCompressedFile(bytes_data, header, verbose=True):
@@ -416,12 +311,70 @@ def extractCompressedData(compressed_file, verbose=False):
     return header, compressed_data
 
 
-def getCompressedFile(header, compressed_data, verbose=False):
+def compressData(data, compressor, verbose=True):
+    """
+    Compress the input data via the specified compressor.
+
+    :param bytearray, bytes data: The input data.
+    :param string compressor: A string indicating the compressor to be used.
+    :param boolean verbose: A boolean indicating whether or not debug comments are printed.
+
+    :return bytearray compressed_data: The output data (compressed data).
+    """
+    start_time = time.time()
+
+    if compressor == "ZSTD":
+        cctx = zstandard.ZstdCompressor()
+        compressed_data = cctx.compress(data)
+    elif compressor == "LZ4":
+        compressed_data = lz4.frame.compress(data)
+    elif compressor == "LZMA":
+        compressed_data = pylzma.compress(data)
+    else:
+        raise ValueError("Compressor not recognized")
+
+    end_time = time.time()
+    if verbose:
+        print("-> Compressed data in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
+    return compressed_data
+
+
+def decompressData(compressed_data, compressor, verbose=False):
+    """
+    Decompress the input compressed data via the specified compressor.
+
+    :param bytearray, bytes compressed_data: The input data.
+    :param string compressor: A string indicating the compressor to be used.
+    :param boolean verbose: A boolean indicating whether or not debug comments are printed.
+
+    :return bytearray decompressed_data: The output data (decompressed data).
+    """
+    start_time = time.time()
+
+    if compressor == "ZSTD":
+        dctx = zstandard.ZstdDecompressor()
+        decompressed_data = dctx.decompress(compressed_data)
+    elif compressor == "LZ4":
+        decompressed_data = lz4.frame.decompress(compressed_data)
+    elif compressor == "LZMA":
+        decompressed_data = pylzma.decompress(compressed_data)
+    else:
+        raise ValueError("Compressor not recognized")
+
+    end_time = time.time()
+    if verbose:
+        print("-> Decompressed data in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
+
+    return decompressed_data
+
+
+def getCompressedFile(header, data, verbose=False):
     """
     Assembles the full compressed aedat file by joining the CompressedFileHeader object to the compressed spikes data.
 
     :param CompressedFileHeader header: The header to attach to the compressed file.
-    :param bytearray compressed_data: The input bytearray that contains the compressed spikes.
+    :param bytearray, bytes data: The input bytearray containing data to be compressed.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
     :return bytearray compressed_file: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
@@ -431,7 +384,8 @@ def getCompressedFile(header, compressed_data, verbose=False):
     # Create file with header
     compressed_file = header.toBytes()
 
-    # Extend file with data
+    # Compress data and extend the compressed file with it
+    compressed_data = compressData(data, header.compressor, verbose=False)
     compressed_file.extend(compressed_data)
 
     end_time = time.time()
@@ -441,32 +395,84 @@ def getCompressedFile(header, compressed_data, verbose=False):
     return compressed_file
 
 
-def checkCompressedFileExists(dst_compressed_file_path):
+def storeFile(file_bytes, initial_file_path, ask_user=False, overwrite=False):
     """
-    Checks if a compressed file already exits in the specified path. If it does, this function allows the user to
-    decide whether to overwrite it or not. If the user decides not to overwrite the file, a new file path
-    is generated to write the file to.
+    Stores a file.
 
-    :param string dst_compressed_file_path: The input string that indicates where the file is intended to be written.
-
-    :return string file_path: The output string that indicates where the file will be finally written.
+    :param bytearray file_bytes: The input bytearray.
+    :param string initial_file_path: A string indicating where the file is intended to be written.
+    :param boolean ask_user: A boolean indicating whether or not to prompt the user to overwrite a file that has been found at the specified path.
+    :param boolean overwrite: A boolean indicating wheter or not a file that has been found at the specified path must be or not be overwritten.
     """
-    file_path = dst_compressed_file_path
+    # Check the file
+    final_file_path = checkFileExists(initial_file_path, ask_user=ask_user, overwrite=overwrite)
 
-    if os.path.exists(file_path):
-        print("\nThe compressed aedat file already exists\n"
-              "Do you want to overwrite it? Y/N")
-        option = input()
+    # Check the destination folder
+    if not os.path.exists(os.path.dirname(final_file_path)):
+        os.makedirs(os.path.dirname(final_file_path))
+
+    # Write the file
+    file = open(final_file_path, "wb")
+    file.write(file_bytes)
+    file.close()
+
+
+def checkFileExists(initial_file_path, ask_user=False, overwrite=False):
+    """
+    Checks if a file already exits in the specified path. If it does, this function allows the user to decide whether to
+    overwrite it or not. If the user decides not to overwrite the file, a new file path is generated to write the file
+    to.
+
+    :param string initial_file_path: The input string indicating where the file is intended to be written.
+    :param boolean ask_user: A boolean indicating whether or not to prompt the user to overwrite a file that has been found at the specified path.
+    :param boolean overwrite: A boolean indicating wheter or not a file that has been found at the specified path must be or not be overwritten.
+
+    :return string final_file_path: The output string indicating where the file will be finally written.
+    """
+    final_file_path = initial_file_path
+
+    if os.path.exists(final_file_path):
+        if ask_user:
+            print("\nA file already exists in the specified path.\n"
+                  "Do you want to overwrite it? Y/N")
+            option = input()
+
+            while option != "Y" and option != "N":
+                print("\nUnexpected value. Please, enter 'Y' (overwrite) or 'N' (no overwrite)")
+                option = input()
+        else:
+            if overwrite:
+                option = "Y"
+            else:
+                option = "N"
 
         if option == "N":
-            cut_ext = os.path.splitext(file_path)
-            check_path = dst_compressed_file_path
+            cut_ext = os.path.splitext(final_file_path)
+            check_path = initial_file_path
 
             i = 1
             while os.path.exists(check_path):
                 check_path = cut_ext[0] + "(" + str(i) + ")" + cut_ext[1]
                 i += 1
 
-            file_path = check_path
+            final_file_path = check_path
 
-    return file_path
+    return final_file_path
+
+
+def loadFile(file_path):
+    """
+    Loads a file.
+
+    :param string file_path: A string indicating the file path.
+
+    :return bytearray file_bytes: The output bytearray.
+    """
+    # Read all the file
+    file = open(file_path, "rb")
+    file_bytes = file.read()
+
+    # Close the file
+    file.close()
+
+    return file_bytes
