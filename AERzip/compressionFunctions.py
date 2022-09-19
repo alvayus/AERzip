@@ -13,13 +13,15 @@ from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, cal
 
 def compressDataFromStoredFile(file_path, address_size, timestamp_size, compressor, store=True, verbose=True):
     # TODO: Related to compressDataFromStoredNASFile function
+    # But how to load a generic aedat file
     pass
 
 
 def compressDataFromStoredNASFile(initial_file_path, settings, compressor, store=True, ask_user=False, overwrite=False,
                                   verbose=True):
     """
-    Reads an original aedat file, extracts and compress its raw spikes data and returns a compressed file bytearray.
+    Reads an original aedat NAS file, extracts and compress its raw spikes data and returns a compressed file bytearray.
+    This function cannot be used with files not associated with the NAS.
 
     :param string initial_file_path: A string indicating the original aedat file path.
     :param MainSettings settings: A MainSettings object from pyNAVIS containing information about the file.
@@ -85,23 +87,20 @@ def compressDataFromStoredNASFile(initial_file_path, settings, compressor, store
     return compressed_file, final_file_path
 
 
-def decompressDataFromFile(src_file_path, verbose=True):
+def extractDataFromCompressedFile(file_path, verbose=True):
     """
-    Reads a file as a compressed file, decompress it to extract its raw spikes data and returns a SpikesFile object.
+    Reads a compressed aedat file and extracts and decompress its compressed information.
 
-    :param string src_file_path: A string indicating the compressed aedat file path.
+    :param string file_path: A string indicating the compressed aedat file path.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    Returns:
-        spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS. It contains raw spikes.
-        new_settings (MainSettings): A MainSettings object from pyNAVIS. It contains the CompressedFileHeader's address_size and timestamp_size fields.
-
-    Notes:
-        new_settings is returned in order to allow direct visualization of the files data using pyNAVIS plot functions.
+    :return:
+    - spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS. It contains raw spikes.
+    - new_settings (MainSettings): A MainSettings object from pyNAVIS. It contains the CompressedFileHeader's address_size and timestamp_size fields.
     """
     # --- Load data from compressed aedat file ---
-    file = os.path.basename(src_file_path)
-    dir_path = os.path.dirname(src_file_path)
+    file = os.path.basename(file_path)
+    dir_path = os.path.dirname(file_path)
     dataset = os.path.basename(dir_path)
     main_folder = os.path.basename(os.path.dirname(dir_path))
 
@@ -109,7 +108,7 @@ def decompressDataFromFile(src_file_path, verbose=True):
     if verbose:
         print("\nLoading " + "/" + main_folder + "/" + dataset + "/" + file + " (compressed aedat file)")
 
-    compressed_file = loadFile(src_file_path)
+    compressed_file = loadFile(file_path)
 
     end_time = time.time()
     if verbose:
@@ -121,13 +120,13 @@ def decompressDataFromFile(src_file_path, verbose=True):
     start_time = time.time()
 
     # Call to bytesToSpikesFile function
-    header, spikes_file, new_settings = compressedFileToSpikesFile(compressed_file)
+    header, spikes_file, final_address_size, final_timestamp_size = compressedFileToSpikesFile(compressed_file, verbose=verbose)
 
     end_time = time.time()
     if verbose:
         print("Decompression achieved in " + '{0:.3f}'.format(end_time - start_time) + " seconds")
 
-    return spikes_file, new_settings
+    return header, spikes_file, final_address_size, final_timestamp_size
 
 
 def bytesToCompressedFile(bytes_data, header, verbose=True):
@@ -243,7 +242,7 @@ def compressedFileToSpikesFile(compressed_file, verbose=False):
 
     This function is the inverse of the spikesFileToCompressedFile function.
 
-    :param bytearray compressed_file: The input bytearray that contains the CompressedFileHeader and the compressed spikes.
+    :param bytearray, bytes compressed_file: The input bytearray that contains the CompressedFileHeader and the compressed spikes.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
     :return SpikesFile spikes_file: The output SpikesFile object from pyNAVIS.

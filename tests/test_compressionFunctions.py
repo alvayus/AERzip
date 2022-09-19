@@ -1,3 +1,4 @@
+import copy
 import os
 import unittest
 
@@ -6,7 +7,7 @@ from pyNAVIS import MainSettings, Loaders
 from AERzip.CompressedFileHeader import CompressedFileHeader
 from AERzip.compressionFunctions import compressDataFromStoredFile, compressedFileToSpikesFile, checkFileExists, \
     getCompressedFile, extractCompressedData, decompressData, compressDataFromStoredNASFile, loadFile, \
-    spikesFileToCompressedFile
+    spikesFileToCompressedFile, extractDataFromCompressedFile
 
 
 class CompressionFunctionTests(unittest.TestCase):
@@ -39,8 +40,6 @@ class CompressionFunctionTests(unittest.TestCase):
         self.spikes_files = []
         for file_data in self.files_data:
             self.spikes_files.append(Loaders.loadAEDAT(file_data[0], file_data[1]))
-
-    # TODO: test_decompressDataFromFile
 
     def test_compressAndDecompress(self):
         for i in range(len(self.spikes_files)):
@@ -76,8 +75,7 @@ class CompressionFunctionTests(unittest.TestCase):
                 compressed_file = loadFile(compressed_file_path)
 
                 # Call to compressedFileToSpikesFile function
-                header, spikes_file, final_address_size, final_timestamp_size = \
-                    compressedFileToSpikesFile(compressed_file)
+                header, spikes_file, final_address_size, final_timestamp_size = compressedFileToSpikesFile(compressed_file)
 
                 # Call to spikesFileToCompressedFile function
                 new_compressed_file = spikesFileToCompressedFile(spikes_file, final_address_size, final_timestamp_size,
@@ -87,6 +85,32 @@ class CompressionFunctionTests(unittest.TestCase):
                 # Compare compressed_files
                 self.assertIsNot(compressed_file, new_compressed_file)
                 self.assertEqual(compressed_file, new_compressed_file)
+
+                # Call to compressedFileToSpikesFile function
+                new_header, new_spikes_file, new_final_address_size, new_final_timestamp_size = extractDataFromCompressedFile(compressed_file_path, verbose=False)
+
+                # Comparing header, address_size and timestamp_size
+                self.assertEqual(header.__dict__, new_header.__dict__)
+                self.assertEqual(final_address_size, new_final_address_size)
+                self.assertEqual(final_timestamp_size, new_final_timestamp_size)
+
+                # Compare original and final spikes_file
+                self.assertIsNot(spikes_file, new_spikes_file)
+
+                spikes_file_dict = copy.deepcopy(spikes_file).__dict__
+                spikes_file_dict.pop("addresses")
+                spikes_file_dict.pop("timestamps")
+
+                new_spikes_file_dict = copy.deepcopy(new_spikes_file).__dict__
+                new_spikes_file_dict.pop("addresses")
+                new_spikes_file_dict.pop("timestamps")
+
+                self.assertEqual(spikes_file_dict, new_spikes_file_dict)
+                for j in range(len(spikes_file.addresses)):
+                    self.assertEqual(spikes_file.addresses[j], new_spikes_file.addresses[j])
+                for k in range(len(spikes_file.timestamps)):
+                    self.assertEqual(spikes_file.timestamps[k], new_spikes_file.timestamps[k])
+
 
     def test_getCompressedFile(self):
         for algorithm in self.compression_algorithms:

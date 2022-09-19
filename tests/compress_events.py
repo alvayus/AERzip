@@ -11,7 +11,7 @@ from pyNAVIS import *
 # TODO: Fix and complete documentation and images (remove prunedBytes)
 # TODO: Writing in AEDAT 4.0?
 # TODO: Add a bytesToPrunedBytes function
-from AERzip.compressionFunctions import compressDataFromStoredFile, decompressDataFromFile
+from AERzip.compressionFunctions import compressDataFromStoredFile, extractDataFromCompressedFile
 
 if __name__ == '__main__':
     root = Tk()
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     start_time = time.time()
 
     # Decompress the compressed aedat file
-    spikes_file, new_settings = decompressDataFromFile(dst_path, settings)
+    spikes_file, new_settings = extractDataFromCompressedFile(dst_path, settings)
     gc.collect()  # Cleaning memory
 
     end_time = time.time()

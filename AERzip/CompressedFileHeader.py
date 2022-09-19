@@ -1,3 +1,4 @@
+import pkg_resources
 from pyNAVIS import MainSettings
 
 
@@ -33,7 +34,7 @@ class CompressedFileHeader:
         self.header_length = self.library_version_length + self.compressor_length + self.address_size_length + self.timestamp_size_length + self.optional_length + self.header_end_length
 
         # Values for fixed fields
-        self.library_version = "AERzip v0.6.5"  # TODO: Use AERzip's version
+        self.library_version = "AERzip v" + pkg_resources.get_distribution("AERzip").version   # TODO: Use AERzip's in-code version
         self.compressor = compressor
         self.address_size = address_size
         self.timestamp_size = timestamp_size
