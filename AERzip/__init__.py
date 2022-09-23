@@ -1,7 +1,1 @@
-from AERzip import compressionFunctions, CompressedFileHeader
-
-__all__ = [
-    'CompressedFileHeader',
-    'compressionFunctions',
-    'conversionFunctions'
-]
+__version__ = "0.7.1"

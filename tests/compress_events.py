@@ -7,14 +7,11 @@ from tkinter.filedialog import askopenfilename
 import matplotlib.pyplot as plt
 from pyNAVIS import *
 
-from AERzip import compressionFunctions
-from compressionFunctions import decompressDataFromFile, compressDataFromFile
-
 # TODO: Test files
 # TODO: Fix and complete documentation and images (remove prunedBytes)
 # TODO: Writing in AEDAT 4.0?
 # TODO: Add a bytesToPrunedBytes function
-
+from AERzip.compressionFunctions import compressDataFromStoredFile, extractDataFromCompressedFile
 
 if __name__ == '__main__':
     root = Tk()
@@ -105,13 +102,13 @@ if __name__ == '__main__':
 
     compressor = compressors[number - 1]
 
-    _, dst_path = compressDataFromFile(path, settings, compressor=compressor, ignore_overwriting=False)
+    _, dst_path = compressDataFromStoredFile(path, settings, compressor=compressor, ignore_overwriting=False)
 
     # --- COMPRESSED DATA ---
     start_time = time.time()
 
     # Decompress the compressed aedat file
-    spikes_file, new_settings = decompressDataFromFile(dst_path, settings)
+    spikes_file, new_settings = extractDataFromCompressedFile(dst_path, settings)
     gc.collect()  # Cleaning memory
 
     end_time = time.time()
