@@ -25,7 +25,7 @@ copyright = '2022, Alvaro Ayuso Martinez'
 author = 'Alvaro Ayuso Martinez'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.7.0.post0'
+release = 'v0.7.0'
 
 
 # -- General configuration ---------------------------------------------------
