@@ -111,7 +111,6 @@ class CompressionFunctionTests(unittest.TestCase):
                 for k in range(len(spikes_file.timestamps)):
                     self.assertEqual(spikes_file.timestamps[k], new_spikes_file.timestamps[k])
 
-
     def test_getCompressedFile(self):
         for algorithm in self.compression_algorithms:
             # Define initial objects

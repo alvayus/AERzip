@@ -19,7 +19,7 @@ def bytesToSpikesFile(bytes_data, initial_address_size, initial_timestamp_size, 
     :param int initial_timestamp_size: An int indicating the size of the timestamps in bytes_data.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return:
+    :return: This function returns three different objects, listed below:
     - spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS.
     - final_address_size (int): An int indicating the size of the addresses in the final SpikesFile.
     - final_timestamp_size (int): An int indicating the size of the timestamps in the final SpikesFile.
@@ -114,7 +114,8 @@ def spikesFileToBytes(spikes_file, initial_address_size, initial_timestamp_size,
     :param int final_timestamp_size: An int indicating the size of the timestamps in the final bytearray.
     :param boolean verbose: A boolean indicating whether or not debug comments must be printed.
 
-    :return bytearray bytes_data: The output bytearray.
+    :return: The output bytearray.
+    :rtype: bytearray
     """
     if verbose:
         start_time = time.time()
@@ -206,7 +207,8 @@ def calcRequiredBytes(spikes_file, settings):
     :param SpikesFile spikes_file: The input SpikesFile object from pyNAVIS.
     :param MainSettings settings: A MainSettings object from pyNAVIS.
 
-    :return CompressedFileHeader header: A CompressedFileHeader object.
+    :return: A CompressedFileHeader object.
+    :rtype: CompressedFileHeader
     """
     # Address size
     address_size = int(math.ceil(settings.num_channels * (settings.mono_stereo + 1) *
@@ -229,7 +231,7 @@ def constructStruct(first_field, first_field_size, second_field, second_file_siz
     :param string second_field: A string indicating the name of the second field.
     :param (int, tuple) second_file_size: An int or tuple indicating the number of bytes of the elements of the second field.
 
-    :return struct: A numpy data type structure required to interpret a bytearray.
+    :return: A numpy data type structure required to interpret a bytearray.
     """
 
     struct = np.dtype([(first_field, ">u1", first_field_size), (second_field, ">u1", second_file_size)])

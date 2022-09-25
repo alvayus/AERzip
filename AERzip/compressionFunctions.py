@@ -10,11 +10,10 @@ from pyNAVIS import *
 from AERzip.CompressedFileHeader import CompressedFileHeader
 from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, calcRequiredBytes
 
-
-def compressDataFromStoredFile(file_path, address_size, timestamp_size, compressor, store=True, verbose=True):
-    # TODO: Related to compressDataFromStoredNASFile function
-    # But how to load a generic aedat file
-    pass
+# TODO: Related to compressDataFromStoredNASFile function
+# But how to load a generic aedat file
+'''def compressDataFromStoredFile(file_path, address_size, timestamp_size, compressor, store=True, verbose=True):
+    pass'''
 
 
 def compressDataFromStoredNASFile(initial_file_path, settings, compressor, store=True, ask_user=False, overwrite=False,
@@ -31,7 +30,8 @@ def compressDataFromStoredNASFile(initial_file_path, settings, compressor, store
     :param boolean overwrite: A boolean indicating wheter or not a file that has been found at the specified path must be or not be overwritten.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return bytearray compressed_file: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
+    :return: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
+    :rtype: bytearray
     """
     file_name = os.path.basename(initial_file_path)
     dir_name = os.path.dirname(initial_file_path)
@@ -94,7 +94,7 @@ def extractDataFromCompressedFile(file_path, verbose=True):
     :param string file_path: A string indicating the compressed aedat file path.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return:
+    :return: This function returns two different objects, listed below:
     - spikes_file (SpikesFile): The output SpikesFile object from pyNAVIS. It contains raw spikes.
     - new_settings (MainSettings): A MainSettings object from pyNAVIS. It contains the CompressedFileHeader's address_size and timestamp_size fields.
     """
@@ -143,7 +143,8 @@ def bytesToCompressedFile(bytes_data, header, verbose=True):
     :param string compressor: A string indicating the compressor to be used.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return bytearray compressed_file: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
+    :return: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
+    :rtype: bytearray
     """
     start_time = time.time()
     if verbose:
@@ -171,7 +172,8 @@ def compressedFileToBytes(compressed_file, verbose=True):
     :param bytearray compressed_file: The input bytearray that contains the CompressedFileHeader and the compressed spikes.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return bytearray decompressed_data: The output bytearray. It contains raw spikes shaped as the compressed spikes of the compressed file.
+    :return: The output bytearray. It contains raw spikes shaped as the compressed spikes of the compressed file.
+    :rtype: bytearray
     """
     # Extract the compressed spikes
     header, compressed_data = extractCompressedData(compressed_file)
@@ -206,7 +208,8 @@ def spikesFileToCompressedFile(spikes_file, initial_address_size, initial_timest
     :param string compressor: A string indicating the compressor to be used.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return bytearray compressed_file: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
+    :return: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
+    :rtype: bytearray
     """
     if compressor != "LZMA":
         if verbose:
@@ -245,7 +248,8 @@ def compressedFileToSpikesFile(compressed_file, verbose=False):
     :param bytearray, bytes compressed_file: The input bytearray that contains the CompressedFileHeader and the compressed spikes.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return SpikesFile spikes_file: The output SpikesFile object from pyNAVIS.
+    :return: The output SpikesFile object from pyNAVIS.
+    :rtype: SpikesFile
     """
     # Call to compressedFileToBytes function
     data, header = compressedFileToBytes(compressed_file, verbose=verbose)
@@ -267,7 +271,7 @@ def extractCompressedData(compressed_file, verbose=False):
     :param bytearray, bytes compressed_file: The input bytearray (or bytes). It contains the CompressedFileHeader bound to the compressed spikes.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return:
+    :return: This function returns two different objects, listed below:
     - header (CompressedFileHeader): The output CompressedFileHeader object.
     - compressed_data (bytearray): The output bytearray that contains the compressed spikes.
     """
@@ -319,7 +323,8 @@ def compressData(data, compressor, verbose=True):
     :param string compressor: A string indicating the compressor to be used.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return bytearray compressed_data: The output data (compressed data).
+    :return: The output data (compressed data).
+    :rtype: bytearray
     """
     start_time = time.time()
 
@@ -348,7 +353,8 @@ def decompressData(compressed_data, compressor, verbose=False):
     :param string compressor: A string indicating the compressor to be used.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return bytearray decompressed_data: The output data (decompressed data).
+    :return: The output data (decompressed data).
+    :rtype: bytearray
     """
     start_time = time.time()
 
@@ -377,7 +383,8 @@ def getCompressedFile(header, data, verbose=False):
     :param bytearray, bytes data: The input bytearray containing data to be compressed.
     :param boolean verbose: A boolean indicating whether or not debug comments are printed.
 
-    :return bytearray compressed_file: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
+    :return: The output bytearray. It contains the CompressedFileHeader bound to the compressed spikes data.
+    :rtype: bytearray
     """
     start_time = time.time()
 
@@ -427,7 +434,8 @@ def checkFileExists(initial_file_path, ask_user=False, overwrite=False):
     :param boolean ask_user: A boolean indicating whether or not to prompt the user to overwrite a file that has been found at the specified path.
     :param boolean overwrite: A boolean indicating wheter or not a file that has been found at the specified path must be or not be overwritten.
 
-    :return string final_file_path: The output string indicating where the file will be finally written.
+    :return: The output string indicating where the file will be finally written.
+    :rtype: string
     """
     final_file_path = initial_file_path
 
@@ -466,7 +474,8 @@ def loadFile(file_path):
 
     :param string file_path: A string indicating the file path.
 
-    :return bytearray file_bytes: The output bytearray.
+    :return: The output bytearray.
+    :rtype: bytearray
     """
     # Read all the file
     file = open(file_path, "rb")
