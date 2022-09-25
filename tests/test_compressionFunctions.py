@@ -4,8 +4,9 @@ import unittest
 
 from pyNAVIS import MainSettings, Loaders
 
+import AERzip
 from AERzip.CompressedFileHeader import CompressedFileHeader
-from AERzip.compressionFunctions import compressDataFromStoredFile, compressedFileToSpikesFile, checkFileExists, \
+from AERzip.compressionFunctions import compressedFileToSpikesFile, checkFileExists, \
     getCompressedFile, extractCompressedData, decompressData, compressDataFromStoredNASFile, loadFile, \
     spikesFileToCompressedFile, extractDataFromCompressedFile
 
@@ -84,7 +85,11 @@ class CompressionFunctionTests(unittest.TestCase):
 
                 # Compare compressed_files
                 self.assertIsNot(compressed_file, new_compressed_file)
-                self.assertEqual(compressed_file, new_compressed_file)
+                if compressed_file[8:13].decode("utf-8") != AERzip.__version__:
+                    self.assertNotEqual(compressed_file[0:20], new_compressed_file[0:20])
+                else:
+                    self.assertEqual(compressed_file[0:20], new_compressed_file[0:20])
+                self.assertEqual(compressed_file[20:], new_compressed_file[20:])
 
                 # Call to compressedFileToSpikesFile function
                 new_header, new_spikes_file, new_final_address_size, new_final_timestamp_size = extractDataFromCompressedFile(compressed_file_path, verbose=False)
