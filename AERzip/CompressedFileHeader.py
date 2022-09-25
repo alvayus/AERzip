@@ -65,7 +65,8 @@ class CompressedFileHeader:
         fields. These fields have a fixed position in the returned bytearray, calculated from the length in bytes of
         each.
 
-        :return bytearray header_bytes: The CompressedFileHeader object as a bytearray.
+        :return: The CompressedFileHeader object as a bytearray.
+        :rtype: bytearray
         """
         header_bytes = bytearray()
 
