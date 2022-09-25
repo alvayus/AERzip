@@ -1,3 +1,5 @@
+import sphinx_rtd_theme
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -19,7 +21,7 @@ sys.path.insert(0, os.path.abspath('../../AERzip'))
 # -- Project information -----------------------------------------------------
 
 project = 'AERzip'
-copyright = '2021, Alvaro Ayuso Martinez'
+copyright = '2022, Alvaro Ayuso Martinez'
 author = 'Alvaro Ayuso Martinez'
 
 # The full version, including alpha/beta/rc tags
@@ -32,7 +34,8 @@ release = 'v0.7.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc'
+    'sphinx.ext.autodoc',
+    'sphinx_rtd_theme'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
