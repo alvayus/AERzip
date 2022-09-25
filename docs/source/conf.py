@@ -23,7 +23,7 @@ copyright = '2021, Alvaro Ayuso Martinez'
 author = 'Alvaro Ayuso Martinez'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.6.0'
+release = 'v0.7.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -32,9 +32,7 @@ release = 'v0.6.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinxcontrib.napoleon',
-    'myst_parser'
+    'sphinx.ext.autodoc'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

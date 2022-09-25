@@ -1,6 +1,3 @@
-sphinxcontrib-napoleon
-myst_parser
-
 pyNAVIS
 numpy
 
