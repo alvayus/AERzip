@@ -9,6 +9,7 @@ class CompressedFileHeader:
     A CompressedFileHeader describes the information contained in its associated compressed aedat file.
 
     These are the main attributes of this class:
+
     - library_version (string): A string indicating the library version.
     - compressor (string): A string indicating the compressor used.
     - address_size (int): An int indicating the size of the addresses contained in the compressed file.
@@ -86,8 +87,10 @@ class CompressedFileHeader:
 
     def addMainSettings(self, settings):
         """
-        Stores extra information of a MainSettings object from pyNAVIS in the optional field of the header. This
-        information is summarized here:
+        Stores extra information of a MainSettings object from pyNAVIS in the optional field of the header.
+
+        This information is summarized below:
+
         - num_channels (int): An int indicating the number of channels of the NAS.
         - mono_stereo (int): An int indicating if the file is mono or stereo.
         - ts_tick (float): A float indicating the correspondence factor for timestamps.

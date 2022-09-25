@@ -78,24 +78,28 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AERzip.CompressedFileHeader.</span></span><span class="sig-name descname"><span class="pre">CompressedFileHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A CompressedFileHeader describes the information contained in its associated compressed aedat file.</p>
-<p>These are the main attributes of this class:
-- library_version (string): A string indicating the library version.
-- compressor (string): A string indicating the compressor used.
-- address_size (int): An int indicating the size of the addresses contained in the compressed file.
-- timestamp_size (int): An int indicating the size of the timestamps contained in the compressed file.
-- header_end (string): The string that represents the end of the header in generic aedat files.</p>
+<p>These are the main attributes of this class:</p>
+<ul class="simple">
+<li><p>library_version (string): A string indicating the library version.</p></li>
+<li><p>compressor (string): A string indicating the compressor used.</p></li>
+<li><p>address_size (int): An int indicating the size of the addresses contained in the compressed file.</p></li>
+<li><p>timestamp_size (int): An int indicating the size of the timestamps contained in the compressed file.</p></li>
+<li><p>header_end (string): The string that represents the end of the header in generic aedat files.</p></li>
+</ul>
 <p>Each attribute has an int associated which represents its length in bytes inside the compressed aedat file. These
 ints are not stored in the file and they cannot be changed since they are fixed in the CompressedFileHeader’s
 constructor method, in order to allow compatibility between different versions of AERzip.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.addMainSettings">
 <span class="sig-name descname"><span class="pre">addMainSettings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.addMainSettings" title="Permalink to this definition"></a></dt>
-<dd><p>Stores extra information of a MainSettings object from pyNAVIS in the optional field of the header. This
-information is summarized here:
-- num_channels (int): An int indicating the number of channels of the NAS.
-- mono_stereo (int): An int indicating if the file is mono or stereo.
-- ts_tick (float): A float indicating the correspondence factor for timestamps.
-- on_off (int): An int indicating if the addresses correspond to ON or OFF (or both) spikes</p>
+<dd><p>Stores extra information of a MainSettings object from pyNAVIS in the optional field of the header.</p>
+<p>This information is summarized below:</p>
+<ul class="simple">
+<li><p>num_channels (int): An int indicating the number of channels of the NAS.</p></li>
+<li><p>mono_stereo (int): An int indicating if the file is mono or stereo.</p></li>
+<li><p>ts_tick (float): A float indicating the correspondence factor for timestamps.</p></li>
+<li><p>on_off (int): An int indicating if the addresses correspond to ON or OFF (or both) spikes</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>settings</strong> (<em>MainSettings</em>) – A MainSettings object from pyNAVIS.</p>
@@ -145,7 +149,7 @@ each.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Alvaro Ayuso Martinez.</p>
+    <p>&#169; Copyright 2022, Alvaro Ayuso Martinez.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
