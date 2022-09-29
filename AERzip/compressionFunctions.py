@@ -1,11 +1,10 @@
-import copy
 import os
 import time
 
 import lz4.frame
 import pylzma
 import zstandard
-from pyNAVIS import *
+from pyNAVIS import Functions, Loaders
 
 from AERzip.CompressedFileHeader import CompressedFileHeader
 from AERzip.conversionFunctions import bytesToSpikesFile, spikesFileToBytes, calcRequiredBytes

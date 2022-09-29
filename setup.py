@@ -1,7 +1,5 @@
 from setuptools import setup, find_packages
 
-import AERzip
-
 with open('README.md') as readme_file:
     README = readme_file.read()
 
@@ -10,7 +8,7 @@ with open('README.md') as readme_file:
 
 setup(
     name='AERzip',
-    version=AERzip.__version__,
+    version="0.7.2",  # TODO: Parametrizar version del paquete
     description='Useful tools to compress and decompress AEDAT files in Python',
     # long_description_content_type="text/markdown",
     # long_description=README + '\n\n' + HISTORY,

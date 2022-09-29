@@ -8,7 +8,7 @@
 
 ## About AERzip
 
-AERzip is an open-source Python package which provides a good number of useful tools to allow **AEDAT files compression and decompression**. Its main advantage is decreasing the size of the stored in disk AEDAT files with virtually no increase in processing time, so it could be considered a real-time task.
+AERzip is an open-source Python package that provides a number of useful tools to allow compression and decompression of AEDAT files. Its main advantage is the reduction in the size of the AEDAT files stored on disk without practically increasing the processing time.
 
 ## Installing
 
