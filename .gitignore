@@ -4,8 +4,8 @@ __pycache__/*
 AERzip.egg-info/*
 dist/*
 venv/*
-AERzip\__init__.py
-AERzip\__pycache__\
+AERzip/__init__.py
+AERzip/__pycache__/
 *.dtmp
 *.bkp
 *.pyc

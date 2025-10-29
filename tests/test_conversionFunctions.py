@@ -2,7 +2,6 @@ import copy
 import unittest
 
 from pyNAVIS import MainSettings, Loaders
-
 from AERzip.conversionFunctions import calcRequiredBytes, spikesFileToBytes, bytesToSpikesFile
 
 

@@ -1,8 +1,8 @@
 import os
 import time
 
-import lz4.frame
-import pylzma
+#import lz4.frame
+#import pylzma
 import zstandard
 from pyNAVIS import Functions, Loaders
 
@@ -281,27 +281,27 @@ def extractCompressedData(compressed_file, verbose=False):
 
     # Separate header and compressed data
     start_index = 0
-    end_index = header.library_version_length
+    end_index = header.library_version_size
     header.library_version = compressed_file[start_index:end_index].decode("utf-8").strip()
 
     start_index = end_index
-    end_index = start_index + header.compressor_length
+    end_index = start_index + header.compressor_size
     header.compressor = compressed_file[start_index:end_index].decode("utf-8").strip()
 
     start_index = end_index
-    end_index = start_index + header.address_size_length
+    end_index = start_index + header.address_size_size
     header.address_size = int.from_bytes(compressed_file[start_index:end_index], "big")
 
     start_index = end_index
-    end_index = start_index + header.timestamp_size_length
+    end_index = start_index + header.timestamp_size_size
     header.timestamp_size = int.from_bytes(compressed_file[start_index:end_index], "big")
 
     start_index = end_index
-    end_index = start_index + header.optional_length
+    end_index = start_index + header.optional_size
     header.optional = compressed_file[start_index:end_index]
 
     start_index = end_index
-    end_index = start_index + header.header_end_length
+    end_index = start_index + header.header_end_size
     header.header_end = compressed_file[start_index:end_index].decode("utf-8")
 
     start_index = end_index

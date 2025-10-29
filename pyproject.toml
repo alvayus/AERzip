@@ -1,6 +1,19 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "AERzip"
+version = "0.8.0"
+description = "Useful tools to compress and decompress AEDAT files in Python"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Álvaro Ayuso Martínez", email = "aayuso@us.es"}
 ]
-build-backend = "setuptools.build_meta"
+dependencies = [
+  "pyNAVIS"
+]
+
+[project.urls]
+"Repository" = "https://github.com/alvayus/AERzip"
