@@ -88,9 +88,9 @@
 <img alt="_images/AERzip_CompressedFileHeader.png" src="_images/AERzip_CompressedFileHeader.png" />
 <dl class="py class" id="module-AERzip.CompressedFileHeader">
 <dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AERzip.CompressedFileHeader.</span></span><span class="sig-name descname"><span class="pre">CompressedFileHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AERzip.CompressedFileHeader.</span></span><span class="sig-name descname"><span class="pre">CompressedFileHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AERzip/CompressedFileHeader.html#CompressedFileHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A CompressedFileHeader contains useful metadata for compressed files from AERzip. Thus, compressed files consist of a header and 
+<p>A CompressedFileHeader contains useful metadata for compressed files from AERzip. Thus, compressed files consist of a header and
 the recorded data (addresses and time stamps of the spikes).</p>
 <p>The main fields of this header are the following:</p>
 <ul class="simple">
@@ -103,7 +103,7 @@ the recorded data (addresses and time stamps of the spikes).</p>
 <p>Each field has a specific size. Thus, the sum of the size of all these fields determines the total size of the header.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.addOptional">
-<span class="sig-name descname"><span class="pre">addOptional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.addOptional" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">addOptional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/AERzip/CompressedFileHeader.html#CompressedFileHeader.addOptional"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.addOptional" title="Link to this definition"></a></dt>
 <dd><p>This function allows to insert data (in bytes) into the optional field of the header.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -120,7 +120,7 @@ the recorded data (addresses and time stamps of the spikes).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.toBytes">
-<span class="sig-name descname"><span class="pre">toBytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.toBytes" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">toBytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/AERzip/CompressedFileHeader.html#CompressedFileHeader.toBytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.toBytes" title="Link to this definition"></a></dt>
 <dd><p>This function constructs a bytearray from the CompressedFileHeader object. This facilitates its storage in a compressed file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>

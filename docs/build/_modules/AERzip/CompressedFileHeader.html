@@ -1,0 +1,205 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AERzip.CompressedFileHeader &mdash; AERzip v0.7.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=05c9169f"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            AERzip
+              <img src="../../_static/AERzip_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickIntroduction.html">Quick introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Functions.html">Functions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">AERzip</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">AERzip.CompressedFileHeader</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for AERzip.CompressedFileHeader</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyNAVIS</span><span class="w"> </span><span class="kn">import</span> <span class="n">MainSettings</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">AERzip</span>
+
+
+<div class="viewcode-block" id="CompressedFileHeader">
+<a class="viewcode-back" href="../../Classes.html#AERzip.CompressedFileHeader.CompressedFileHeader">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompressedFileHeader</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A CompressedFileHeader contains useful metadata for compressed files from AERzip. Thus, compressed files consist of a header and </span>
+<span class="sd">    the recorded data (addresses and time stamps of the spikes).</span>
+
+<span class="sd">    The main fields of this header are the following:</span>
+
+<span class="sd">    - library_version (string): A string indicating the library version.</span>
+<span class="sd">    - compressor (string): A string indicating the compressor used.</span>
+<span class="sd">    - address_size (int): An integer indicating the size of the addresses contained in the compressed file.</span>
+<span class="sd">    - timestamp_size (int): An integer indicating the size of the timestamps contained in the compressed file.</span>
+<span class="sd">    - header_end (string): The string that represents the end of the header. This is the string used in generic AEDAT files.</span>
+
+<span class="sd">    Each field has a specific size. Thus, the sum of the size of all these fields determines the total size of the header. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compressor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">address_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamp_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Checking parameters</span>
+        <span class="c1"># TODO: Compressors? Empty for now</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;if compressor is not None and not (compressor == &quot;ZSTD&quot; or compressor == &quot;LZ4&quot; or compressor == &quot;LZMA&quot;):</span>
+<span class="sd">            raise ValueError(&quot;Only ZSTD, LZ4 or LZMA compression algorithms are supported for now&quot;)&#39;&#39;&#39;</span>
+
+        <span class="c1"># Field sizes (bytes)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">library_version_bytes</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compressor_bytes</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address_size_bytes</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_size_bytes</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optional_bytes</span> <span class="o">=</span> <span class="mi">40</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header_end_bytes</span> <span class="o">=</span> <span class="mi">22</span>  <span class="c1"># Size of fixed string &quot;#End Of ASCII Header\r\n&quot;</span>
+
+        <span class="c1"># Other internal attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optional_available</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optional_bytes</span>  <span class="c1"># Allows to control the space available in the optional field</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">library_version_bytes</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">compressor_bytes</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_size_bytes</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_size_bytes</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">optional_bytes</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_end_bytes</span>
+
+        <span class="c1"># Field values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">library_version</span> <span class="o">=</span> <span class="s2">&quot;AERzip v&quot;</span> <span class="o">+</span> <span class="n">AERzip</span><span class="o">.</span><span class="n">__version__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compressor</span> <span class="o">=</span> <span class="n">compressor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address_size</span> <span class="o">=</span> <span class="n">address_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_size</span> <span class="o">=</span> <span class="n">timestamp_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optional</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optional_bytes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header_end</span> <span class="o">=</span> <span class="s2">&quot;#End Of ASCII Header</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+
+<div class="viewcode-block" id="CompressedFileHeader.addOptional">
+<a class="viewcode-back" href="../../Classes.html#AERzip.CompressedFileHeader.CompressedFileHeader.addOptional">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">addOptional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function allows to insert data (in bytes) into the optional field of the header.</span>
+
+<span class="sd">        :param bytearray data: Data to insert into the optional</span>
+<span class="sd">        :raises MemoryError: It is not allowed to use this function when there is not enough space in the optional field.</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data_size</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">optional_available</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">MemoryError</span><span class="p">(</span><span class="s2">&quot;The optional field has reached its maximum capacity.&quot;</span><span class="p">)</span>
+
+        <span class="n">start_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optional_bytes</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">optional_available</span>
+        <span class="n">end_index</span> <span class="o">=</span> <span class="n">start_index</span> <span class="o">+</span> <span class="n">data_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optional</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optional_available</span> <span class="o">-=</span> <span class="n">data_size</span></div>
+
+
+<div class="viewcode-block" id="CompressedFileHeader.toBytes">
+<a class="viewcode-back" href="../../Classes.html#AERzip.CompressedFileHeader.CompressedFileHeader.toBytes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">toBytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function constructs a bytearray from the CompressedFileHeader object. This facilitates its storage in a compressed file.</span>
+
+<span class="sd">        :return: The CompressedFileHeader object as a bytearray.</span>
+<span class="sd">        :rtype: bytearray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The address size must be defined first.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The time stamp size must be defined first.&quot;</span><span class="p">)</span>
+        
+        <span class="n">header_bytes</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+
+        <span class="c1"># Inserting header data</span>
+        <span class="n">header_bytes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">library_version</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">library_version_bytes</span><span class="p">),</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compressor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">header_bytes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compressor</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compressor_bytes</span><span class="p">),</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">header_bytes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compressor_bytes</span><span class="p">),</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+        <span class="n">header_bytes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address_size</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address_size_bytes</span><span class="p">,</span> <span class="s2">&quot;little&quot;</span><span class="p">))</span>
+        <span class="n">header_bytes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_size</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp_size_bytes</span><span class="p">,</span> <span class="s2">&quot;little&quot;</span><span class="p">))</span>
+        <span class="n">header_bytes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optional</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optional_bytes</span><span class="p">))</span>
+        <span class="n">header_bytes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header_end</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header_end_bytes</span><span class="p">),</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">header_bytes</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Alvaro Ayuso Martinez.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
