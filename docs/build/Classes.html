@@ -1,20 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Classes &mdash; AERzip v0.7.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=05c9169f"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -27,12 +28,16 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> AERzip
-            <img src="_static/AERzip_logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            AERzip
+              <img src="_static/AERzip_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -42,7 +47,14 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="QuickIntroduction.html">Quick introduction</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Classes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#AERzip.CompressedFileHeader.CompressedFileHeader"><code class="docutils literal notranslate"><span class="pre">CompressedFileHeader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#AERzip.CompressedFileHeader.CompressedFileHeader.addOptional"><code class="docutils literal notranslate"><span class="pre">CompressedFileHeader.addOptional()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#AERzip.CompressedFileHeader.CompressedFileHeader.toBytes"><code class="docutils literal notranslate"><span class="pre">CompressedFileHeader.toBytes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Functions.html">Functions</a></li>
 </ul>
 
@@ -59,8 +71,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Classes</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Classes</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/Classes.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -71,65 +83,50 @@
            <div itemprop="articleBody">
              
   <section id="classes">
-<h1>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h1>
-<p>This section shows the different classes used in AERzip. There is only one right now, the CompressedFileHeader class.</p>
+<h1>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h1>
+<p>This section shows the different classes used in AERzip. Currently, there is only one class which is used to handle the compressed file header.</p>
 <img alt="_images/AERzip_CompressedFileHeader.png" src="_images/AERzip_CompressedFileHeader.png" />
-<span class="target" id="module-AERzip.CompressedFileHeader"></span><dl class="py class">
+<dl class="py class" id="module-AERzip.CompressedFileHeader">
 <dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AERzip.CompressedFileHeader.</span></span><span class="sig-name descname"><span class="pre">CompressedFileHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AERzip.CompressedFileHeader.</span></span><span class="sig-name descname"><span class="pre">CompressedFileHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A CompressedFileHeader describes the information contained in its associated compressed aedat file.</p>
-<p>These are the main attributes of this class:</p>
+<p>A CompressedFileHeader contains useful metadata for compressed files from AERzip. Thus, compressed files consist of a header and 
+the recorded data (addresses and time stamps of the spikes).</p>
+<p>The main fields of this header are the following:</p>
 <ul class="simple">
 <li><p>library_version (string): A string indicating the library version.</p></li>
 <li><p>compressor (string): A string indicating the compressor used.</p></li>
-<li><p>address_size (int): An int indicating the size of the addresses contained in the compressed file.</p></li>
-<li><p>timestamp_size (int): An int indicating the size of the timestamps contained in the compressed file.</p></li>
-<li><p>header_end (string): The string that represents the end of the header in generic aedat files.</p></li>
+<li><p>address_size (int): An integer indicating the size of the addresses contained in the compressed file.</p></li>
+<li><p>timestamp_size (int): An integer indicating the size of the timestamps contained in the compressed file.</p></li>
+<li><p>header_end (string): The string that represents the end of the header. This is the string used in generic AEDAT files.</p></li>
 </ul>
-<p>Each attribute has an int associated which represents its length in bytes inside the compressed aedat file. These
-ints are not stored in the file and they cannot be changed since they are fixed in the CompressedFileHeader’s
-constructor method, in order to allow compatibility between different versions of AERzip.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.addMainSettings">
-<span class="sig-name descname"><span class="pre">addMainSettings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.addMainSettings" title="Permalink to this definition"></a></dt>
-<dd><p>Stores extra information of a MainSettings object from pyNAVIS in the optional field of the header.</p>
-<p>This information is summarized below:</p>
-<ul class="simple">
-<li><p>num_channels (int): An int indicating the number of channels of the NAS.</p></li>
-<li><p>mono_stereo (int): An int indicating if the file is mono or stereo.</p></li>
-<li><p>ts_tick (float): A float indicating the correspondence factor for timestamps.</p></li>
-<li><p>on_off (int): An int indicating if the addresses correspond to ON or OFF (or both) spikes</p></li>
-</ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>settings</strong> (<em>MainSettings</em>) – A MainSettings object from pyNAVIS.</p>
-</dd>
-</dl>
-</dd></dl>
-
+<p>Each field has a specific size. Thus, the sum of the size of all these fields determines the total size of the header.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.addOptional">
-<span class="sig-name descname"><span class="pre">addOptional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.addOptional" title="Permalink to this definition"></a></dt>
-<dd><p>Adds bytes from data_bytes to the optional field of the header.</p>
+<span class="sig-name descname"><span class="pre">addOptional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.addOptional" title="Link to this definition"></a></dt>
+<dd><p>This function allows to insert data (in bytes) into the optional field of the header.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>data_bytes</strong> (<em>bytearray</em>) – Bytes to add to the optional field</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>bytearray</em>) – Data to insert into the optional</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>MemoryError</strong> – It is not allowed to use this function when there is not enough space in the optional field.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AERzip.CompressedFileHeader.CompressedFileHeader.toBytes">
-<span class="sig-name descname"><span class="pre">toBytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.toBytes" title="Permalink to this definition"></a></dt>
-<dd><p>Constructs a bytearray from the CompressedFileHeader object using the information contained in each of its
-fields. These fields have a fixed position in the returned bytearray, calculated from the length in bytes of
-each.</p>
+<span class="sig-name descname"><span class="pre">toBytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.CompressedFileHeader.CompressedFileHeader.toBytes" title="Link to this definition"></a></dt>
+<dd><p>This function constructs a bytearray from the CompressedFileHeader object. This facilitates its storage in a compressed file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The CompressedFileHeader object as a bytearray.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>bytearray</p>
 </dd>
 </dl>

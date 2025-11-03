@@ -1,24 +1,24 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Functions &mdash; AERzip v0.7.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=05c9169f"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Data compression functions" href="CompressionFunctions.html" />
     <link rel="prev" title="Classes" href="Classes.html" /> 
 </head>
 
@@ -27,12 +27,16 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> AERzip
-            <img src="_static/AERzip_logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            AERzip
+              <img src="_static/AERzip_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -44,8 +48,8 @@
 <li class="toctree-l1"><a class="reference internal" href="QuickIntroduction.html">Quick introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Classes.html">Classes</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Functions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="CompressionFunctions.html">Data compression functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ConversionFunctions.html">Data conversion functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#AERzip.functions.loadCompressedFile"><code class="docutils literal notranslate"><span class="pre">loadCompressedFile()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#AERzip.functions.saveCompressedFile"><code class="docutils literal notranslate"><span class="pre">saveCompressedFile()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -63,8 +67,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Functions</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Functions</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/Functions.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -75,14 +79,49 @@
            <div itemprop="articleBody">
              
   <section id="functions">
-<h1>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h1>
-<img alt="_images/AERzip_Complete.png" src="_images/AERzip_Complete.png" />
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="CompressionFunctions.html">Data compression functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ConversionFunctions.html">Data conversion functions</a></li>
+<h1>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h1>
+<p>This section shows the different functions used in AERzip.</p>
+<dl class="py function" id="module-AERzip.functions">
+<dt class="sig sig-object py" id="AERzip.functions.loadCompressedFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.functions.</span></span><span class="sig-name descname"><span class="pre">loadCompressedFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.functions.loadCompressedFile" title="Link to this definition"></a></dt>
+<dd><p>This function loads a compressed file and returns the addresses and time stamps stored in it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>string</em>) – A string indicating the path of the compressed file to be loaded.</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not to print information about the process.</p></li>
 </ul>
-</div>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing two lists: the addresses and the time stamps stored in the compressed file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AERzip.functions.saveCompressedFile">
+<span class="sig-prename descclassname"><span class="pre">AERzip.functions.</span></span><span class="sig-name descname"><span class="pre">saveCompressedFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addresses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AERzip.functions.saveCompressedFile" title="Link to this definition"></a></dt>
+<dd><p>This function compresses and saves a compressed file from the provided addresses and timestamps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>addresses</strong> (<em>list</em>) – A list containing the addresses of the spikes to be stored.</p></li>
+<li><p><strong>timestamps</strong> (<em>list</em>) – A list containing the timestamps of the spikes to be stored</p></li>
+<li><p><strong>file_path</strong> (<em>string</em>) – A string indicating where the file should be written.</p></li>
+<li><p><strong>max_address</strong> (<em>int</em>) – An integer indicating the maximum address of the addresses list. Not required, but can speed up the compression.</p></li>
+<li><p><strong>max_timestamp</strong> (<em>int</em>) – An integer indicating the maximum time stamp of the timestamps list. Not required, but can speed up the compression.</p></li>
+<li><p><strong>min_timestamp</strong> (<em>int</em>) – An integer indicating the minimum time stamp of the timestamps list. Not required, but can speed up the compression.</p></li>
+<li><p><strong>ask</strong> (<em>boolean</em>) – A boolean indicating whether or not to prompt the user to overwrite a file that has been found at the specified path.</p></li>
+<li><p><strong>overwrite</strong> (<em>boolean</em>) – A boolean indicating wheter or not a file that has been found at the specified path must be or not be overwritten (if the user is not asked).</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – A boolean indicating whether or not to print information about the process.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -90,7 +129,6 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Classes.html" class="btn btn-neutral float-left" title="Classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="CompressionFunctions.html" class="btn btn-neutral float-right" title="Data compression functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

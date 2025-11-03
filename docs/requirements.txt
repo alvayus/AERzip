@@ -1,9 +1,7 @@
 pyNAVIS
 numpy
 
-lz4
-zstandard
-pylzma
+sphinx_rtd_theme
 
 myst_parser
 sphinx!=5.2.0.post0

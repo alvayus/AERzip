@@ -16,9 +16,9 @@ def saveCompressedFile(addresses, timestamps, file_path, max_address=None, max_t
     :param list addresses: A list containing the addresses of the spikes to be stored.
     :param list timestamps: A list containing the timestamps of the spikes to be stored
     :param string file_path: A string indicating where the file should be written.
-    :param int max_address: An integer indicating the maximum address of the addresses list.
-    :param int max_timestamp: An integer indicating the maximum time stamp of the timestamps list.
-    :param int min_timestamp: An integer indicating the minimum time stamp of the timestamps list.
+    :param int max_address: An integer indicating the maximum address of the addresses list. Not required, but can speed up the compression.
+    :param int max_timestamp: An integer indicating the maximum time stamp of the timestamps list. Not required, but can speed up the compression.
+    :param int min_timestamp: An integer indicating the minimum time stamp of the timestamps list. Not required, but can speed up the compression.
     :param boolean ask: A boolean indicating whether or not to prompt the user to overwrite a file that has been found at the specified path.
     :param boolean overwrite: A boolean indicating wheter or not a file that has been found at the specified path must be or not be overwritten (if the user is not asked).
     :param boolean verbose: A boolean indicating whether or not to print information about the process.

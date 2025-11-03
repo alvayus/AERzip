@@ -1,8 +1,9 @@
 Functions
 ---------
 
-.. image:: ../../images/AERzip_Complete.png
+This section shows the different functions used in AERzip.
 
-.. toctree::
-   CompressionFunctions
-   ConversionFunctions
+.. automodule:: AERzip.functions
+   :members:
+   :undoc-members:
+   :show-inheritance:
