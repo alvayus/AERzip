@@ -1,5 +1,7 @@
 from setuptools import setup, find_packages
 
+import AERzip
+
 with open('README.md') as readme_file:
     README = readme_file.read()
 
@@ -8,7 +10,7 @@ with open('README.md') as readme_file:
 
 setup(
     name='AERzip',
-    version="0.8.0",  # TODO: Parametrizar version del paquete
+    version=AERzip.__version__,
     description='Useful tools to compress and decompress AEDAT files in Python',
     # long_description_content_type="text/markdown",
     # long_description=README + '\n\n' + HISTORY,
@@ -23,9 +25,6 @@ setup(
     install_requires=[
         'pyNAVIS>=1.2.5',
         'matplotlib>=3.4.3',
-        'numpy',
-        'lz4>=3.1.3',
-        'zstandard>=0.16.0',
-        'pylzma'
+        'numpy'
     ]
 )
