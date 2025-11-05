@@ -1,5 +1,6 @@
 pyNAVIS
 numpy
+AERzip
 
 sphinx_rtd_theme
 
