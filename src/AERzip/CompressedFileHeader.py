@@ -1,5 +1,3 @@
-from pyNAVIS import MainSettings
-
 import AERzip
 
 

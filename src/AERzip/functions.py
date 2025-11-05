@@ -1,9 +1,6 @@
 import os
-import pickle
-import struct
 import time
 
-import msgpack
 import numpy as np
 
 from AERzip.CompressedFileHeader import CompressedFileHeader
