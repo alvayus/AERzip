@@ -11,7 +11,6 @@ Welcome to the AERzip documentation!
 .. image:: https://img.shields.io/github/downloads/alvaroy96/aerzip/total?label=GitHub%20Downloads&style=plastic   :alt: GitHub all releases
 
 .. toctree::
-   :maxdepth: 2
    :caption: Contents:
 
    Home <self>

@@ -1,4 +1,4 @@
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 from .CompressedFileHeader import CompressedFileHeader
 from .functions import(saveCompressedFile, loadCompressedFile)

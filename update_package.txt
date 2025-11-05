@@ -16,3 +16,6 @@ twine upload dist/*
 pip install AERzip
 
 https://packaging.python.org/tutorials/packaging-projects/
+
+# Para cambiar la versión del paquete
+pyproject.toml, src/AERzip/__init__.py, conf.py
