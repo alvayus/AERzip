@@ -49,7 +49,7 @@ class NewFunctionTests(unittest.TestCase):
             file_basename = os.path.basename(self.file_data[i][0]) 
             print("Processing file: " + file_basename)
 
-            compressed_file_path = "tests/events/compressedEvents/" + file_basename.split(".")[0] + "_compressed.aedat"
+            compressed_file_path = "tests/events/compressedEvents/" + file_basename.split(".")[0] + "_compressed.aerzip"
             saveCompressedFile(addresses, timestamps, compressed_file_path, overwrite=True, verbose=True)
             new_addresses, new_timestamps = loadCompressedFile(compressed_file_path, verbose=True)
             print("\n")
@@ -70,7 +70,7 @@ class NewFunctionTests(unittest.TestCase):
             self.assertTrue((new_timestamps == timestamps).all())
 
             # Cleaning up
-            os.remove(compressed_file_path)
+            #os.remove(compressed_file_path)
 
     def test_compressIdealFile(self):
         print("--- Ideal test ---")
@@ -78,8 +78,9 @@ class NewFunctionTests(unittest.TestCase):
         timestamps = np.random.randint(0, 2 ** 32, size=1000000, dtype=np.uint64)
         timestamps = timestamps - min(timestamps)
 
-        saveCompressedFile(addresses, timestamps, "tests/events/compressedEvents/prueba_ideal.aedat", overwrite=True, verbose=True)
-        new_addresses, new_timestamps = loadCompressedFile("tests/events/compressedEvents/prueba_ideal.aedat", verbose=True)
+        file_name = "ideal_test.aerzip"
+        saveCompressedFile(addresses, timestamps, "tests/events/compressedEvents/" + file_name, overwrite=True, verbose=True)
+        new_addresses, new_timestamps = loadCompressedFile("tests/events/compressedEvents/" + file_name, verbose=True)
 
         # Ordering original arrays by addresses to compare with loaded arrays
         sort_idx = np.lexsort((timestamps, addresses))
@@ -95,7 +96,7 @@ class NewFunctionTests(unittest.TestCase):
         self.assertEqual(len(new_timestamps), len(timestamps))
         self.assertTrue((new_addresses == addresses).all())
         self.assertTrue((new_timestamps == timestamps).all())
-        os.remove("tests/events/compressedEvents/prueba_ideal.aedat")
+        #os.remove("tests/events/compressedEvents/" + file_name)
         
 if __name__ == '__main__':
     unittest.main(verbosity=2)

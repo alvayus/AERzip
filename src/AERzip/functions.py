@@ -51,12 +51,12 @@ def saveCompressedFile(addresses, timestamps, file_path, max_address=None, max_t
 
     # --- STORE DATA ---
     # Check the destination folder
+    dst_path = file_path
+
     if not os.path.exists(os.path.dirname(file_path)):
         os.makedirs(os.path.dirname(file_path))
     else:
         # If the destination folder exists, check if the file exists
-        dst_path = file_path
-
         if os.path.exists(dst_path):
             if ask:
                 print("A file already exists in the specified path.\n"
